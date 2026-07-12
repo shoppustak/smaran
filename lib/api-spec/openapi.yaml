@@ -10,7 +10,45 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: panchang
+    description: Hindu lunar calendar (Panchang) operations, backed by the Vedika API
 paths:
+  /panchang:
+    get:
+      operationId: getPanchang
+      tags: [panchang]
+      summary: Get today's Panchang
+      description: Returns Panchang (Hindu lunar calendar) data for a given date and location, sourced from the Vedika API sandbox.
+      parameters:
+        - name: date
+          in: query
+          required: false
+          description: Date to resolve, ISO 8601 (defaults to today)
+          schema:
+            type: string
+        - name: latitude
+          in: query
+          required: false
+          schema:
+            type: number
+        - name: longitude
+          in: query
+          required: false
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Panchang data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Panchang"
+        "502":
+          description: Upstream Vedika API error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorMessage"
   /healthz:
     get:
       operationId: healthCheck
@@ -33,4 +71,78 @@ components:
           type: string
       required:
         - status
+    Panchang:
+      type: object
+      description: Simplified Panchang summary derived from the Vedika API
+      properties:
+        source:
+          type: string
+          description: Which Vedika environment produced this data
+          enum: [sandbox, production]
+        date:
+          type: string
+        tithi:
+          type: object
+          properties:
+            name:
+              type: string
+            paksha:
+              type: string
+            number:
+              type: integer
+          required: [name, paksha, number]
+        nakshatra:
+          type: object
+          properties:
+            name:
+              type: string
+            lord:
+              type: string
+          required: [name, lord]
+        masa:
+          type: object
+          properties:
+            name:
+              type: string
+            englishEquivalent:
+              type: string
+          required: [name, englishEquivalent]
+        overallAuspiciousness:
+          type: string
+        summary:
+          type: string
+        bestActivities:
+          type: array
+          items:
+            type: string
+        activitiesToAvoid:
+          type: array
+          items:
+            type: string
+        dishaShool:
+          type: object
+          properties:
+            direction:
+              type: string
+            description:
+              type: string
+          required: [direction, description]
+      required:
+        - source
+        - date
+        - tithi
+        - nakshatra
+        - masa
+        - overallAuspiciousness
+        - summary
+        - bestActivities
+        - activitiesToAvoid
+        - dishaShool
+    ApiErrorMessage:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
 

@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout";
+import { PanchangWidget } from "@/components/panchang-widget";
 import { useSmaranStore } from "@/hooks/use-smaran";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +23,8 @@ export default function Dashboard() {
           <h1 className="font-serif text-4xl text-primary">Pranam.</h1>
           <p className="text-muted-foreground text-lg">Your upcoming rituals for this fortnight.</p>
         </div>
+
+        <PanchangWidget />
 
         {upcomingEvents.length === 0 ? (
           <Card className="bg-transparent border-dashed">
