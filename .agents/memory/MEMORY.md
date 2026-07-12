@@ -1,0 +1,1 @@
+- [Smaran product scope](smaran-product.md) — WhatsApp-native purohit ledger; strict negative constraints (no marketplace, no consumer web UI) apply to the real product, not the internal demo.

@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "Smaran"
+version = "1.0.0"
+id = "artifacts/smaran"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22235
+
+[services.development]
+run = "pnpm --filter @workspace/smaran run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/smaran", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/smaran/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22235"
+BASE_PATH = "/"
