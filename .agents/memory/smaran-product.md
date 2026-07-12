@@ -26,3 +26,16 @@ Quirks discovered when wiring this up:
 - Switching sandbox → production is designed to be just an env var flip: set `VEDIKA_API_KEY` (and optionally `VEDIKA_API_BASE_URL`, default `https://api.vedika.io`) and the route auto-switches base URL + adds the Bearer header — no code changes needed.
 
 **Why this matters:** future work extending Panchang usage (e.g. real lapse/conflict date resolution) will hit the "always returns 1995-01-01" limitation immediately — budget for the production tier before treating sandbox output as real dates.
+
+## WhatsApp test layer (Meta Cloud API)
+
+Chose Meta's own WhatsApp Cloud API (not Twilio) for testing, since the blueprint's real target stack is Meta — user explicitly picked this over the Twilio Sandbox connector to avoid a vendor mismatch later. Implemented as `POST /api/whatsapp/send`, `GET/POST /api/whatsapp/webhook`, `GET /api/whatsapp/messages` on `artifacts/api-server`, with a live test panel on the Smaran Settings page. Inbound messages are stored in-memory only (no DB yet, per project scope).
+
+Verified working end-to-end: inbound message from a real WhatsApp number reached the webhook and rendered in the UI within seconds; outbound send correctly reaches Meta's Graph API (confirmed via the expected "recipient not in allowed list" error for an unverified test number).
+
+Quirks discovered when wiring this up:
+- Meta's test-mode setup requires *two separate steps* that are easy to miss: (1) entering the callback URL + verify token in WhatsApp → Configuration, and (2) separately clicking "Subscribe" on the "messages" webhook field in the same page. Step 1 alone registers the URL but sends zero webhook calls — step 2 is what actually triggers delivery.
+- Using the same string for the access token and the verify token is harmless — they're compared independently (one is a Bearer credential for outbound Graph API calls, the other is just an echoed handshake secret for the webhook GET).
+- Test-mode sending only works to phone numbers pre-added as verified test recipients in the Meta dashboard, and only within the 24-hour window opened by that recipient messaging the test number first.
+
+**Why this matters:** this is a test/proof-of-concept integration path, distinct from the blueprint's real production WhatsApp requirement — but since it already uses the real Meta Cloud API (not Twilio), the same route/webhook code should carry forward largely unchanged into production (swap test number/token for a verified business number).
