@@ -1,0 +1,190 @@
+SMARAN — The Complete Blueprint
+
+A WhatsApp-native ledger and practice book for the independent urban purohit
+
+v3.0 · July 2026 · Self-contained: this document supersedes all prior drafts and requires none of them. Parts 5–7 are agent-ready.
+
+
+Part 1 — What Smaran Is
+
+Every independent Hindu priest carries his practice in two places: a paper bahi khata and his memory. In them live 50–200 yajman families — each with its gotra, its ancestral death anniversaries (shraddh tithis), its annual kathas, its festival bookings — obligations reckoned on a lunar calendar that shifts against the Gregorian year and differs by region. When memory slips, a sacred date is missed, a family quietly drifts, income silently leaks.
+
+Smaran (स्मरण — "remembrance") is a WhatsApp bot that becomes the purohit's ledger, calendar, and memory. He speaks or photographs his bahi khata into it once; from then on it converts every family's Hindu dates into this year's actual dates, reminds him ahead of each one, generates the cards he forwards to families, detects the yajmans who have lapsed, guards his festival-season schedule against double-booking, and keeps a corroborated record of every ritual completed and dakshina received — money flowing directly to his own UPI, never through the platform.
+
+It is a tool for the priest, never a marketplace. Families see only their own purohit, always.
+
+Part 2 — The Wedge
+
+The market. India's religious and spiritual economy is enormous, and micro-payment behaviour within it is the most proven in Indian consumer tech: millions of paid sessions and digital offerings monthly across astrology and devotion platforms. Digital fluency among priests is no longer speculative — vendor-side apps exist and are used, and festival-season online demand has pushed traditional priests onto smartphones, digital calendars, and streaming setups.
+
+The backlash. The funded FaithTech incumbents are all aggregators: they commodify ritual ("batch pujas" reciting 50+ family names in one sitting, which devotees increasingly resent as inauthentic), and they treat priests as commissioned agents, retaining up to 50–70% margins on pujas and offerings. Every rupee of VC spent on stranger-discovery marketplaces deepens the resentment of the independent purohit who already has his families — and makes a tool that protects his direct relationships more distinct, not less.
+
+The gap. No one serves the relationship that already exists. Marketplaces replace the family purohit; Smaran defends him. The hereditary purohit ↔ yajman bond — recurring, calendared, trust-dense, entirely unrecorded — is the unowned layer.
+
+The customer, precisely. The independent urban purohit: city-based, self-employed, with an established yajman roster. Not the village archaka on a temple stipend (no wallet), not the elite diaspora priest (different economy). His income is seasonal-spiky (festival peaks, lean inauspicious months) and his deepest professional anxieties are a missed tithi, a drifting yajman, and a double-booked muhurat.
+
+Verified-facts discipline. Two widely-circulated numbers are excluded from this blueprint's case: "50,000 temples in one district" (false — endowment records show figures in the dozens-to-low-thousands per district) and "₹72,000/month average purohit income" (a pilgrimage-city outlier; not transferable to seed wards). Pricing rests on ground contact, not on either stat. Marketplace priest-registration counts are treated as evidence of digital sign-up willingness only, not as the size of the target population.
+
+Part 3 — The Value Ladder
+
+Ordered by what the purohit will actually pay for, not by build order:
+
+
+REMEMBER — every yajman's tithis and annual rituals resolved to real dates, reminded ahead of time. The hygiene layer; the demo "wow."
+RECOVER — the highest-value loop. The system knows the Verma family performed their satyanarayan katha every Kartik for six years and hasn't booked this year; it prompts the purohit to send a respectful namaskar card. One recovered yajman pays for years of subscription. This is what converts the pitch from "reminder app" (convenience) to "income protection" (embedded) — and embedded payers are what the revenue geometry assumes.
+PROTECT — festival-season schedule defense: a "my week" day-sheet on demand, and a conflict warning when two rituals collide on one muhurat window.
+COLLECT — post-ritual dakshina cards with the purohit's own UPI deep link, and a two-party corroborated ledger (Part 5, State 5).
+
+
+The succession promise (retention moat, zero code at launch): purohit practices are hereditary. Smaran commits, in its positioning from day one, to preserving the complete bahi khata — every family, gotra, and tithi — for handover to the purohit's successor. The accumulated record becomes intergenerational.
+
+Part 4 — Business Model & Revenue Geometry
+
+Purohit pricing — annual-first. ₹1,499/year (anchor), positioned immediately after a festival season the tool has just visibly carried him through. ₹999/year early-bird for the seed-ward cohort only. Monthly (₹149) exists as a fallback plan, never the default — a monthly fee invites churn in every lean month, and the purohit's income rhythm is seasonal.
+
+Family layer — load-bearing, not optional. Families receiving cards may subscribe to their own family ritual calendar — reminders of their tithis and festivals, always attributed to and routed through their purohit — at ₹29/month via UPI autopay. The geometry below does not close without this layer.
+
+The back-solve (machine-verified). Unit: the purohit hub (~30 actively reached families each). Feasible solo seed: 70 activated purohits by end of month 4 in 2–3 temple-dense wards of one city. Compounding months m = 8 (M4→M12); one-time purohit-to-purohit invite multiplier k; revenue per activated hub r = (conversion × ARPU) + (30 × family attach × ₹29).
+
+ScenariokConv.Family attachM12 MRRConservative1.025%3%~₹52KMiddle1.1530%5%~₹1.15LPre-registered1.330% @ ₹125/mo-eq5%~₹1.81L
+
+Read this honestly: Smaran clears the ₹1.5–2L MRR month-12 bar only at the optimistic edge of every parameter simultaneously. A structural fact drives this: families cannot recruit priests (a family already has its purohit), so all growth is purohit-to-purohit — sabhas, temple clusters, priest lineages. Social virality, not structural; k is the make-or-break number and it is currently unmeasured.
+
+Pre-registration record (binding):
+
+
+Seed: 70 activated purohits by end M4 · k = 1.3 · purohit conversion 30% at ₹1,499/yr · family attach 5% at ₹29/mo
+Voiding thresholds: observed k < 1.15 at the M4 gate voids the revenue case and reopens the kill question at month 4. Conversion < 22% or attach < 3% at the M8 gate does the same. Parameter revisions in writing only, with the back-solve re-run; a second revision escalates to a full registry review.
+Gates: M0–4 seed (density + observed k; revenue ₹0 by design) → M5–8 geometry (conversion + attach + week-8 retention >60%) → M9–12 replicate.
+
+
+Part 5 — Product Requirements (Agent Doc A)
+
+Platform: WhatsApp Cloud API (interface only), Supabase (PostgreSQL + Edge Functions; the system of record), Vedika API for all Panchang computation (never build astronomical logic), raw dynamic UPI deep links to the purohit's own merchant VPA (no PSP, no gateway). Bot registered with Meta as a task-specific agent ("ritual calendar and ledger assistant for Hindu priests") per the 2026 general-purpose-AI prohibition. All business-initiated outbound uses registered Utility templates (₹0.115–0.15/msg); all conversational follow-ups ride free user-initiated service windows.
+
+State 1 — Onboarding & the first three minutes
+
+Purohit messages the bot. Collect: name, city (geocoded to lat/long for Panchang accuracy), ward/temple-cluster (→ locality_key), merchant UPI ID, and calendar system (purnimanta / amanta) — North and South India reckon the lunar month differently, and this single setting prevents the product's only unforgivable error: a shraddh reminder on the wrong fortnight.
+Design the first three minutes for one family, one date, one card: he enters a single family and a single tithi, and instantly sees it resolved to this year's Gregorian date on a beautifully rendered card. The wow lands before bulk import is ever mentioned.
+
+State 2 — Ingestion (voice-first; never typed forms)
+
+Do not build sequential text-entry prompts. Two paths:
+
+
+Voice: the purohit sends a voice note ("Sharma parivar, gotra Kashyap, pitaji ki punyatithi Bhadrapada Krishna Dwadashi"). Transcribe, extract structured fields (family name, gotra, event type, maas/paksha/tithi), present for one-tap confirm.
+Photo: he photographs bahi khata pages; vision extraction drafts entries; he corrects and confirms.
+Pandits are oral professionals who have never typed a ledger; data entry is where activation lives or dies. Every extraction is confirmed by the purohit before it is written — the AI drafts, the priest ratifies.
+
+
+State 3 — The daily brain (6:00 AM Edge Function)
+
+Queries Vedika for the coming week against the events table, respecting each purohit's calendar system, and triggers:
+
+
+Pre-ritual cards (~7 and ~2 days ahead): tithi/date, ritual name, samagri list, "Confirm ritual ✓" button for the family. No payment link on this card, ever — a shraddh reminder with a UPI link reads as an invoice for remembrance, the exact commercialization the wedge stands against.
+Lapse detection: any family whose annual ritual (by last_performed_year + expected maas) has no booking this cycle → prompt the purohit with a respectful re-engagement namaskar card to forward. Lapse recovery is the product's core value event; instrument it (recoveries are the number the annual-renewal pitch is built on).
+Solemn events (shraddh) and celebratory events (birthdays, kathas) use separate template packs with different copy registers, reviewed by a native speaker before Meta submission.
+
+
+State 4 — Protect (on-demand)
+
+Bot command ("my week" / "इस हफ्ते") returns the purohit's day-sheet: bookings by muhurat window. When a new booking collides with an existing one in the same window, warn before saving.
+
+State 5 — Collect: two-party corroborated payments
+
+There are no payment webhooks in this system and there never can be: raw UPI links settle to the purohit's own VPA, so no bank or PSP ever calls Smaran. Payment truth is corroborated socially:
+
+
+After the ritual date (or the purohit's "completed" tap), the post-ritual card goes out: gratitude framing, dakshina UPI deep link, "Dakshina received ✓" (purohit's copy) and "Confirm ✓" (family's copy — their tap also opens a free service window).
+Ledger: pending → claimed (purohit taps) → corroborated (both have tapped). Never mark paid on one side's assertion.
+Amount is entered by the purohit only; the family's confirm corroborates occurrence, never amount.
+Each corroborated pair is a deposit into the relationship record — the asset.
+
+
+State 6 — Family calendar subscription
+
+On cards a family receives, a subtle offer: "Get your family's ritual calendar" — their own tithis and festival dates, reminded directly, always in their purohit's name. ₹29/month UPI autopay deep link. Managed states: active / lapsed / cancelled, renewal nudges as Utility messages. The family flow must never enable discovery, comparison, or contact with any other purohit.
+
+State 7 — Referral (k-instrumentation)
+
+On demand, the bot generates the purohit's personal referral card ("Share Smaran with a fellow purohit-ji"). Onboardings via it set referred_by_purohit_id. A weekly job computes observed k = referred activations ÷ activated purohits (cohort-tagged) — this is the M4 gate's primary measurement. Seeding strategy targets sabhas and priest associations (one presentation = many hubs), never door-to-door.
+
+Part 6 — Database Schema (Agent Doc B)
+
+sqlCREATE TABLE purohits (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  phone_number TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
+  city TEXT NOT NULL,
+  latitude DOUBLE PRECISION NOT NULL,   -- Vedika accuracy
+  longitude DOUBLE PRECISION NOT NULL,
+  locality_key TEXT NOT NULL,           -- ward / temple-cluster; the density unit
+  upi_id TEXT NOT NULL,                 -- validated Merchant VPA format
+  calendar_system TEXT NOT NULL DEFAULT 'purnimanta',  -- purnimanta | amanta
+  plan TEXT NOT NULL DEFAULT 'trial',   -- trial | annual | monthly | lapsed
+  renews_at TIMESTAMPTZ,
+  trial_ends_at TIMESTAMPTZ,
+  referred_by_purohit_id UUID REFERENCES purohits(id),  -- k instrumentation
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE yajmans (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  purohit_id UUID NOT NULL REFERENCES purohits(id),
+  family_name TEXT NOT NULL,
+  gotra TEXT,
+  whatsapp_number TEXT,
+  locality_key TEXT,                    -- family's ward if known
+  consent_status TEXT NOT NULL DEFAULT 'pending',  -- DPDP: pending | granted | withdrawn
+  family_sub_status TEXT NOT NULL DEFAULT 'none',  -- none | active | lapsed | cancelled
+  family_sub_renews_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  yajman_id UUID NOT NULL REFERENCES yajmans(id),
+  event_type TEXT NOT NULL,             -- shraddh | katha | birthday | griha_pravesh | ...
+  maas TEXT NOT NULL,                   -- e.g. 'Bhadrapada'  (structured; free-string Hindu
+  paksha TEXT NOT NULL,                 --  'Shukla'|'Krishna'  dates cannot be matched
+  tithi SMALLINT NOT NULL,              --  1–15               against Panchang output)
+  last_performed_year SMALLINT,         -- lapse-detection anchor
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE ledger (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  purohit_id UUID NOT NULL REFERENCES purohits(id),
+  yajman_id UUID NOT NULL REFERENCES yajmans(id),
+  event_id UUID REFERENCES events(id),
+  amount_collected NUMERIC(10,2),
+  payment_status TEXT NOT NULL DEFAULT 'pending',  -- pending | claimed | corroborated
+  purohit_claimed_at TIMESTAMPTZ,
+  family_confirmed_at TIMESTAMPTZ,
+  locality_key TEXT NOT NULL,           -- denormalized: density computable from this table alone
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+Density (per-locality activation, event, and corroboration counts) is the leading indicator for the M0–4 gate and must be computable without joins across half the schema — hence locality_key denormalized onto ledger.
+
+Part 7 — Negative Constraints (Agent Doc C — strict)
+
+
+NO marketplace, ratings, search, matching, or discovery — ever. Trust is computed from corroborated interactions, never declared or rated. Families must never see, compare, or reach any other purohit. Every future "growth idea" will disguise itself as this; the answer is permanently no.
+NO consumer app or web UI. The family-side WhatsApp flow is in scope (cards, confirms, ₹29 calendar subscription); an app, portal, or catalog is not.
+NO payment gateways or PSP checkout. Raw dynamic UPI deep links to the purohit's merchant VPA only. Zero commission is the point.
+NO webhook-driven payment states. No webhook will ever arrive (see State 5). Corroboration buttons are the only path to corroborated. Never trust a single side's client-side assertion.
+NO samagri commerce. The samagri list is the value; kits, inventory, and fulfilment break leanness and are someone else's business.
+NO diaspora/NRI payment flows in v1. International UPI is a swamp; revisit at scale.
+NO marketing blasts. Registered Utility templates only; promotional messaging burns cost structure and Meta standing.
+NO system of record on WhatsApp. WhatsApp is the interface; PostgreSQL is the truth. A channel ban must never touch the asset.
+NO custom Panchang engine. Vedika API only.
+
+
+Part 8 — Compliance
+
+
+DPDP Act 2023: gotra and death-anniversary data constitute religious personal data. Minimal collection; a consent line at family-side first contact (consent_status); deletion on request as a built function, not a manual promise. This is also brand: the product's entire identity is sanctity of the relationship.
+Meta 2026: task-specific agent registration; Utility-template discipline (Part 5).
+Domain: use a trust-signaling TLD (smaran.in-class). A disposable-feeling domain contradicts the brand promise on every card the pandit's families ever see.
