@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSmaranStore } from "@/hooks/use-smaran";
+import { WhatsappTestPanel } from "@/components/whatsapp-test-panel";
 
 export default function Settings() {
   const { purohit } = useSmaranStore();
@@ -56,6 +57,8 @@ export default function Settings() {
             </p>
           </CardContent>
         </Card>
+
+        <WhatsappTestPanel />
 
       </div>
     </Layout>

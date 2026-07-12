@@ -9,6 +9,33 @@ import * as zod from 'zod';
 
 
 /**
+ * Sends a free-form WhatsApp message via the Meta Cloud API. Only works within an open 24-hour customer service window (i.e. the recipient must have messaged the test number first).
+ * @summary Send a WhatsApp test message
+ */
+export const SendWhatsappMessageBody = zod.object({
+  "to": zod.string().describe('Recipient phone number in E.164 format (e.g. +919876543210)'),
+  "message": zod.string()
+}).describe('Body for sending a free-form WhatsApp text message')
+
+export const SendWhatsappMessageResponse = zod.object({
+  "status": zod.enum(['sent']),
+  "messageId": zod.string()
+})
+
+
+/**
+ * Returns the most recent inbound messages received via the Meta webhook, newest first. In-memory only, for demo/testing purposes.
+ * @summary List recently received WhatsApp messages
+ */
+export const ListWhatsappMessagesResponseItem = zod.object({
+  "from": zod.string(),
+  "text": zod.string(),
+  "receivedAt": zod.string()
+})
+export const ListWhatsappMessagesResponse = zod.array(ListWhatsappMessagesResponseItem)
+
+
+/**
  * Returns Panchang (Hindu lunar calendar) data for a given date and location, sourced from the Vedika API sandbox.
  * @summary Get today's Panchang
  */

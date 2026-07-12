@@ -62,6 +62,33 @@ export interface ApiErrorMessage {
   error: string;
 }
 
+/**
+ * Body for sending a free-form WhatsApp text message
+ */
+export interface WhatsappMessageInput {
+  /** Recipient phone number in E.164 format (e.g. +919876543210) */
+  to: string;
+  message: string;
+}
+
+export type WhatsappSendResultStatus = typeof WhatsappSendResultStatus[keyof typeof WhatsappSendResultStatus];
+
+
+export const WhatsappSendResultStatus = {
+  sent: 'sent',
+} as const;
+
+export interface WhatsappSendResult {
+  status: WhatsappSendResultStatus;
+  messageId: string;
+}
+
+export interface WhatsappInboundMessage {
+  from: string;
+  text: string;
+  receivedAt: string;
+}
+
 export type GetPanchangParams = {
 /**
  * Date to resolve, ISO 8601 (defaults to today)

@@ -6,11 +6,15 @@
  * OpenAPI spec version: 0.1.0
  */
 import {
+  useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
+  MutationFunction,
   QueryFunction,
   QueryKey,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query';
@@ -19,11 +23,14 @@ import type {
   ApiErrorMessage,
   GetPanchangParams,
   HealthStatus,
-  Panchang
+  Panchang,
+  WhatsappInboundMessage,
+  WhatsappMessageInput,
+  WhatsappSendResult
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
-import type { ErrorType } from '../custom-fetch';
+import type { ErrorType , BodyType } from '../custom-fetch';
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -48,6 +55,156 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getSendWhatsappMessageUrl = () => {
+
+
+
+
+  return `/api/whatsapp/send`
+}
+
+/**
+ * Sends a free-form WhatsApp message via the Meta Cloud API. Only works within an open 24-hour customer service window (i.e. the recipient must have messaged the test number first).
+ * @summary Send a WhatsApp test message
+ */
+export const sendWhatsappMessage = async (whatsappMessageInput: WhatsappMessageInput, options?: RequestInit): Promise<WhatsappSendResult> => {
+
+  return customFetch<WhatsappSendResult>(getSendWhatsappMessageUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(whatsappMessageInput)
+  }
+);}
+
+
+
+
+
+export const getSendWhatsappMessageMutationOptions = <TError = ErrorType<ApiErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sendWhatsappMessage>>, TError,{data: BodyType<WhatsappMessageInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof sendWhatsappMessage>>, TError,{data: BodyType<WhatsappMessageInput>}, TContext> => {
+
+const mutationKey = ['sendWhatsappMessage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof sendWhatsappMessage>>, {data: BodyType<WhatsappMessageInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  sendWhatsappMessage(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SendWhatsappMessageMutationResult = NonNullable<Awaited<ReturnType<typeof sendWhatsappMessage>>>
+    export type SendWhatsappMessageMutationBody = BodyType<WhatsappMessageInput>
+    export type SendWhatsappMessageMutationError = ErrorType<ApiErrorMessage>
+
+    /**
+ * @summary Send a WhatsApp test message
+ */
+export const useSendWhatsappMessage = <TError = ErrorType<ApiErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sendWhatsappMessage>>, TError,{data: BodyType<WhatsappMessageInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof sendWhatsappMessage>>,
+        TError,
+        {data: BodyType<WhatsappMessageInput>},
+        TContext
+      > => {
+      return useMutation(getSendWhatsappMessageMutationOptions(options));
+    }
+
+export const getListWhatsappMessagesUrl = () => {
+
+
+
+
+  return `/api/whatsapp/messages`
+}
+
+/**
+ * Returns the most recent inbound messages received via the Meta webhook, newest first. In-memory only, for demo/testing purposes.
+ * @summary List recently received WhatsApp messages
+ */
+export const listWhatsappMessages = async ( options?: RequestInit): Promise<WhatsappInboundMessage[]> => {
+
+  return customFetch<WhatsappInboundMessage[]>(getListWhatsappMessagesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListWhatsappMessagesQueryKey = () => {
+    return [
+    `/api/whatsapp/messages`
+    ] as const;
+    }
+
+
+export const getListWhatsappMessagesQueryOptions = <TData = Awaited<ReturnType<typeof listWhatsappMessages>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listWhatsappMessages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListWhatsappMessagesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listWhatsappMessages>>> = ({ signal }) => listWhatsappMessages({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listWhatsappMessages>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListWhatsappMessagesQueryResult = NonNullable<Awaited<ReturnType<typeof listWhatsappMessages>>>
+export type ListWhatsappMessagesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List recently received WhatsApp messages
+ */
+
+export function useListWhatsappMessages<TData = Awaited<ReturnType<typeof listWhatsappMessages>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listWhatsappMessages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListWhatsappMessagesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getGetPanchangUrl = (params?: GetPanchangParams,) => {
   const normalizedParams = new URLSearchParams();

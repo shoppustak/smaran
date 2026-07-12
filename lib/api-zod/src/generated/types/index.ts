@@ -15,3 +15,7 @@ export * from './panchangMasa';
 export * from './panchangNakshatra';
 export * from './panchangSource';
 export * from './panchangTithi';
+export * from './whatsappInboundMessage';
+export * from './whatsappMessageInput';
+export * from './whatsappSendResult';
+export * from './whatsappSendResultStatus';

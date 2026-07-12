@@ -12,7 +12,49 @@ tags:
     description: Health operations
   - name: panchang
     description: Hindu lunar calendar (Panchang) operations, backed by the Vedika API
+  - name: whatsapp
+    description: WhatsApp messaging test layer, backed by the Meta WhatsApp Cloud API
 paths:
+  /whatsapp/send:
+    post:
+      operationId: sendWhatsappMessage
+      tags: [whatsapp]
+      summary: Send a WhatsApp test message
+      description: Sends a free-form WhatsApp message via the Meta Cloud API. Only works within an open 24-hour customer service window (i.e. the recipient must have messaged the test number first).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WhatsappMessageInput"
+      responses:
+        "200":
+          description: Message accepted by Meta
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WhatsappSendResult"
+        "502":
+          description: Upstream Meta API error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorMessage"
+  /whatsapp/messages:
+    get:
+      operationId: listWhatsappMessages
+      tags: [whatsapp]
+      summary: List recently received WhatsApp messages
+      description: Returns the most recent inbound messages received via the Meta webhook, newest first. In-memory only, for demo/testing purposes.
+      responses:
+        "200":
+          description: Recent inbound messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WhatsappInboundMessage"
   /panchang:
     get:
       operationId: getPanchang
@@ -145,4 +187,40 @@ components:
           type: string
       required:
         - error
+    WhatsappMessageInput:
+      type: object
+      description: Body for sending a free-form WhatsApp text message
+      properties:
+        to:
+          type: string
+          description: Recipient phone number in E.164 format (e.g. +919876543210)
+        message:
+          type: string
+      required:
+        - to
+        - message
+    WhatsappSendResult:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [sent]
+        messageId:
+          type: string
+      required:
+        - status
+        - messageId
+    WhatsappInboundMessage:
+      type: object
+      properties:
+        from:
+          type: string
+        text:
+          type: string
+        receivedAt:
+          type: string
+      required:
+        - from
+        - text
+        - receivedAt
 
