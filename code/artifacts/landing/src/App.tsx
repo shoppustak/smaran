@@ -1,5 +1,6 @@
 import { LanguageProvider, useLanguage } from "@/context/LanguageContext";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { WhatsAppCta } from "@/components/WhatsAppCta";
 
 function AppContent() {
   const { content } = useLanguage();
@@ -11,6 +12,7 @@ function AppContent() {
         <LanguageToggle />
       </div>
       <p>{content.hero.headlinePrefix + content.hero.headlineEmphasis + content.hero.headlineSuffix}</p>
+      <WhatsAppCta variant="hero" />
     </div>
   );
 }
