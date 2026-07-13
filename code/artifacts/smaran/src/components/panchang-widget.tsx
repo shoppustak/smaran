@@ -37,16 +37,16 @@ export function PanchangWidget() {
           <div>
             <span className="block text-muted-foreground">Tithi</span>
             <span className="font-serif text-primary text-base">
-              {data.tithi.paksha} {data.tithi.name}
+              {data.tithi?.paksha} {data.tithi?.name}
             </span>
           </div>
           <div>
             <span className="block text-muted-foreground">Nakshatra</span>
-            <span className="font-serif text-primary text-base">{data.nakshatra.name}</span>
+            <span className="font-serif text-primary text-base">{data.nakshatra?.name}</span>
           </div>
           <div>
             <span className="block text-muted-foreground">Maas</span>
-            <span className="font-serif text-primary text-base">{data.masa.name}</span>
+            <span className="font-serif text-primary text-base">{data.masa?.name}</span>
           </div>
           <div>
             <span className="block text-muted-foreground">Overall</span>
@@ -56,7 +56,7 @@ export function PanchangWidget() {
         <p className="text-sm text-muted-foreground">{data.summary}</p>
         <div className="flex items-center gap-2 text-xs text-muted-foreground pt-1 border-t border-border/60 mt-2">
           <Compass className="h-3.5 w-3.5" />
-          <span>Disha Shool: {data.dishaShool.direction} — {data.dishaShool.description}</span>
+          <span>Disha Shool: {data.dishaShool?.direction} — {data.dishaShool?.description}</span>
         </div>
       </CardContent>
     </Card>

@@ -14,6 +14,7 @@ import YajmanDetail from '@/pages/yajman-detail';
 import Onboarding from '@/pages/onboarding';
 import { Route, Switch, Router as WouterRouter } from 'wouter';
 
+
 const queryClient = new QueryClient();
 
 function Router() {

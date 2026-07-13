@@ -34,16 +34,6 @@ export function WhatsAppCta({ variant }: WhatsAppCtaProps) {
   return (
     <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-stretch">
       {button}
-      <div className="hidden items-center gap-4 rounded-2xl bg-white/50 p-2 pr-6 shadow-sm ring-1 ring-black/5 backdrop-blur-sm md:flex">
-        <img
-          src="/qr-whatsapp.png"
-          alt={content.hero.qrCaption}
-          className="h-16 w-16 rounded-xl mix-blend-multiply"
-        />
-        <span className="text-sm font-medium text-foreground/80">
-          {content.hero.qrCaption}
-        </span>
-      </div>
     </div>
   );
 }

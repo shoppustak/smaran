@@ -1,6 +1,6 @@
-@import "tailwindcss";
 @import "@workspace/design-tokens/fonts.css";
 @import "@workspace/design-tokens/tokens.css";
+@import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));

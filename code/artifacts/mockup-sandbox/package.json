@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "eslint src --config ../../eslint.config.mjs"
+    "lint": "cd ../.. && pnpm run lint"
   },
   "devDependencies": {
     "@hookform/resolvers": "^3.10.0",
