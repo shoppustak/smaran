@@ -27,7 +27,21 @@ export function Sidebar() {
   return (
     <div className="flex flex-col w-64 bg-sidebar border-r border-sidebar-border min-h-[100dvh] paper-texture">
       <div className="p-6 relative z-10 flex items-center gap-3">
-        <img src="/mark-180.png" alt="" className="h-9 w-9 shrink-0" />
+        <div
+          className="h-12 w-12 shrink-0 bg-primary"
+          // eslint-disable-next-line no-restricted-syntax
+          style={{
+            maskImage: "url(/mark-180.png)",
+            maskSize: "contain",
+            maskRepeat: "no-repeat",
+            maskPosition: "center",
+            WebkitMaskImage: "url(/mark-180.png)",
+            WebkitMaskSize: "contain",
+            WebkitMaskRepeat: "no-repeat",
+            WebkitMaskPosition: "center",
+          }}
+          aria-hidden="true"
+        />
         <div>
           <h1 className="font-serif text-3xl text-primary tracking-tight mb-1">स्मरण</h1>
           <p className="text-sm text-muted-foreground uppercase tracking-widest">Smaran</p>
