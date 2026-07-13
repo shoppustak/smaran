@@ -23,6 +23,7 @@ import type {
   ApiErrorMessage,
   GetPanchangParams,
   HealthStatus,
+  KeepaliveStatus,
   Panchang,
   WhatsappInboundMessage,
   WhatsappMessageInput,
@@ -357,6 +358,84 @@ export function useHealthCheck<TData = Awaited<ReturnType<typeof healthCheck>>, 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getHealthCheckQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getKeepaliveUrl = () => {
+
+
+
+
+  return `/api/keepalive`
+}
+
+/**
+ * Always returns 200, even when the database is unreachable or not configured — external pingers (e.g. cron-job.org) treat non-2xx as failure and auto-disable the job after repeated failures. Use /healthz for a strict health check instead.
+ * @summary Keep-warm endpoint for external uptime pingers
+ */
+export const keepalive = async ( options?: RequestInit): Promise<KeepaliveStatus> => {
+
+  return customFetch<KeepaliveStatus>(getKeepaliveUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getKeepaliveQueryKey = () => {
+    return [
+    `/api/keepalive`
+    ] as const;
+    }
+
+
+export const getKeepaliveQueryOptions = <TData = Awaited<ReturnType<typeof keepalive>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof keepalive>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getKeepaliveQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof keepalive>>> = ({ signal }) => keepalive({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof keepalive>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type KeepaliveQueryResult = NonNullable<Awaited<ReturnType<typeof keepalive>>>
+export type KeepaliveQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Keep-warm endpoint for external uptime pingers
+ */
+
+export function useKeepalive<TData = Awaited<ReturnType<typeof keepalive>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof keepalive>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getKeepaliveQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

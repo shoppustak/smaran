@@ -104,6 +104,22 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /keepalive:
+    get:
+      operationId: keepalive
+      tags: [health]
+      summary: Keep-warm endpoint for external uptime pingers
+      description: >
+        Always returns 200, even when the database is unreachable or not configured —
+        external pingers (e.g. cron-job.org) treat non-2xx as failure and auto-disable
+        the job after repeated failures. Use /healthz for a strict health check instead.
+      responses:
+        "200":
+          description: Always returned, regardless of database state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KeepaliveStatus"
 components:
   schemas:
     HealthStatus:
@@ -113,6 +129,20 @@ components:
           type: string
       required:
         - status
+    KeepaliveStatus:
+      type: object
+      properties:
+        status:
+          type: string
+        database:
+          type: string
+          enum: [ok, cold, not_configured]
+        timestamp:
+          type: string
+      required:
+        - status
+        - database
+        - timestamp
     Panchang:
       type: object
       description: Simplified Panchang summary derived from the Vedika API

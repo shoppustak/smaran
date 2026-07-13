@@ -81,3 +81,14 @@ export const HealthCheckResponse = zod.object({
 })
 
 
+/**
+ * Always returns 200, even when the database is unreachable or not configured — external pingers (e.g. cron-job.org) treat non-2xx as failure and auto-disable the job after repeated failures. Use /healthz for a strict health check instead.
+ * @summary Keep-warm endpoint for external uptime pingers
+ */
+export const KeepaliveResponse = zod.object({
+  "status": zod.string(),
+  "database": zod.enum(['ok', 'cold', 'not_configured']),
+  "timestamp": zod.string()
+})
+
+

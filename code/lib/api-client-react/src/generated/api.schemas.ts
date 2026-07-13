@@ -9,6 +9,21 @@ export interface HealthStatus {
   status: string;
 }
 
+export type KeepaliveStatusDatabase = typeof KeepaliveStatusDatabase[keyof typeof KeepaliveStatusDatabase];
+
+
+export const KeepaliveStatusDatabase = {
+  ok: 'ok',
+  cold: 'cold',
+  not_configured: 'not_configured',
+} as const;
+
+export interface KeepaliveStatus {
+  status: string;
+  database: KeepaliveStatusDatabase;
+  timestamp: string;
+}
+
 /**
  * Which Vedika environment produced this data
  */
