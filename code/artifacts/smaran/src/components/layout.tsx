@@ -118,7 +118,7 @@ export function Sidebar() {
 
 export function Topbar({ title }: { title?: string }) {
   return (
-    <div className="h-16 border-b border-border bg-background flex items-center px-6 sticky top-0 z-20">
+    <div className="h-16 border-b border-border bg-background/50 backdrop-blur-md flex items-center px-6 sticky top-0 z-20">
       <h2 className="font-serif text-xl font-medium">{title}</h2>
     </div>
   );
