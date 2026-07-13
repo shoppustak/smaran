@@ -26,9 +26,12 @@ export function Sidebar() {
 
   return (
     <div className="flex flex-col w-64 bg-sidebar border-r border-sidebar-border min-h-[100dvh] paper-texture">
-      <div className="p-6 relative z-10">
-        <h1 className="font-serif text-3xl text-primary tracking-tight mb-1">स्मरण</h1>
-        <p className="text-sm text-muted-foreground uppercase tracking-widest">Smaran</p>
+      <div className="p-6 relative z-10 flex items-center gap-3">
+        <img src="/mark-180.png" alt="" className="h-9 w-9 shrink-0" />
+        <div>
+          <h1 className="font-serif text-3xl text-primary tracking-tight mb-1">स्मरण</h1>
+          <p className="text-sm text-muted-foreground uppercase tracking-widest">Smaran</p>
+        </div>
       </div>
 
       <div className="px-4 pb-4 border-b border-sidebar-border relative z-10">
