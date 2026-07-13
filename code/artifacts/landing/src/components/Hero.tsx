@@ -1,124 +1,142 @@
+import {
+  BellRing,
+  HeartHandshake,
+  IndianRupee,
+  ShieldCheck,
+  type LucideIcon,
+} from "lucide-react";
+import { useState } from "react";
+
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { WhatsAppCta } from "@/components/WhatsAppCta";
 import { useLanguage } from "@/context/LanguageContext";
+import type { HowItWorksIcon } from "@/types";
+
+const ICONS: Record<HowItWorksIcon, LucideIcon> = {
+  "bell-ring": BellRing,
+  "heart-handshake": HeartHandshake,
+  "shield-check": ShieldCheck,
+  "indian-rupee": IndianRupee,
+};
 
 export function Hero() {
   const { content } = useLanguage();
   const { hero } = content;
+  const [illustrationFailed, setIllustrationFailed] = useState(false);
+  const [first, second, third, fourth] = content.howItWorks.items;
 
   return (
-    <header className="relative min-h-[90vh] overflow-hidden flex flex-col bg-[#FAF9FC]">
-      {/* Tango-style background gradient wash — full hero, edge to edge, clearly visible */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 bg-gradient-to-br from-background via-primary/15 to-secondary/25"
-      />
-      
-      {/* Full-width Top Navigation */}
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-6 sm:px-8">
-        <div className="flex items-center">
-          <div className="flex flex-col items-start leading-none">
-            <span className="font-serif text-3xl font-bold text-slate-900 tracking-tight pb-1">
-              {hero.wordmarkDevanagari}
+    <header className="relative overflow-hidden bg-background">
+      {/* Full-bleed photo — bleeds to the true right edge of the viewport,
+          ignoring the max-w-7xl content constraint. Desktop only. */}
+      <div className="pointer-events-none absolute bottom-0 right-0 top-32 hidden w-[52%] lg:block">
+        {!illustrationFailed && (
+          <img
+            src="/purohit-photo.png"
+            alt=""
+            aria-hidden="true"
+            onError={() => setIllustrationFailed(true)}
+            className="h-full w-full object-cover object-[65%_25%]"
+          />
+        )}
+        {first && (
+          <div className="pointer-events-auto absolute left-6 top-10 z-10 flex items-center gap-2 rounded-full bg-white/95 px-4 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur-sm">
+            <BellRing className="h-4 w-4 text-primary" aria-hidden="true" />
+            <span className="text-sm font-medium text-foreground">
+              {first.label}
             </span>
           </div>
-        </div>
+        )}
+        {second && (
+          <div className="pointer-events-auto absolute right-10 top-1/4 z-10 flex items-center gap-2 rounded-full bg-white/95 px-4 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur-sm">
+            <HeartHandshake className="h-4 w-4 text-secondary" aria-hidden="true" />
+            <span className="text-sm font-medium text-foreground">
+              {second.label}
+            </span>
+          </div>
+        )}
+        {third && (
+          <div className="pointer-events-auto absolute bottom-16 left-10 z-10 flex items-center gap-2 rounded-full bg-white/95 px-4 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur-sm">
+            <ShieldCheck className="h-4 w-4 text-primary" aria-hidden="true" />
+            <span className="text-sm font-medium text-foreground">
+              {third.label}
+            </span>
+          </div>
+        )}
+        {fourth && (
+          <div className="pointer-events-auto absolute bottom-6 right-10 z-10 flex items-center gap-2 rounded-full bg-white/95 px-4 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur-sm">
+            <IndianRupee className="h-4 w-4 text-secondary" aria-hidden="true" />
+            <span className="text-sm font-medium text-foreground">
+              {fourth.label}
+            </span>
+          </div>
+        )}
+        {/* Fade the photo's left and top edges into the page background so
+            the bleed doesn't end in hard seams. */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-background to-transparent"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-background to-transparent"
+        />
+      </div>
+
+      {/* Full-width Top Navigation — single logo lockup image */}
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-8 sm:px-8 sm:py-10">
+        <img
+          src="/logo-lockup.png"
+          alt={hero.wordmarkDevanagari}
+          className="h-12 w-auto sm:h-14"
+        />
         <LanguageToggle />
       </div>
 
-      {/* 2-Column Hero Content */}
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-center gap-12 px-6 pb-12 pt-0 lg:flex-row lg:items-center lg:pt-4 lg:pb-16">
-        
-        {/* Left Column - Typography & CTA */}
-        <div className="flex flex-1 flex-col items-center text-center lg:items-start lg:text-left pt-0 lg:pr-8">
-          <div className="flex items-center justify-center w-20 h-20 rounded-3xl bg-white shadow-xl shadow-black/5 ring-1 ring-black/5 mb-8">
-            <div 
-              className="w-12 h-12 bg-slate-900 shrink-0" 
-              style={{
-                WebkitMaskImage: 'url(/logo_true_vector.svg)',
-                WebkitMaskPosition: 'center',
-                WebkitMaskRepeat: 'no-repeat',
-                WebkitMaskSize: '220%', 
-              }}
-            />
-          </div>
-          <h1 className="font-serif text-5xl font-semibold tracking-tight text-foreground sm:text-6xl lg:text-7xl lg:leading-[1.1]">
+      {/* Text column only — essential height, no forced min-height. The
+          photo bleeds separately behind/beside this on desktop. */}
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-center gap-10 px-6 pb-10 pt-2 text-center lg:items-start lg:pb-14 lg:text-left">
+        <div className="flex w-full flex-col items-center text-center lg:max-w-[48%] lg:items-start lg:text-left">
+          <p className="max-w-xl text-2xl font-medium leading-snug text-foreground sm:text-3xl">
             {hero.headlinePrefix}
-            <span className="text-primary italic pr-2 font-serif font-medium">
-              {hero.headlineEmphasis}
-            </span>
-            <br className="hidden lg:block" />
+            <span className="text-primary italic">{hero.headlineEmphasis}</span>
             {hero.headlineSuffix}
-          </h1>
-          <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground sm:text-2xl">
+          </p>
+          <p className="mt-3 max-w-xl text-base leading-relaxed text-foreground sm:text-lg">
             {hero.subline}
           </p>
-          
-          <div className="mt-10 flex w-full justify-center lg:justify-start">
+
+          <div className="mt-6 flex w-full justify-center lg:justify-start">
             <WhatsAppCta variant="hero" />
           </div>
-        </div>
 
-        {/* Right Column - Visual Composition */}
-        <div className="relative w-full max-w-lg lg:w-[500px] shrink-0">
-          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-primary/5 to-secondary/5 shadow-2xl shadow-primary/5 ring-1 ring-border/50">
-            {/* Soft background blob */}
-            <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
-            <div className="absolute -left-20 bottom-10 h-64 w-64 rounded-full bg-secondary/10 blur-3xl" />
-            
-            {/* The Composed Elements inside the container */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
-              
-              {/* Floating QR Card */}
-              <div className="group relative z-20 flex flex-col items-center gap-4 rounded-3xl bg-white/90 p-6 shadow-xl shadow-primary/10 ring-1 ring-black/5 backdrop-blur-md transition-all duration-300 hover:-translate-y-2 hover:shadow-primary/20">
-                <div className="rounded-2xl bg-white p-2 shadow-sm ring-1 ring-black/5">
-                  <img
-                    src="/qr-whatsapp.png"
-                    alt={content.hero.qrCaption}
-                    className="h-40 w-40 rounded-xl mix-blend-multiply sm:h-48 sm:w-48"
-                  />
+          {/* Compact quick-link row — feature summary pulled above the fold */}
+          <div className="mt-8 grid w-full grid-cols-2 gap-3 sm:max-w-md">
+            {content.howItWorks.items.map((item, index) => {
+              const Icon = ICONS[item.icon];
+              const accent =
+                index % 2 === 0
+                  ? "bg-primary/10 text-primary"
+                  : "bg-secondary/10 text-secondary";
+              const tint = index % 2 === 0 ? "bg-primary/5" : "bg-secondary/5";
+              return (
+                <div
+                  key={item.label}
+                  className={`flex items-center gap-2 rounded-xl px-3 py-2.5 ${tint}`}
+                >
+                  <span
+                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${accent}`}
+                  >
+                    <Icon className="h-4 w-4" aria-hidden="true" />
+                  </span>
+                  <span className="text-sm font-medium text-foreground">
+                    {item.label}
+                  </span>
                 </div>
-                <div className="text-center">
-                  <h3 className="font-semibold text-foreground">Scan with your phone</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">{content.hero.qrCaption}</p>
-                </div>
-              </div>
-
-              {/* Fake WhatsApp Message Bubbles floating behind/below */}
-              <div className="absolute bottom-12 left-6 z-10 max-w-[70%] rounded-2xl rounded-bl-sm bg-white p-4 shadow-sm ring-1 ring-black/5 transform -rotate-2">
-                <p className="text-sm font-medium text-foreground">Next Reminder 🔔</p>
-                <p className="text-xs text-muted-foreground mt-1">Tomorrow: Gayatri Yagya</p>
-              </div>
-              <div className="absolute top-16 right-6 z-10 max-w-[70%] rounded-2xl rounded-br-sm bg-[#D9FDD3] p-4 shadow-sm ring-1 ring-black/5 transform rotate-3">
-                <p className="text-sm font-medium text-foreground">Added to Smaran</p>
-                <p className="text-xs text-muted-foreground mt-1 text-right">✓✓</p>
-              </div>
-
-            </div>
+              );
+            })}
           </div>
         </div>
-
-      </div>
-
-      {/* Elegant Bottom Curve Divider */}
-      <div className="absolute bottom-0 inset-x-0 w-full overflow-hidden leading-none">
-        <svg
-          className="block w-full h-[40px] md:h-[80px]"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 1200 120"
-          preserveAspectRatio="none"
-        >
-          <path
-            d="M0,0 C300,120 900,120 1200,0 L1200,120 L0,120 Z"
-            className="fill-background"
-          ></path>
-          <path
-            d="M0,0 C300,120 900,120 1200,0"
-            className="stroke-border/40"
-            fill="none"
-            strokeWidth="1"
-          ></path>
-        </svg>
       </div>
     </header>
   );

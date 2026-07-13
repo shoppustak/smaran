@@ -7,11 +7,11 @@ export const enContent: LandingContent = {
   hero: {
     wordmarkDevanagari: "स्मरण",
     wordmarkLatin: "Smaran",
-    headlinePrefix: "Your bahi khata — now it ",
-    headlineEmphasis: "remembers",
-    headlineSuffix: " for you",
+    headlinePrefix: "Every family's tithi, ",
+    headlineEmphasis: "reminded ahead of time",
+    headlineSuffix: ".",
     subline:
-      "Every family's tithi, reminded ahead of time, on WhatsApp — always in your name.",
+      "A simple WhatsApp service — built for purohits, for the families they already serve.",
     ctaLabel: "Start on WhatsApp",
     ctaMicrocopy: "No app. No forms. Straight on your WhatsApp.",
     qrCaption: "Scan with your phone",
@@ -51,19 +51,49 @@ export const enContent: LandingContent = {
   },
   pricing: {
     framingLine: "One returned yajman covers years of the fee.",
-    priceLine: "₹1,499 / year",
-    earlyBirdLine: "For the first purohits of your area — ₹999 / year",
+    priceLine: "₹1,100 / year",
     includedItems: [
       "Unlimited families and tithis",
       "Everything on WhatsApp",
       "Try first, decide later",
     ],
     ctaLabel: "Start on WhatsApp",
-    fallbackLine: "A monthly plan at ₹149 is also available.",
+    fallbackLine: "A monthly plan at ₹151 is also available.",
+  },
+  faq: {
+    heading: "Frequently asked questions",
+    items: [
+      {
+        question: "Do I need to download an app?",
+        answer:
+          "No. Smaran works entirely inside WhatsApp — no separate app, no login.",
+      },
+      {
+        question: "Is my families' information safe?",
+        answer:
+          "Yes. Your information is yours alone — never sold, and you can have it removed anytime.",
+      },
+      {
+        question: "My calendar is purnimanta or amanta — does that matter?",
+        answer:
+          "Yes, a great deal. We ask this at the start, so a shraddh or tithi date never lands on the wrong fortnight.",
+      },
+      {
+        question: "Is this like a marketplace?",
+        answer:
+          "No. It's only between you and your own families — no other purohit appears here, no comparison.",
+      },
+      {
+        question: "How does dakshina reach me?",
+        answer:
+          "After the ritual, the family gets a gratitude card with your own UPI link. The money comes straight to you — Smaran never sits in between.",
+      },
+    ],
   },
   footer: {
     ctaLabel: "Start on WhatsApp",
-    successionLine: "Smaran — so that your memory becomes your tradition.",
+    aboutLine:
+      "Smaran is a simple WhatsApp service — built for purohits, for the families they already serve. No app, no middleman — just your dates, in your name, on time.",
     privacyLine:
       "Your families' information is yours alone — never sold, and deleted the moment you ask.",
     copyright: "© स्मरण",

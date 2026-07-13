@@ -1,6 +1,7 @@
+import { FAQ } from "@/components/FAQ";
 import { Footer } from "@/components/Footer";
 import { Hero } from "@/components/Hero";
-import { FeatureBlocks } from "@/components/FeatureBlocks";
+import { TrustPricing } from "@/components/TrustPricing";
 import { LanguageProvider } from "@/context/LanguageContext";
 
 function App() {
@@ -8,7 +9,8 @@ function App() {
     <LanguageProvider>
       <div className="min-h-[100dvh] bg-background text-foreground">
         <Hero />
-        <FeatureBlocks />
+        <TrustPricing />
+        <FAQ />
         <Footer />
       </div>
     </LanguageProvider>

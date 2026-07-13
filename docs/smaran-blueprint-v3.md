@@ -37,22 +37,22 @@ Ordered by what the purohit will actually pay for, not by build order:
 
 ## Part 4 — Business Model & Revenue Geometry
 
-**Purohit pricing — annual-first.** ₹1,499/year (anchor), positioned immediately after a festival season the tool has just visibly carried him through. ₹999/year early-bird for the seed-ward cohort only. Monthly (₹149) exists as a fallback plan, never the default — a monthly fee invites churn in every lean month, and the purohit's income rhythm is seasonal.
+**Purohit pricing — annual-first, auspicious numbers.** ₹1,100/year (anchor), positioned immediately after a festival season the tool has just visibly carried him through. No separate early-bird tier — one price, for everyone, kept low and round on purpose (auspicious/shagun-register number, not a discount-anchored SaaS price). Monthly (₹151) exists as a fallback plan, never the default — a monthly fee invites churn in every lean month, and the purohit's income rhythm is seasonal.
 
-**Family layer — load-bearing, not optional.** Families receiving cards may subscribe to their own family ritual calendar — reminders of their tithis and festivals, always attributed to and routed through their purohit — at ₹29/month via UPI autopay. The geometry below does not close without this layer.
+**Family layer — load-bearing, not optional.** Families receiving cards may subscribe to their own family ritual calendar — reminders of their tithis and festivals, always attributed to and routed through their purohit — at ₹21/month via UPI autopay. The geometry below does not close without this layer.
 
-**The back-solve (machine-verified).** Unit: the purohit hub (~30 actively reached families each). Feasible solo seed: **70 activated purohits by end of month 4** in 2–3 temple-dense wards of one city. Compounding months m = 8 (M4→M12); one-time purohit-to-purohit invite multiplier k; revenue per activated hub r = (conversion × ARPU) + (30 × family attach × ₹29).
+**The back-solve (machine-verified, revised for the ₹1,100/₹21 price revision below).** Unit: the purohit hub (~30 actively reached families each). Feasible solo seed: **70 activated purohits by end of month 4** in 2–3 temple-dense wards of one city. Compounding months m = 8 (M4→M12); one-time purohit-to-purohit invite multiplier k; revenue per activated hub r = (conversion × ARPU) + (30 × family attach × ₹21), ARPU = ₹1,100/12 ≈ ₹91.7/mo-eq (previously ₹125/mo-eq at the ₹1,499 anchor).
 
 | Scenario | k | Conv. | Family attach | M12 MRR |
 |---|---|---|---|---|
-| Conservative | 1.0 | 25% | 3% | ~₹52K |
-| Middle | 1.15 | 30% | 5% | ~₹1.15L |
-| **Pre-registered** | **1.3** | **30% @ ₹125/mo-eq** | **5%** | **~₹1.81L** |
+| Conservative | 1.0 | 25% | 3% | ~₹38K |
+| Middle | 1.15 | 30% | 5% | ~₹84K |
+| **Pre-registered** | **1.3** | **30% @ ₹91.7/mo-eq** | **5%** | **~₹1.32L** |
 
-**Read this honestly: Smaran clears the ₹1.5–2L MRR month-12 bar only at the optimistic edge of every parameter simultaneously.** A structural fact drives this: families cannot recruit priests (a family already has its purohit), so all growth is purohit-to-purohit — sabhas, temple clusters, priest lineages. Social virality, not structural; k is the make-or-break number and it is currently unmeasured.
+**Read this honestly: at the revised ₹1,100/₹21 prices, Smaran no longer clears the ₹1.5–2L MRR month-12 bar even at the optimistic edge of every parameter — the Pre-registered scenario lands at ~₹1.32L.** This was a deliberate, acknowledged trade: auspicious/shagun-register pricing was judged more important to this audience's trust and adoption than preserving the original revenue bar, and the product's near-$0/month infra cost (see platform architecture KB) makes ~₹1.32L MRR viable to sustain on. If growth (k) or conversion outperforms the Pre-registered row, the case improves further; it is not re-padded back up to ₹1.5–2L by assumption. A structural fact still drives the shape of this: families cannot recruit priests (a family already has its purohit), so all growth is purohit-to-purohit — sabhas, temple clusters, priest lineages. Social virality, not structural; k is the make-or-break number and it is currently unmeasured.
 
-**Pre-registration record (binding):**
-- Seed: 70 activated purohits by end M4 · k = 1.3 · purohit conversion 30% at ₹1,499/yr · family attach 5% at ₹29/mo
+**Pre-registration record (binding, revised 2026-07-14):**
+- Seed: 70 activated purohits by end M4 · k = 1.3 · purohit conversion 30% at ₹1,100/yr · family attach 5% at ₹21/mo
 - **Voiding thresholds:** observed k < 1.15 at the M4 gate voids the revenue case and reopens the kill question at month 4. Conversion < 22% or attach < 3% at the M8 gate does the same. Parameter revisions in writing only, with the back-solve re-run; a second revision escalates to a full registry review.
 - Gates: M0–4 seed (density + observed k; revenue ₹0 by design) → M5–8 geometry (conversion + attach + week-8 retention >60%) → M9–12 replicate.
 

@@ -35,17 +35,20 @@ export interface LandingContent {
     heading: string;
     statements: string[];
   };
+  faq: {
+    heading: string;
+    items: { question: string; answer: string }[];
+  };
   pricing: {
     framingLine: string;
     priceLine: string;
-    earlyBirdLine: string;
     includedItems: string[];
     ctaLabel: string;
     fallbackLine: string;
   };
   footer: {
     ctaLabel: string;
-    successionLine: string;
+    aboutLine: string;
     privacyLine: string;
     copyright: string;
   };
