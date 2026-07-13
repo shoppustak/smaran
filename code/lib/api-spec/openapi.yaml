@@ -1,0 +1,226 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: panchang
+    description: Hindu lunar calendar (Panchang) operations, backed by the Vedika API
+  - name: whatsapp
+    description: WhatsApp messaging test layer, backed by the Meta WhatsApp Cloud API
+paths:
+  /whatsapp/send:
+    post:
+      operationId: sendWhatsappMessage
+      tags: [whatsapp]
+      summary: Send a WhatsApp test message
+      description: Sends a free-form WhatsApp message via the Meta Cloud API. Only works within an open 24-hour customer service window (i.e. the recipient must have messaged the test number first).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WhatsappMessageInput"
+      responses:
+        "200":
+          description: Message accepted by Meta
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WhatsappSendResult"
+        "502":
+          description: Upstream Meta API error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorMessage"
+  /whatsapp/messages:
+    get:
+      operationId: listWhatsappMessages
+      tags: [whatsapp]
+      summary: List recently received WhatsApp messages
+      description: Returns the most recent inbound messages received via the Meta webhook, newest first. In-memory only, for demo/testing purposes.
+      responses:
+        "200":
+          description: Recent inbound messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WhatsappInboundMessage"
+  /panchang:
+    get:
+      operationId: getPanchang
+      tags: [panchang]
+      summary: Get today's Panchang
+      description: Returns Panchang (Hindu lunar calendar) data for a given date and location, sourced from the Vedika API sandbox.
+      parameters:
+        - name: date
+          in: query
+          required: false
+          description: Date to resolve, ISO 8601 (defaults to today)
+          schema:
+            type: string
+        - name: latitude
+          in: query
+          required: false
+          schema:
+            type: number
+        - name: longitude
+          in: query
+          required: false
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Panchang data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Panchang"
+        "502":
+          description: Upstream Vedika API error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorMessage"
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    Panchang:
+      type: object
+      description: Simplified Panchang summary derived from the Vedika API
+      properties:
+        source:
+          type: string
+          description: Which Vedika environment produced this data
+          enum: [sandbox, production]
+        date:
+          type: string
+        tithi:
+          type: object
+          properties:
+            name:
+              type: string
+            paksha:
+              type: string
+            number:
+              type: integer
+          required: [name, paksha, number]
+        nakshatra:
+          type: object
+          properties:
+            name:
+              type: string
+            lord:
+              type: string
+          required: [name, lord]
+        masa:
+          type: object
+          properties:
+            name:
+              type: string
+            englishEquivalent:
+              type: string
+          required: [name, englishEquivalent]
+        overallAuspiciousness:
+          type: string
+        summary:
+          type: string
+        bestActivities:
+          type: array
+          items:
+            type: string
+        activitiesToAvoid:
+          type: array
+          items:
+            type: string
+        dishaShool:
+          type: object
+          properties:
+            direction:
+              type: string
+            description:
+              type: string
+          required: [direction, description]
+      required:
+        - source
+        - date
+        - tithi
+        - nakshatra
+        - masa
+        - overallAuspiciousness
+        - summary
+        - bestActivities
+        - activitiesToAvoid
+        - dishaShool
+    ApiErrorMessage:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+    WhatsappMessageInput:
+      type: object
+      description: Body for sending a free-form WhatsApp text message
+      properties:
+        to:
+          type: string
+          description: Recipient phone number in E.164 format (e.g. +919876543210)
+        message:
+          type: string
+      required:
+        - to
+        - message
+    WhatsappSendResult:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [sent]
+        messageId:
+          type: string
+      required:
+        - status
+        - messageId
+    WhatsappInboundMessage:
+      type: object
+      properties:
+        from:
+          type: string
+        text:
+          type: string
+        receivedAt:
+          type: string
+      required:
+        - from
+        - text
+        - receivedAt
+
