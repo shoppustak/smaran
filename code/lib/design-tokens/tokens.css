@@ -64,57 +64,57 @@
   --elevate-1: rgba(0, 0, 0, 0.03);
   --elevate-2: rgba(0, 0, 0, 0.08);
 
-  /* Sandalwood / Aged paper vibe */
-  --background: 40 33% 96%;
-  --foreground: 215 20% 20%;
+  /* Clean white / near-black, Tango-style */
+  --background: 0 0% 100%;
+  --foreground: 240 10% 4%;
 
-  --border: 40 20% 80%;
+  --border: 240 6% 90%;
 
-  --card: 40 40% 98%;
-  --card-foreground: 215 20% 20%;
-  --card-border: 40 20% 85%;
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 4%;
+  --card-border: 240 6% 90%;
 
-  --popover: 40 40% 98%;
-  --popover-foreground: 215 20% 20%;
-  --popover-border: 40 20% 85%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 4%;
+  --popover-border: 240 6% 90%;
 
-  /* Deep Marigold / Kumkum */
-  --primary: 28 85% 45%;
+  /* Tango violet */
+  --primary: 262 83% 58%;
   --primary-foreground: 0 0% 100%;
 
-  /* Temple Brass */
-  --secondary: 45 40% 60%;
+  /* Tango terracotta-orange */
+  --secondary: 16 75% 55%;
   --secondary-foreground: 0 0% 100%;
 
-  --muted: 40 20% 90%;
-  --muted-foreground: 215 10% 45%;
+  --muted: 240 5% 96%;
+  --muted-foreground: 240 4% 46%;
 
-  --accent: 40 30% 90%;
-  --accent-foreground: 215 20% 20%;
+  --accent: 240 5% 96%;
+  --accent-foreground: 240 10% 4%;
 
   --destructive: 0 70% 50%;
   --destructive-foreground: 0 0% 100%;
 
-  --input: 40 20% 80%;
-  --ring: 28 85% 45%;
+  --input: 240 6% 90%;
+  --ring: 262 83% 58%;
 
-  --sidebar: 40 33% 94%;
-  --sidebar-foreground: 215 20% 20%;
-  --sidebar-border: 40 20% 85%;
-  --sidebar-primary: 28 85% 45%;
+  --sidebar: 240 5% 98%;
+  --sidebar-foreground: 240 10% 4%;
+  --sidebar-border: 240 6% 90%;
+  --sidebar-primary: 262 83% 58%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 40 30% 88%;
-  --sidebar-accent-foreground: 215 20% 20%;
-  --sidebar-ring: 28 85% 45%;
+  --sidebar-accent: 240 5% 94%;
+  --sidebar-accent-foreground: 240 10% 4%;
+  --sidebar-ring: 262 83% 58%;
 
-  --chart-1: 28 85% 45%;
-  --chart-2: 45 40% 60%;
-  --chart-3: 215 20% 30%;
-  --chart-4: 15 60% 50%;
-  --chart-5: 40 30% 70%;
+  --chart-1: 262 83% 58%;
+  --chart-2: 16 75% 55%;
+  --chart-3: 240 10% 25%;
+  --chart-4: 280 60% 65%;
+  --chart-5: 240 5% 70%;
 
-  --app-font-sans: 'DM Sans', sans-serif;
-  --app-font-serif: 'Fraunces', serif;
+  --app-font-sans: 'Inter', sans-serif;
+  --app-font-serif: 'Playfair Display', serif;
   --app-font-mono: Menlo, monospace;
 
   --radius: 0.5rem; /* 8px */
@@ -122,43 +122,43 @@
 
 /* No dark mode needed unless explicitly requested, but setting cohesive fallbacks just in case */
 .dark {
-  --background: 215 20% 10%;
-  --foreground: 40 33% 96%;
+  --background: 240 10% 4%;
+  --foreground: 0 0% 98%;
 
-  --border: 215 20% 20%;
+  --border: 240 6% 20%;
 
-  --card: 215 20% 12%;
-  --card-foreground: 40 33% 96%;
-  --card-border: 215 20% 20%;
+  --card: 240 8% 7%;
+  --card-foreground: 0 0% 98%;
+  --card-border: 240 6% 20%;
 
-  --popover: 215 20% 12%;
-  --popover-foreground: 40 33% 96%;
-  --popover-border: 215 20% 20%;
+  --popover: 240 8% 7%;
+  --popover-foreground: 0 0% 98%;
+  --popover-border: 240 6% 20%;
 
-  --primary: 28 85% 55%;
-  --primary-foreground: 0 0% 10%;
+  --primary: 263 70% 68%;
+  --primary-foreground: 240 10% 4%;
 
-  --secondary: 45 40% 60%;
-  --secondary-foreground: 0 0% 10%;
+  --secondary: 18 80% 65%;
+  --secondary-foreground: 240 10% 4%;
 
-  --muted: 215 20% 20%;
-  --muted-foreground: 40 20% 70%;
+  --muted: 240 4% 16%;
+  --muted-foreground: 240 5% 65%;
 
-  --accent: 215 20% 20%;
-  --accent-foreground: 40 33% 96%;
+  --accent: 240 4% 16%;
+  --accent-foreground: 0 0% 98%;
 
   --destructive: 0 60% 50%;
   --destructive-foreground: 0 0% 100%;
 
-  --input: 215 20% 20%;
-  --ring: 28 85% 55%;
+  --input: 240 4% 16%;
+  --ring: 263 70% 68%;
 
-  --sidebar: 215 20% 12%;
-  --sidebar-foreground: 40 33% 96%;
-  --sidebar-border: 215 20% 20%;
-  --sidebar-primary: 28 85% 55%;
-  --sidebar-primary-foreground: 0 0% 10%;
-  --sidebar-accent: 215 20% 20%;
-  --sidebar-accent-foreground: 40 33% 96%;
-  --sidebar-ring: 28 85% 55%;
+  --sidebar: 240 8% 7%;
+  --sidebar-foreground: 0 0% 98%;
+  --sidebar-border: 240 6% 20%;
+  --sidebar-primary: 263 70% 68%;
+  --sidebar-primary-foreground: 240 10% 4%;
+  --sidebar-accent: 240 4% 16%;
+  --sidebar-accent-foreground: 0 0% 98%;
+  --sidebar-ring: 263 70% 68%;
 }
