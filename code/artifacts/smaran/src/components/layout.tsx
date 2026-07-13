@@ -28,7 +28,7 @@ export function Sidebar() {
     <div className="flex flex-col w-64 bg-sidebar border-r border-sidebar-border min-h-[100dvh] paper-texture">
       <div className="p-6 relative z-10 flex items-center gap-3">
         <div
-          className="h-12 w-12 shrink-0 bg-primary"
+          className="h-20 w-20 shrink-0 bg-gradient-to-br from-primary to-purple-400"
           // eslint-disable-next-line no-restricted-syntax
           style={{
             maskImage: "url(/mark-180.png)",
@@ -126,13 +126,22 @@ export function Topbar({ title }: { title?: string }) {
 
 export function Layout({ children, title }: { children: React.ReactNode, title?: string }) {
   return (
-    <div className="flex min-h-[100dvh] w-full bg-background">
-      <Sidebar />
-      <div className="flex-1 flex flex-col max-w-5xl">
-        <Topbar title={title} />
-        <main className="flex-1 p-6 md:p-8 overflow-y-auto">
-          {children}
-        </main>
+    <div className="flex min-h-[100dvh] w-full bg-background relative overflow-hidden">
+      {/* Ambient Background Gradients */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        <div className="absolute -top-[20%] -right-[10%] h-[500px] w-[500px] rounded-full bg-primary/20 blur-[120px]" />
+        <div className="absolute top-[40%] -left-[10%] h-[600px] w-[600px] rounded-full bg-purple-500/10 blur-[150px]" />
+        <div className="absolute -bottom-[20%] right-[10%] h-[500px] w-[500px] rounded-full bg-secondary/10 blur-[120px]" />
+      </div>
+      
+      <div className="relative z-10 flex min-h-[100dvh] w-full">
+        <Sidebar />
+        <div className="flex-1 flex flex-col w-full max-w-5xl mx-auto">
+          <Topbar title={title} />
+          <main className="flex-1 p-6 md:p-8 overflow-y-auto">
+            {children}
+          </main>
+        </div>
       </div>
     </div>
   );
