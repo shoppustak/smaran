@@ -21,7 +21,7 @@ export function WhatsAppCta({ variant }: WhatsAppCtaProps) {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-base font-semibold text-primary-foreground shadow-sm transition hover:opacity-90"
+      className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-4 text-lg font-medium text-primary-foreground shadow-lg shadow-primary/25 transition hover:opacity-90 hover:shadow-xl hover:-translate-y-0.5"
     >
       {label}
     </a>
@@ -32,15 +32,15 @@ export function WhatsAppCta({ variant }: WhatsAppCtaProps) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-4 sm:flex-row">
+    <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-stretch">
       {button}
-      <div className="hidden flex-col items-center gap-1 md:flex">
+      <div className="hidden items-center gap-4 rounded-2xl bg-white/50 p-2 pr-6 shadow-sm ring-1 ring-black/5 backdrop-blur-sm md:flex">
         <img
           src="/qr-whatsapp.png"
           alt={content.hero.qrCaption}
-          className="h-28 w-28 rounded-md border border-border"
+          className="h-16 w-16 rounded-xl mix-blend-multiply"
         />
-        <span className="text-xs text-muted-foreground">
+        <span className="text-sm font-medium text-foreground/80">
           {content.hero.qrCaption}
         </span>
       </div>
