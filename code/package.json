@@ -13,7 +13,10 @@
     "@replit/connectors-sdk": "^0.4.1"
   },
   "devDependencies": {
+    "@rollup/rollup-darwin-arm64": "4.62.2",
+    "eslint": "catalog:",
     "prettier": "^3.9.4",
-    "typescript": "~5.9.3"
+    "typescript": "~5.9.3",
+    "typescript-eslint": "catalog:"
   }
 }
