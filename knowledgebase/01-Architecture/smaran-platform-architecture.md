@@ -79,3 +79,29 @@ Corroborated Payments → Daily Brain → Schedule Protection → Family Calenda
 have started as of this doc's `_last_updated` — this architecture doc describes what's in the
 codebase today (scaffolding + test routes + mockups), not the planned end state. Don't treat
 ROADMAP.md phases as built until this doc is updated to say so.
+
+## Deployment
+
+Production: one Render free Web Service (`smaran-api`, `render.yaml` at repo root),
+kept perpetually warm by an external pinger (cron-job.org, every 5 min) hitting
+`GET /api/keepalive` — ported from `/Users/maulik/streethawk`'s minibag project,
+which discovered the pattern the hard way (a strict health-check endpoint gets
+external pingers auto-disabled on any transient failure; `/keepalive` always
+returns 200 regardless of DB state). Database: Supabase free project
+(`smaran-prod`). Custom domain: `api.smaran.click`.
+
+No persistent staging host — Render's free tier shares a 750 free instance-hour/
+month budget across the whole workspace, and keeping even one service perpetually
+warm already consumes nearly all of it (the same reason minibag's own design docs
+give for never running a second free Render service). Staging is local dev
+(`pnpm --dir code --filter @workspace/api-server run dev`, the same command the
+root Playwright suite boots) against a separate `smaran-dev` Supabase project and
+a separate Meta WhatsApp test app.
+
+As of this doc's `_last_updated`, none of this is provisioned yet — `render.yaml`,
+the `/api/keepalive` route, and `.env.example` are all implemented and verified
+locally (see `docs/superpowers/plans/2026-07-13-staging-prod-infra.md` Tasks 1-5),
+but the Render service, both Supabase projects, the cron-job.org pinger, and the
+`api.smaran.click` DNS record (Tasks 6-7, manual/external) have not been created.
+
+Full design: `docs/superpowers/specs/2026-07-13-staging-prod-infra-design.md`.

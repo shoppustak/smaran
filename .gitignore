@@ -4,3 +4,8 @@ Thumbs.db
 
 # GSD staging (kept locally, not synced)
 .planning/intel/classifications/
+
+# Root npm project (E2E suite)
+node_modules/
+test-results/
+playwright-report/
