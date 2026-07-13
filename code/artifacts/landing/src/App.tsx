@@ -1,3 +1,4 @@
+import { Footer } from "@/components/Footer";
 import { Hero } from "@/components/Hero";
 import { HowItWorks } from "@/components/HowItWorks";
 import { PricingCard } from "@/components/PricingCard";
@@ -12,6 +13,7 @@ function App() {
         <HowItWorks />
         <TrustRow />
         <PricingCard />
+        <Footer />
       </div>
     </LanguageProvider>
   );
