@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: smaran-api
+    env: node
+    region: singapore
+    plan: free
+    branch: main
+    autoDeploy: true
+    buildCommand: cd code && pnpm install && pnpm --filter @workspace/api-server run build
+    startCommand: node code/artifacts/api-server/dist/index.mjs
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: DATABASE_URL
+        sync: false
+      - key: WHATSAPP_ACCESS_TOKEN
+        sync: false
+      - key: WHATSAPP_PHONE_NUMBER_ID
+        sync: false
+      - key: WHATSAPP_VERIFY_TOKEN
+        sync: false
+      - key: VEDIKA_API_KEY
+        sync: false
+      - key: VEDIKA_API_BASE_URL
+        sync: false
+    healthCheckPath: /api/healthz
+    customDomains:
+      - api.smaran.click
