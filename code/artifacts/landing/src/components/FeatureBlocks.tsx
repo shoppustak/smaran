@@ -1,4 +1,5 @@
 import { useLanguage } from "@/context/LanguageContext";
+import { CalendarHeart, ShieldCheck } from "lucide-react";
 
 export function FeatureBlocks() {
   const { content } = useLanguage();
@@ -10,6 +11,9 @@ export function FeatureBlocks() {
         {/* Block 1: Reminders & Reconnect (Text Left, Visual Right) */}
         <div className="flex flex-col gap-12 lg:flex-row lg:items-center lg:gap-24">
           <div className="flex flex-1 flex-col justify-center text-center lg:text-left">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-[1.25rem] bg-primary/10 ring-1 ring-primary/20 mb-8 lg:mx-0 mx-auto shadow-sm text-primary">
+               <CalendarHeart className="h-8 w-8" strokeWidth={2} />
+            </div>
             <h2 className="font-serif text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">
               Never miss a <span className="font-serif italic text-primary">Tithi</span>
             </h2>
@@ -70,8 +74,13 @@ export function FeatureBlocks() {
           </div>
 
           <div className="flex flex-1 flex-col justify-center text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 mb-4 mx-auto lg:mx-0">
-               <span className="inline-flex items-center rounded-full bg-secondary/10 px-3 py-1 text-sm font-semibold text-secondary ring-1 ring-inset ring-secondary/20">Simple Pricing</span>
+            <div className="flex items-center gap-4 mb-6 mx-auto lg:mx-0">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-secondary/10 ring-1 ring-secondary/20 shadow-sm text-secondary">
+                 <ShieldCheck className="h-7 w-7" strokeWidth={2} />
+              </div>
+              <span className="inline-flex items-center rounded-full bg-secondary/10 px-4 py-1.5 text-sm font-semibold text-secondary ring-1 ring-inset ring-secondary/20">
+                Simple Pricing
+              </span>
             </div>
             <h2 className="font-serif text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">
               Private. Secure. <br/><span className="font-serif italic text-secondary text-5xl sm:text-7xl block mt-2">Always Free.</span>

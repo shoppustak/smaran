@@ -15,15 +15,10 @@ export function Hero() {
       />
       
       {/* Full-width Top Navigation */}
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-2 sm:px-8 border-b border-border/40">
-        <div className="flex items-center gap-1">
-          <img 
-            src="/logo_true_vector.svg" 
-            alt="Smaran Logo" 
-            className="h-28 w-auto object-contain sm:h-32 -ml-4 scale-110"
-          />
-          <div className="flex flex-col items-start leading-none -ml-2">
-            <span className="font-serif text-3xl font-bold text-foreground tracking-tight sm:text-4xl">
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-6 sm:px-8">
+        <div className="flex items-center">
+          <div className="flex flex-col items-start leading-none">
+            <span className="font-serif text-3xl font-bold text-slate-900 tracking-tight pb-1">
               {hero.wordmarkDevanagari}
             </span>
           </div>
@@ -36,6 +31,17 @@ export function Hero() {
         
         {/* Left Column - Typography & CTA */}
         <div className="flex flex-1 flex-col items-center text-center lg:items-start lg:text-left pt-0 lg:pr-8">
+          <div className="flex items-center justify-center w-20 h-20 rounded-3xl bg-white shadow-xl shadow-black/5 ring-1 ring-black/5 mb-8">
+            <div 
+              className="w-12 h-12 bg-slate-900 shrink-0" 
+              style={{
+                WebkitMaskImage: 'url(/logo_true_vector.svg)',
+                WebkitMaskPosition: 'center',
+                WebkitMaskRepeat: 'no-repeat',
+                WebkitMaskSize: '220%', 
+              }}
+            />
+          </div>
           <h1 className="font-serif text-5xl font-semibold tracking-tight text-foreground sm:text-6xl lg:text-7xl lg:leading-[1.1]">
             {hero.headlinePrefix}
             <span className="text-primary italic pr-2 font-serif font-medium">
