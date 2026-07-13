@@ -1,4 +1,5 @@
 import { Hero } from "@/components/Hero";
+import { HowItWorks } from "@/components/HowItWorks";
 import { LanguageProvider } from "@/context/LanguageContext";
 
 function App() {
@@ -6,6 +7,7 @@ function App() {
     <LanguageProvider>
       <div className="min-h-[100dvh] bg-background text-foreground">
         <Hero />
+        <HowItWorks />
       </div>
     </LanguageProvider>
   );
