@@ -1,5 +1,6 @@
 import { Hero } from "@/components/Hero";
 import { HowItWorks } from "@/components/HowItWorks";
+import { PricingCard } from "@/components/PricingCard";
 import { TrustRow } from "@/components/TrustRow";
 import { LanguageProvider } from "@/context/LanguageContext";
 
@@ -10,6 +11,7 @@ function App() {
         <Hero />
         <HowItWorks />
         <TrustRow />
+        <PricingCard />
       </div>
     </LanguageProvider>
   );
