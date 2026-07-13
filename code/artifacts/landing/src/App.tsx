@@ -1,26 +1,12 @@
-import { LanguageProvider, useLanguage } from "@/context/LanguageContext";
-import { LanguageToggle } from "@/components/LanguageToggle";
-import { WhatsAppCta } from "@/components/WhatsAppCta";
-
-function AppContent() {
-  const { content } = useLanguage();
-
-  return (
-    <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-4 bg-background text-foreground">
-      <div className="flex items-center gap-4">
-        <p className="font-serif text-3xl">{content.hero.wordmarkDevanagari}</p>
-        <LanguageToggle />
-      </div>
-      <p>{content.hero.headlinePrefix + content.hero.headlineEmphasis + content.hero.headlineSuffix}</p>
-      <WhatsAppCta variant="hero" />
-    </div>
-  );
-}
+import { Hero } from "@/components/Hero";
+import { LanguageProvider } from "@/context/LanguageContext";
 
 function App() {
   return (
     <LanguageProvider>
-      <AppContent />
+      <div className="min-h-[100dvh] bg-background text-foreground">
+        <Hero />
+      </div>
     </LanguageProvider>
   );
 }
