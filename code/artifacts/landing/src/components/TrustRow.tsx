@@ -10,9 +10,12 @@ export function TrustRow() {
         <h2 className="mb-8 text-center font-serif text-2xl font-medium text-foreground">
           {trust.heading}
         </h2>
-        <ul className="grid gap-6 sm:grid-cols-3">
+        <ul className="grid gap-4 sm:grid-cols-3">
           {trust.statements.map((statement) => (
-            <li key={statement} className="text-center text-sm text-foreground">
+            <li
+              key={statement}
+              className="rounded-xl border border-card-border bg-card p-6 text-center text-sm text-foreground shadow-sm"
+            >
               {statement}
             </li>
           ))}
