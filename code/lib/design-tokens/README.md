@@ -33,20 +33,20 @@ width).
 
 | Semantic name | CSS var | Light value | Usage |
 |---|---|---|---|
-| Background | `--background` | `40 33% 96%` (sandalwood/aged paper) | Page background |
-| Foreground | `--foreground` | `215 20% 20%` | Default text |
-| Border | `--border` | `40 20% 80%` | Default borders |
-| Card | `--card` / `--card-foreground` / `--card-border` | `40 40% 98%` bg | Card surfaces |
-| Popover | `--popover` / `--popover-foreground` / `--popover-border` | `40 40% 98%` bg | Popovers/menus |
-| Primary | `--primary` / `--primary-foreground` | `28 85% 45%` (deep marigold/kumkum) | Primary actions, brand accent |
-| Secondary | `--secondary` / `--secondary-foreground` | `45 40% 60%` (temple brass) | Secondary actions |
-| Muted | `--muted` / `--muted-foreground` | `40 20% 90%` | De-emphasized surfaces/text |
-| Accent | `--accent` / `--accent-foreground` | `40 30% 90%` | Hover/highlight surfaces |
+| Background | `--background` | `0 0% 100%` (pure white) | Page background |
+| Foreground | `--foreground` | `240 10% 4%` (near-black) | Default text |
+| Border | `--border` | `240 6% 90%` | Default borders |
+| Card | `--card` / `--card-foreground` / `--card-border` | `0 0% 100%` bg | Card surfaces |
+| Popover | `--popover` / `--popover-foreground` / `--popover-border` | `0 0% 100%` bg | Popovers/menus |
+| Primary | `--primary` / `--primary-foreground` | `262 83% 58%` (Tango violet) | Primary actions, brand accent |
+| Secondary | `--secondary` / `--secondary-foreground` | `16 75% 55%` (Tango terracotta) | Secondary actions |
+| Muted | `--muted` / `--muted-foreground` | `240 5% 96%` | De-emphasized surfaces/text |
+| Accent | `--accent` / `--accent-foreground` | `240 5% 96%` | Hover/highlight surfaces |
 | Destructive | `--destructive` / `--destructive-foreground` | `0 70% 50%` | Errors, destructive actions |
-| Sidebar | `--sidebar*` | `40 33% 94%` bg | Sidebar nav surface |
-| Chart 1-5 | `--chart-1` … `--chart-5` | marigold → brass → ink → terracotta → sand | Data visualization series |
-| Sans font | `--app-font-sans` | `'DM Sans', sans-serif` | Body text |
-| Serif font | `--app-font-serif` | `'Fraunces', serif` | Headings (`h1`-`h6`) |
+| Sidebar | `--sidebar*` | `240 5% 98%` bg | Sidebar nav surface |
+| Chart 1-5 | `--chart-1` … `--chart-5` | violet → terracotta → ink → lavender → sand | Data visualization series |
+| Sans font | `--app-font-sans` | `'Inter', sans-serif` | Body text |
+| Serif font | `--app-font-serif` | `'Playfair Display', serif` | Headings |
 | Mono font | `--app-font-mono` | `Menlo, monospace` | Code, tabular numbers |
 | Radius | `--radius` | `0.5rem` (8px) | Base corner radius (`sm`/`md`/`lg`/`xl` derive from this) |
 
