@@ -133,7 +133,17 @@ No existing test framework covers `smaran`/`mockup-sandbox` (typecheck+build onl
 - **Build** succeeds; QR static asset resolves at the expected path.
 - **Manual visual QA**, both languages: toggle EN⇄HI; confirm gradient headline renders correctly in both (Playfair→Devanagari-default fallback expected in Hindi mode); confirm QR shows `≥768px` / hides `<768px` (resize or device emulation); confirm the wa.me link's pre-filled message matches the active language at tap time (`नमस्ते स्मरण` in HI mode, `Hi Smaran` in EN mode).
 
+## wa.me link
+
+Test WhatsApp API number (not production): `+1 555 136 3612`. Link format:
+`https://wa.me/15551363612?text=<url-encoded message>` — message text per active
+language (`नमस्ते स्मरण` HI / `Hi Smaran` EN, per the i18n section above).
+
+Store the raw number as a single constant (e.g. `WHATSAPP_NUMBER = "15551363612"`
+in the content module or a small `config.ts`) — not hardcoded per-component — so
+swapping in the production number later is a one-line change.
+
 ## Open items for the implementation plan (not this spec)
 
-- Exact wa.me phone number / bot number to link to — needs the actual production/staging bot number, not invented here.
+- Swap the test number above for the production/staging bot number once available.
 - Static hosting choice for `landing` — deferred per Non-goals.
