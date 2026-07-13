@@ -1,0 +1,21 @@
+@import "tailwindcss";
+@import "@workspace/design-tokens/fonts.css";
+@import "@workspace/design-tokens/tokens.css";
+@import "./fonts.css";
+
+:root {
+  /* Local override, scoped to this app only — appends a Devanagari-capable
+     fallback ahead of the shared package's generic sans-serif fallback.
+     Does not modify @workspace/design-tokens. */
+  --app-font-sans: 'Inter', 'Noto Sans Devanagari', sans-serif;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
