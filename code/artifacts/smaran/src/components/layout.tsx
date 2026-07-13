@@ -27,21 +27,18 @@ export function Sidebar() {
   return (
     <div className="flex flex-col w-64 bg-sidebar border-r border-sidebar-border min-h-[100dvh] paper-texture">
       <div className="p-6 relative z-10 flex items-center gap-3">
-        <div
-          className="h-20 w-20 shrink-0 bg-gradient-to-br from-primary to-purple-400"
-          // eslint-disable-next-line no-restricted-syntax
-          style={{
-            maskImage: "url(/mark-180.png)",
-            maskSize: "contain",
-            maskRepeat: "no-repeat",
-            maskPosition: "center",
-            WebkitMaskImage: "url(/mark-180.png)",
-            WebkitMaskSize: "contain",
-            WebkitMaskRepeat: "no-repeat",
-            WebkitMaskPosition: "center",
-          }}
-          aria-hidden="true"
-        />
+        <div className="relative h-20 w-20 shrink-0 flex items-center justify-center">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-purple-400/30 rounded-full blur-md" />
+          <img 
+            src="/mark-180.png" 
+            alt="Smaran Logo" 
+            className="relative h-20 w-20 object-contain drop-shadow-md"
+            // eslint-disable-next-line no-restricted-syntax
+            style={{
+              filter: "brightness(0) saturate(100%) invert(25%) sepia(85%) saturate(4500%) hue-rotate(250deg) brightness(95%) contrast(105%)"
+            }}
+          />
+        </div>
         <div>
           <h1 className="font-serif text-3xl text-primary tracking-tight mb-1">स्मरण</h1>
           <p className="text-sm text-muted-foreground uppercase tracking-widest">Smaran</p>
