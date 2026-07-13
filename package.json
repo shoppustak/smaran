@@ -1,0 +1,14 @@
+{
+  "name": "smaran-e2e",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "test:e2e": "playwright test",
+    "kb:freshness": "node scripts/kb-freshness.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "@types/node": "^25.3.3",
+    "typescript": "~5.9.3"
+  }
+}
