@@ -11,7 +11,7 @@ export function Hero() {
       {/* Tango-style background gradient wash — full hero, edge to edge, clearly visible */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-gradient-to-br from-background via-primary/15 to-secondary/25"
+        className="absolute inset-0 bg-gradient-to-br from-background via-primary/15 to-secondary/25"
       />
       
       {/* Full-width Top Navigation */}

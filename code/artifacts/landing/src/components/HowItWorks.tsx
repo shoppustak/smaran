@@ -25,7 +25,7 @@ export function HowItWorks() {
       {/* Fade-out continuation of the hero's gradient wash — softens the hard seam */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-64 bg-gradient-to-b from-secondary/10 to-background"
+        className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-secondary/10 to-background"
       />
       <div className="relative mx-auto max-w-3xl px-6 py-16">
         <h2 className="mb-10 text-center font-serif text-2xl font-medium text-foreground">
