@@ -82,7 +82,7 @@ export function TrustRow() {
 
               {/* Founder-tier line */}
               {pricing.earlyBirdLine && (
-                <span className="mt-3 inline-block rounded-full bg-primary/10 px-4 py-1.5 fs-small font-semibold text-primary">
+                <span className="mt-4 inline-block rounded-full bg-gradient-to-r from-[#FFB58A]/20 to-[#B6A8FF]/20 border border-[#B6A8FF]/30 px-5 py-2 fs-small font-bold text-[#6B6054] shadow-sm">
                   {pricing.earlyBirdLine}
                 </span>
               )}
