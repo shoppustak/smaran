@@ -48,7 +48,7 @@ Plans:
   1. A purohit can send a voice note describing a family and event, and the bot presents transcribed/extracted fields (family name, gotra, event type, maas, paksha, tithi) for a single confirming tap.
   2. A purohit can photograph a bahi khata page and the bot presents vision-extracted draft entries for correction and confirmation.
   3. Nothing extracted by voice or photo reaches the `yajmans` or `events` tables until the purohit explicitly confirms it.
-**Plans**: 10 plans
+**Plans**: 11 plans
 
 Plans:
 - [ ] 02-01-PLAN.md — ingest_jobs table + events/yajmans provenance columns, pushed to smaran-dev
@@ -58,9 +58,10 @@ Plans:
 - [ ] 02-05-PLAN.md — Shared sendWhatsappMessage helper + media.ts (Stage B download)
 - [ ] 02-06-PLAN.md — Confirm card (Stage G interactive message, §6 locked Hindi copy)
 - [ ] 02-07-PLAN.md — ingest.ts job state machine + Stage B-G pipeline orchestration
-- [ ] 02-08-PLAN.md — confirmJob/rejectJob write gate (Stage H, ING-03) + webhook wiring + E2E test
+- [ ] 02-08-PLAN.md — confirmJob/rejectJob write gate (Stage H, ING-03) + collision resolve + webhook wiring + E2E test
 - [ ] 02-09-PLAN.md — Ops routes: ingest-jobs inspection + §8 retention purge + OpenAPI
 - [ ] 02-10-PLAN.md — §11 eval harness + D-02 extraction-model bake-off tooling
+- [ ] 02-11-PLAN.md — Correction flow (✏ numbered field list, 3-candidate + free-text, §6 locked UX)
 
 ### Phase 3: Corroborated Dakshina Ledger
 **Goal**: Every dakshina payment is recorded only when both the purohit and the family have independently corroborated it — closing the milestone's core success loop (onboard → log event → corroborated payment).
