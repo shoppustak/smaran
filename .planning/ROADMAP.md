@@ -48,7 +48,19 @@ Plans:
   1. A purohit can send a voice note describing a family and event, and the bot presents transcribed/extracted fields (family name, gotra, event type, maas, paksha, tithi) for a single confirming tap.
   2. A purohit can photograph a bahi khata page and the bot presents vision-extracted draft entries for correction and confirmation.
   3. Nothing extracted by voice or photo reaches the `yajmans` or `events` tables until the purohit explicitly confirms it.
-**Plans**: TBD
+**Plans**: 10 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — ingest_jobs table + events/yajmans provenance columns, pushed to smaran-dev
+- [ ] 02-02-PLAN.md — Canonical vocab tables (maas/tithi/paksha/gotra) + fuzzy-match utility (TDD)
+- [ ] 02-03-PLAN.md — AsrProvider interface + Sarvam Saaras v3 (primary) + OpenAI (fallback) adapters
+- [ ] 02-04-PLAN.md — Extraction (Stage E) + vision (§10 photo delta) + 3 bake-off ModelCaller adapters
+- [ ] 02-05-PLAN.md — Shared sendWhatsappMessage helper + media.ts (Stage B download)
+- [ ] 02-06-PLAN.md — Confirm card (Stage G interactive message, §6 locked Hindi copy)
+- [ ] 02-07-PLAN.md — ingest.ts job state machine + Stage B-G pipeline orchestration
+- [ ] 02-08-PLAN.md — confirmJob/rejectJob write gate (Stage H, ING-03) + webhook wiring + E2E test
+- [ ] 02-09-PLAN.md — Ops routes: ingest-jobs inspection + §8 retention purge + OpenAPI
+- [ ] 02-10-PLAN.md — §11 eval harness + D-02 extraction-model bake-off tooling
 
 ### Phase 3: Corroborated Dakshina Ledger
 **Goal**: Every dakshina payment is recorded only when both the purohit and the family have independently corroborated it — closing the milestone's core success loop (onboard → log event → corroborated payment).
@@ -108,7 +120,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Platform Foundation & Purohit Onboarding | 0/5 | Planned | - |
-| 2. Bahi Khata Ingestion | 0/TBD | Not started | - |
+| 2. Bahi Khata Ingestion | 0/10 | Planned | - |
 | 3. Corroborated Dakshina Ledger | 0/TBD | Not started | - |
 | 4. Daily Brain — Scheduling & Lapse Recovery | 0/TBD | Not started | - |
 | 5. Schedule Protection | 0/TBD | Not started | - |
