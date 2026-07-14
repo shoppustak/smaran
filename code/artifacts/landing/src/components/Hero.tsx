@@ -7,7 +7,6 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-import { LanguageToggle } from "@/components/LanguageToggle";
 import { WhatsAppCta } from "@/components/WhatsAppCta";
 import { useLanguage } from "@/context/LanguageContext";
 import type { HowItWorksIcon } from "@/types";
@@ -26,118 +25,111 @@ export function Hero() {
   const [first, second, third, fourth] = content.howItWorks.items;
 
   return (
-    <header className="relative overflow-hidden bg-background">
-      {/* Full-bleed photo — bleeds to the true right edge of the viewport,
-          ignoring the max-w-7xl content constraint. Desktop only. */}
-      <div className="pointer-events-none absolute bottom-0 right-0 top-32 hidden w-[52%] lg:block">
-        {!illustrationFailed && (
-          <img
-            src="/purohit-photo.png"
-            alt=""
-            aria-hidden="true"
-            onError={() => setIllustrationFailed(true)}
-            className="h-full w-full object-cover object-[65%_25%]"
-          />
-        )}
-        {first && (
-          <div className="pointer-events-auto absolute left-6 top-10 z-10 flex items-center gap-2 rounded-full bg-white/95 px-4 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur-sm">
-            <BellRing className="h-4 w-4 text-primary" aria-hidden="true" />
-            <span className="text-sm font-medium text-foreground">
-              {first.label}
-            </span>
-          </div>
-        )}
-        {second && (
-          <div className="pointer-events-auto absolute right-10 top-1/4 z-10 flex items-center gap-2 rounded-full bg-white/95 px-4 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur-sm">
-            <HeartHandshake className="h-4 w-4 text-secondary" aria-hidden="true" />
-            <span className="text-sm font-medium text-foreground">
-              {second.label}
-            </span>
-          </div>
-        )}
-        {third && (
-          <div className="pointer-events-auto absolute bottom-16 left-10 z-10 flex items-center gap-2 rounded-full bg-white/95 px-4 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur-sm">
-            <ShieldCheck className="h-4 w-4 text-primary" aria-hidden="true" />
-            <span className="text-sm font-medium text-foreground">
-              {third.label}
-            </span>
-          </div>
-        )}
-        {fourth && (
-          <div className="pointer-events-auto absolute bottom-6 right-10 z-10 flex items-center gap-2 rounded-full bg-white/95 px-4 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur-sm">
-            <IndianRupee className="h-4 w-4 text-secondary" aria-hidden="true" />
-            <span className="text-sm font-medium text-foreground">
-              {fourth.label}
-            </span>
-          </div>
-        )}
-        {/* Fade the photo's left and top edges into the page background so
-            the bleed doesn't end in hard seams. */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-background to-transparent"
-        />
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-background to-transparent"
-        />
-      </div>
+    <section className="relative bg-background pt-16 pb-12 md:pt-20 md:pb-16 px-6">
 
-      {/* Full-width Top Navigation — single logo lockup image */}
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-8 sm:px-8 sm:py-10">
-        <img
-          src="/logo-lockup.png"
-          alt={hero.wordmarkDevanagari}
-          className="h-12 w-auto sm:h-14"
-        />
-        <LanguageToggle />
-      </div>
+      <div className="relative z-10 mx-auto max-w-[1200px]">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-center lg:gap-16">
+          
+          {/* Left Column: Text Content and WhatsApp CTA constrained to ~480-520px */}
+          <div className="flex flex-col items-center text-center lg:col-span-6 lg:items-start lg:text-left lg:max-w-[500px]">
+            <h1 className="fs-h2 text-foreground tracking-tight leading-[1.15] text-center lg:text-left">
+              {hero.headlinePrefix}
+              <span className="inline-block bg-gradient-to-r from-primary via-emerald-500 to-emerald-600 bg-clip-text italic text-transparent">
+                {hero.headlineEmphasis}
+              </span>
+              {hero.headlineSuffix}
+            </h1>
+            
+            <p className="mt-6 fs-body-lg text-text-secondary leading-[1.6]">
+              {hero.subline}
+            </p>
 
-      {/* Text column only — essential height, no forced min-height. The
-          photo bleeds separately behind/beside this on desktop. */}
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-center gap-10 px-6 pb-10 pt-2 text-center lg:items-start lg:pb-14 lg:text-left">
-        <div className="flex w-full flex-col items-center text-center lg:max-w-[48%] lg:items-start lg:text-left">
-          <p className="max-w-xl text-2xl font-medium leading-snug text-foreground sm:text-3xl">
-            {hero.headlinePrefix}
-            <span className="text-primary italic">{hero.headlineEmphasis}</span>
-            {hero.headlineSuffix}
-          </p>
-          <p className="mt-3 max-w-xl text-base leading-relaxed text-foreground sm:text-lg">
-            {hero.subline}
-          </p>
-
-          <div className="mt-6 flex w-full justify-center lg:justify-start">
-            <WhatsAppCta variant="hero" />
+            <div className="mt-8 flex w-full justify-center lg:justify-start">
+              <WhatsAppCta variant="hero" />
+            </div>
           </div>
 
-          {/* Compact quick-link row — feature summary pulled above the fold */}
-          <div className="mt-8 grid w-full grid-cols-2 gap-3 sm:max-w-md">
-            {content.howItWorks.items.map((item, index) => {
-              const Icon = ICONS[item.icon];
-              const accent =
-                index % 2 === 0
-                  ? "bg-primary/10 text-primary"
-                  : "bg-secondary/10 text-secondary";
-              const tint = index % 2 === 0 ? "bg-primary/5" : "bg-secondary/5";
-              return (
-                <div
-                  key={item.label}
-                  className={`flex items-center gap-2 rounded-xl px-3 py-2.5 ${tint}`}
+          {/* Right Column: Hero image with horizontal aspect and glowing gradient patch below */}
+          <div className="relative flex justify-center lg:col-span-6 w-full">
+            
+            {/* Layered glowing gradient patches directly behind and below the image */}
+            <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center scale-95 blur-[40px] opacity-[0.95]" aria-hidden="true">
+              <div className="absolute -top-8 -left-8 h-44 w-44 rounded-full bg-[#B6A8FF]" />
+              <div className="absolute -top-4 -right-4 h-44 w-44 rounded-full bg-[#7CC8FF]" />
+              <div className="absolute -bottom-4 -left-4 h-44 w-44 rounded-full bg-[#FFB58A]" />
+              <div className="absolute -bottom-8 -right-8 h-44 w-44 rounded-full bg-[#FF8AB2]" />
+            </div>
+
+            <div className="relative w-full max-w-[540px] z-10">
+              
+              {/* Horizontal Image wrapper (aspect-[3/2], no border, rounded corners, shadow-lg) */}
+              <div className="relative aspect-[3/2] w-full overflow-hidden rounded-xl bg-zinc-50 shadow-lg">
+                {!illustrationFailed && (
+                  <img
+                    src="/purohit-photo.png"
+                    alt="Smaran Purohit"
+                    onError={() => setIllustrationFailed(true)}
+                    className="h-full w-full object-cover object-center transition-transform duration-500 hover:scale-[1.02]"
+                  />
+                )}
+                {illustrationFailed && (
+                  <div className="flex h-full w-full items-center justify-center bg-zinc-100">
+                    <span className="text-sm text-text-secondary">Smaran</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Floating Status Pill Badges (radius-sm = 6px, custom status pill bg/text tints) */}
+              {first && (
+                <div 
+                  className="absolute left-[-16px] -top-4 z-20 flex items-center gap-2 rounded-sm px-4 py-2 shadow-md border border-[#1F8C5A]/10 transition-transform duration-300 hover:-translate-y-[1px]"
+                  style={{ backgroundColor: "var(--pill-green-bg)", color: "var(--pill-green-fg)" }}
                 >
-                  <span
-                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${accent}`}
-                  >
-                    <Icon className="h-4 w-4" aria-hidden="true" />
-                  </span>
-                  <span className="text-sm font-medium text-foreground">
-                    {item.label}
+                  <BellRing className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span className="text-[12px] font-semibold tracking-wide">
+                    {first.label}
                   </span>
                 </div>
-              );
-            })}
+              )}
+              {second && (
+                <div 
+                  className="absolute right-[-16px] top-[15%] z-20 flex items-center gap-2 rounded-sm px-4 py-2 shadow-md border border-[#2C6BB8]/10 transition-transform duration-300 hover:-translate-y-[1px]"
+                  style={{ backgroundColor: "var(--pill-blue-bg)", color: "var(--pill-blue-fg)" }}
+                >
+                  <HeartHandshake className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span className="text-[12px] font-semibold tracking-wide">
+                    {second.label}
+                  </span>
+                </div>
+              )}
+              {third && (
+                <div 
+                  className="absolute left-[-12px] bottom-12 z-20 flex items-center gap-2 rounded-sm px-4 py-2 shadow-md border border-[#B5631F]/10 transition-transform duration-300 hover:-translate-y-[1px]"
+                  style={{ backgroundColor: "var(--pill-orange-bg)", color: "var(--pill-orange-fg)" }}
+                >
+                  <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span className="text-[12px] font-semibold tracking-wide">
+                    {third.label}
+                  </span>
+                </div>
+              )}
+              {fourth && (
+                <div 
+                  className="absolute right-[-12px] -bottom-4 z-20 flex items-center gap-2 rounded-sm px-4 py-2 shadow-md border border-[#A87B12]/10 transition-transform duration-300 hover:-translate-y-[1px]"
+                  style={{ backgroundColor: "var(--pill-yellow-bg)", color: "var(--pill-yellow-fg)" }}
+                >
+                  <IndianRupee className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span className="text-[12px] font-semibold tracking-wide">
+                    {fourth.label}
+                  </span>
+                </div>
+              )}
+
+            </div>
           </div>
+
         </div>
       </div>
-    </header>
+    </section>
   );
 }

@@ -1,13 +1,148 @@
 @import "tailwindcss";
 @import "@workspace/design-tokens/fonts.css";
-@import "@workspace/design-tokens/tokens.css";
 @import "./fonts.css";
+@import "@workspace/design-tokens/tokens.css";
 
 :root {
-  /* Local override, scoped to this app only — appends a Devanagari-capable
-     fallback ahead of the shared package's generic sans-serif fallback.
-     Does not modify @workspace/design-tokens. */
-  --app-font-sans: 'Inter', 'Noto Sans Devanagari', sans-serif;
+  /* Colors */
+  --bg-page:        #FFFFFF;
+  --text-primary:   #000000;   /* headlines, section titles */
+  --text-secondary: #000000;   /* body, supporting copy */
+  --text-muted:     #666666;   /* tertiary, meta */
+  --border:         #E8ECF3;
+  --divider:         #F0F2F7;
+
+  /* Brand */
+  --brand-primary:  #4CD38B;   /* mint green CTA */
+  --brand-primary-hover: #3FBE7A;
+  --brand-on-primary: #FFFFFF;
+
+  /* Status pill tints (background → text) */
+  --pill-green-bg:  #E6F8EE;   --pill-green-fg:  #1F8C5A;
+  --pill-blue-bg:   #E6F0FB;   --pill-blue-fg:   #2C6BB8;
+  --pill-yellow-bg: #FDF5DC;   --pill-yellow-fg: #A87B12;
+  --pill-orange-bg: #FDEEDC;   --pill-orange-fg: #B5631F;
+  --pill-red-bg:    #FBE6E6;   --pill-red-fg:    #B53A3A;
+
+  /* Spacing Scale (Reference points mapped directly) */
+  --radius-sm:  6px;   /* pills, small tags */
+  --radius-md:  12px;  /* inputs, secondary buttons */
+  --radius-lg:  16px;  /* cards */
+  --radius-xl:  24px;  /* feature cards, hero card */
+  --radius-pill: 9999px; /* CTA buttons, status tags, FAB */
+
+  /* Shadows */
+  --shadow-sm:  0 1px 2px rgba(31, 35, 64, 0.04);
+  --shadow-md:  0 4px 16px rgba(31, 35, 64, 0.06);
+  --shadow-lg:  0 16px 40px rgba(31, 35, 64, 0.08);
+  --shadow-card:  0 2px 8px rgba(31, 35, 64, 0.04), 0 12px 32px rgba(31, 35, 64, 0.06);
+  --shadow-cta:  0 6px 18px rgba(0, 0, 0, 0.15);
+
+  /* Typography Fonts */
+  --font-sans: "Inter", "Poppins", "Noto Sans Devanagari", system-ui, -apple-system, sans-serif;
+}
+
+@theme {
+  --color-background: var(--bg-page);
+  --color-foreground: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-border: var(--border);
+  --color-divider: var(--divider);
+
+  --color-primary: var(--brand-primary);
+  --color-primary-hover: var(--brand-primary-hover);
+  --color-primary-foreground: var(--brand-on-primary);
+
+  --font-sans: var(--font-sans);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-pill: var(--radius-pill);
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-card: var(--shadow-card);
+  --shadow-cta: var(--shadow-cta);
+}
+
+@layer utilities {
+  /* Typography Utility Classes matching exact design specs */
+  .fs-hero {
+    font-size: 56px;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+  }
+  .fs-h2 {
+    font-size: 40px;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    font-weight: 700;
+  }
+  .fs-h3 {
+    font-size: 20px;
+    line-height: 1.3;
+    letter-spacing: -0.005em;
+    font-weight: 600;
+  }
+  .fs-body-lg {
+    font-size: 18px;
+    line-height: 1.6;
+    letter-spacing: 0;
+    font-weight: 400;
+  }
+  .fs-body {
+    font-size: 16px;
+    line-height: 1.6;
+    letter-spacing: 0;
+    font-weight: 400;
+  }
+  .fs-small {
+    font-size: 14px;
+    line-height: 1.5;
+    letter-spacing: 0;
+    font-weight: 400;
+  }
+  .fs-button {
+    font-size: 15px;
+    line-height: 1;
+    letter-spacing: 0;
+    font-weight: 600;
+  }
+  .fs-eyebrow {
+    font-size: 12px;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  /* Decorative Gradient Blobs */
+  .glow-lavender {
+    background: radial-gradient(circle at 30% 30%, rgba(182, 168, 255, 0.6) 0%, transparent 70%);
+  }
+  .glow-cyan {
+    background: radial-gradient(circle at 70% 40%, rgba(124, 200, 255, 0.6) 0%, transparent 70%);
+  }
+  .glow-peach {
+    background: radial-gradient(circle at 50% 60%, rgba(255, 181, 138, 0.6) 0%, transparent 70%);
+  }
+  .glow-pink {
+    background: radial-gradient(circle at 80% 70%, rgba(255, 138, 178, 0.6) 0%, transparent 70%);
+  }
+
+  /* Standard Card Utility matching spec */
+  .card-styled {
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    padding: 24px;
+  }
 }
 
 @layer base {

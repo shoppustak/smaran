@@ -42,6 +42,7 @@ export interface LandingContent {
   pricing: {
     framingLine: string;
     priceLine: string;
+    earlyBirdLine?: string;
     includedItems: string[];
     ctaLabel: string;
     fallbackLine: string;
@@ -51,5 +52,7 @@ export interface LandingContent {
     aboutLine: string;
     privacyLine: string;
     copyright: string;
+    qrHeader: string;
+    qrSub: string;
   };
 }

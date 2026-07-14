@@ -16,12 +16,13 @@ export function WhatsAppCta({ variant }: WhatsAppCtaProps) {
         ? content.pricing.ctaLabel
         : content.footer.ctaLabel;
 
+  // Primary button (mint pill): height: 48px, padding: 0 24px, shadow-cta, hover translations
   const button = (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center justify-center rounded-full bg-foreground px-8 py-4 text-lg font-medium text-background shadow-lg shadow-foreground/20 transition hover:opacity-90 hover:shadow-xl hover:-translate-y-0.5"
+      className="inline-flex h-12 items-center justify-center rounded-pill bg-black px-6 fs-button text-white shadow-cta transition-all duration-200 hover:-translate-y-[1px] hover:bg-zinc-800 active:translate-y-0 cursor-pointer"
     >
       {label}
     </a>
@@ -32,8 +33,9 @@ export function WhatsAppCta({ variant }: WhatsAppCtaProps) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-stretch">
+    <div className="flex flex-col gap-2 text-center lg:text-left items-center lg:items-start">
       {button}
+      <p className="fs-body text-text-secondary mt-1">{content.hero.ctaMicrocopy}</p>
     </div>
   );
 }

@@ -5,41 +5,62 @@ export function Footer() {
   const { footer, hero } = content;
 
   return (
-    <footer className="relative overflow-hidden bg-foreground px-6 py-16 sm:px-8">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-primary/20 via-transparent to-secondary/20"
-      />
-      <div className="relative mx-auto max-w-5xl">
-        <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
-          <div className="flex flex-col items-center text-center md:max-w-md md:items-start md:text-left">
-            <img
-              src="/logo-lockup.png"
-              alt={hero.wordmarkDevanagari}
-              className="h-16 w-auto"
-            />
-            <p className="mt-5 text-sm leading-relaxed text-background/80">
-              {footer.aboutLine}
-            </p>
+    <footer className="w-full bg-background pt-12 pb-0 px-6 relative">
+      <div className="mx-auto max-w-[1200px]">
+        
+        {/* Main Footer Layout: Grid on desktop */}
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-12 md:items-stretch">
+          
+          {/* Left Column (Brand + Metadata) */}
+          <div className="md:col-span-8 flex flex-col justify-between gap-8 text-center md:text-left pb-12">
+            
+            {/* Top Part: Brand + Tagline */}
+            <div className="max-w-xl">
+              <img
+                src="/logo-lockup.png"
+                alt={hero.wordmarkDevanagari}
+                className="h-16 w-auto mx-auto md:mx-0"
+              />
+              <p className="mt-4 fs-body text-text-secondary leading-[1.6]">
+                {footer.aboutLine}
+              </p>
+            </div>
+
+            {/* Bottom Part: Privacy & Copyright on same horizontal line on desktop */}
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mt-auto border-t border-border/30 pt-6">
+              <p id="privacy" className="fs-body text-text-muted leading-[1.6]">
+                {footer.privacyLine}
+              </p>
+              <p className="fs-body text-text-muted font-medium shrink-0">
+                {footer.copyright}
+              </p>
+            </div>
+
           </div>
 
-          <div className="hidden flex-col items-center gap-2 rounded-2xl bg-white p-4 shadow-xl md:flex">
-            <img
-              src="/qr-whatsapp.png"
-              alt={hero.qrCaption}
-              className="h-28 w-28 rounded-lg"
-            />
-            <span className="text-xs font-medium text-foreground">
-              {hero.qrCaption}
-            </span>
+          {/* Right Column (Vertical QR Card aligned to bottom) */}
+          <div className="md:col-span-4 flex justify-center md:justify-end items-end pb-0">
+            
+            <div className="flex flex-col items-center gap-3 bg-white border border-b-0 border-border rounded-t-2xl rounded-b-none shadow-card p-5 pb-4 max-w-[200px] mx-auto md:mx-0 text-center self-end">
+              <img
+                src="/qr-whatsapp.png"
+                alt={hero.qrCaption}
+                className="h-28 w-28 rounded-xl border border-border/80"
+              />
+              <div className="flex flex-col">
+                <span className="fs-body font-extrabold text-foreground tracking-tight">
+                  {footer.qrHeader}
+                </span>
+                <span className="fs-body text-text-muted mt-1 font-medium leading-tight">
+                  {footer.qrSub}
+                </span>
+              </div>
+            </div>
+
           </div>
+
         </div>
 
-        <div className="mt-10 border-t border-white/10 pt-6 text-center">
-          <p className="w-full text-base text-background/60">
-            {footer.privacyLine} {footer.copyright}
-          </p>
-        </div>
       </div>
     </footer>
   );

@@ -7,7 +7,7 @@ export function LanguageToggle() {
     <button
       type="button"
       onClick={toggle}
-      className="rounded-md border border-border px-3 py-1 text-sm font-medium text-foreground hover:bg-accent"
+      className="rounded-md border border-border px-3 py-1.5 fs-body font-semibold text-foreground hover:bg-accent"
     >
       {content.toggleLabel}
     </button>

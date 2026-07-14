@@ -13,7 +13,7 @@ export const hiContent: LandingContent = {
     subline:
       "एक साधारण WhatsApp सेवा — पुरोहितों के लिए, उनके अपने यजमान परिवारों के साथ।",
     ctaLabel: "WhatsApp पर शुरू करें",
-    ctaMicrocopy: "कोई app नहीं। कोई form नहीं। सीधे आपके WhatsApp पर।",
+    ctaMicrocopy: "कोई app नहीं। कोई form नहीं।",
     qrCaption: "फ़ोन से scan करें",
   },
   howItWorks: {
@@ -50,7 +50,7 @@ export const hiContent: LandingContent = {
     ],
   },
   pricing: {
-    framingLine: "एक लौटा हुआ यजमान — कई वर्षों के शुल्क के बराबर।",
+    framingLine: "एक नियमित यजमान — वार्षिक शुल्क के बराबर।",
     priceLine: "₹1,100 / वर्ष",
     includedItems: [
       "असीमित परिवार और तिथियाँ",
@@ -97,5 +97,7 @@ export const hiContent: LandingContent = {
     privacyLine:
       "आपके परिवारों की जानकारी केवल आपकी है — कभी बेची नहीं जाएगी, और माँगते ही हटा दी जाएगी।",
     copyright: "© स्मरण",
+    qrHeader: "स्कैन करके शुरू करें",
+    qrSub: "सीधे WhatsApp खोलें",
   },
 };

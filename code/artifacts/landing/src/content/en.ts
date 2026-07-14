@@ -8,12 +8,12 @@ export const enContent: LandingContent = {
     wordmarkDevanagari: "स्मरण",
     wordmarkLatin: "Smaran",
     headlinePrefix: "Every family's tithi, ",
-    headlineEmphasis: "reminded ahead of time",
-    headlineSuffix: ".",
+    headlineEmphasis: "reminded ahead of time.",
+    headlineSuffix: "",
     subline:
       "A simple WhatsApp service — built for purohits, for the families they already serve.",
     ctaLabel: "Start on WhatsApp",
-    ctaMicrocopy: "No app. No forms. Straight on your WhatsApp.",
+    ctaMicrocopy: "No app. No forms.",
     qrCaption: "Scan with your phone",
   },
   howItWorks: {
@@ -50,7 +50,7 @@ export const enContent: LandingContent = {
     ],
   },
   pricing: {
-    framingLine: "One returned yajman covers years of the fee.",
+    framingLine: "One retained yajman covers annual fees",
     priceLine: "₹1,100 / year",
     includedItems: [
       "Unlimited families and tithis",
@@ -97,5 +97,7 @@ export const enContent: LandingContent = {
     privacyLine:
       "Your families' information is yours alone — never sold, and deleted the moment you ask.",
     copyright: "© स्मरण",
+    qrHeader: "Scan to start",
+    qrSub: "Open in WhatsApp",
   },
 };
