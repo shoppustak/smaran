@@ -51,7 +51,8 @@ export const hiContent: LandingContent = {
   },
   pricing: {
     framingLine: "एक नियमित यजमान — वार्षिक शुल्क के बराबर।",
-    priceLine: "₹1,100 / वर्ष",
+    priceLine: "₹1,101 / वर्ष",
+    earlyBirdLine: "आपके क्षेत्र के पहले 100 पुरोहितों के लिए — पहला वर्ष ₹501",
     includedItems: [
       "असीमित परिवार और तिथियाँ",
       "WhatsApp पर सब कुछ",

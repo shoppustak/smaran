@@ -51,7 +51,8 @@ export const enContent: LandingContent = {
   },
   pricing: {
     framingLine: "One retained yajman covers annual fees",
-    priceLine: "₹1,100 / year",
+    priceLine: "₹1,101 / year",
+    earlyBirdLine: "For the first 100 purohits of your area — first year ₹501",
     includedItems: [
       "Unlimited families and tithis",
       "Everything on WhatsApp",

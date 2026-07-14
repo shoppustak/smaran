@@ -80,6 +80,13 @@ export function TrustRow() {
                 </span>
               </div>
 
+              {/* Founder-tier line */}
+              {pricing.earlyBirdLine && (
+                <span className="mt-3 inline-block rounded-full bg-primary/10 px-4 py-1.5 fs-small font-semibold text-primary">
+                  {pricing.earlyBirdLine}
+                </span>
+              )}
+
               {/* Inclusions List (fs-body, compact checkmarks) */}
               <ul className="mt-8 mb-6 flex flex-col gap-4 text-left w-full border-t border-border/60 pt-6">
                 {pricing.includedItems.map((item) => (
