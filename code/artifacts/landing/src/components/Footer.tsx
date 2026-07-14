@@ -16,11 +16,16 @@ export function Footer() {
             
             {/* Top Part: Brand + Tagline */}
             <div className="max-w-xl">
-              <img
-                src="/logo-lockup.png"
-                alt={hero.wordmarkDevanagari}
-                className="h-16 w-auto mx-auto md:mx-0"
-              />
+              <div className="flex items-center justify-center md:justify-start gap-3">
+                <img
+                  src="/smaran-logo-origami.png"
+                  alt={hero.wordmarkDevanagari}
+                  className="h-12 w-12 object-contain"
+                />
+                <span className="text-3xl font-bold tracking-tight bg-gradient-to-br from-[#B6A8FF] to-[#FFB58A] bg-clip-text text-transparent">
+                  {hero.wordmarkDevanagari}
+                </span>
+              </div>
               <p className="mt-4 fs-body text-text-secondary leading-[1.6]">
                 {footer.aboutLine}
               </p>
