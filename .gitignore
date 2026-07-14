@@ -2,8 +2,16 @@
 .DS_Store
 Thumbs.db
 
+# Secrets — never commit real env files, only .env.example
+.env
+.env.local
+.env.*.local
+
 # GSD staging (kept locally, not synced)
 .planning/intel/classifications/
+
+# Internal design/intent KB — local only, not pushed to GitHub
+knowledgebase/
 
 # Root npm project (E2E suite)
 node_modules/
