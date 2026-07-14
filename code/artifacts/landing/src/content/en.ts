@@ -95,7 +95,7 @@ export const enContent: LandingContent = {
     aboutLine:
       "Smaran is a simple WhatsApp service — built for purohits, for the families they already serve. No app, no middleman — just your dates, in your name, on time.",
     privacyLine:
-      "Your families' information is yours alone — never sold, and deleted the moment you ask.",
+      "Your yajman's information is yours alone - never shared.",
     copyright: "© स्मरण",
     qrHeader: "Scan to start",
     qrSub: "Open in WhatsApp",
