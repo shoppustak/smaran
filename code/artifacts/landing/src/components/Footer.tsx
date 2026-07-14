@@ -15,15 +15,15 @@ export function Footer() {
           <div className="md:col-span-8 flex flex-col justify-between gap-8 text-center md:text-left pb-12">
             
             {/* Top Part: Brand + Tagline */}
-            <div className="max-w-xl">
-              <div className="flex justify-center md:justify-start">
+            <div className="max-w-2xl flex flex-col md:flex-row items-center md:items-center gap-6">
+              <div className="shrink-0 flex justify-center md:justify-start">
                 <img
                   src="/smaran-logo-origami.png"
                   alt={hero.wordmarkDevanagari}
                   className="h-24 w-24 sm:h-32 sm:w-32 object-contain"
                 />
               </div>
-              <p className="mt-4 fs-body text-text-secondary leading-[1.6]">
+              <p className="fs-body text-text-secondary leading-[1.6] text-center md:text-left">
                 {footer.aboutLine}
               </p>
             </div>
