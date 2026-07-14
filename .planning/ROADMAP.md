@@ -31,7 +31,14 @@ The existing `code/` workspace already has spike-level scaffolding (a Vedika san
   2. Within that same first exchange, the purohit sees one family + tithi resolved to this year's Gregorian date on a rendered card, before bulk import of their full roster is ever offered.
   3. All captured purohit data persists in Supabase Postgres (the `purohits` table, plus the `yajmans`/`events`/`ledger` tables standing ready per the fixed schema) — nothing purohit-identifying lives only in WhatsApp state.
   4. The bot is registered with Meta as a task-specific agent, and outbound onboarding messages use registered Utility templates, not free-form broadcast.
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Drizzle schema for purohits/yajmans/events/ledger + onboarding_state, pushed to smaran-dev
+- [ ] 01-02-PLAN.md — Geocoding (Nominatim), UPI format validation, WhatsApp send helper + outbound log
+- [ ] 01-03-PLAN.md — Resumable onboarding state machine + wow-moment completion routine
+- [ ] 01-04-PLAN.md — OpenAPI contracts, webhook wiring, purohits inspection endpoint, E2E test
+- [ ] 01-05-PLAN.md — [checkpoint] Meta task-specific agent registration
 
 ### Phase 2: Bahi Khata Ingestion
 **Goal**: A purohit can build out their full yajman roster and event history the way they already keep it — by voice or by photographing their bahi khata — never by filling in a sequential typed form.
@@ -100,7 +107,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Platform Foundation & Purohit Onboarding | 0/TBD | Not started | - |
+| 1. Platform Foundation & Purohit Onboarding | 0/5 | Planned | - |
 | 2. Bahi Khata Ingestion | 0/TBD | Not started | - |
 | 3. Corroborated Dakshina Ledger | 0/TBD | Not started | - |
 | 4. Daily Brain — Scheduling & Lapse Recovery | 0/TBD | Not started | - |
