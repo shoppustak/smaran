@@ -12,8 +12,8 @@ The existing `code/` workspace already has spike-level scaffolding (a Vedika san
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Platform Foundation & Purohit Onboarding** - Purohit completes first-contact WhatsApp onboarding onto a real Supabase-backed system of record, and sees a resolved date card within minutes
-- [ ] **Phase 2: Bahi Khata Ingestion** - Purohit populates yajman/event data by voice note or photo, never a typed form, with every AI extraction confirmed before it's saved
+- [x] **Phase 1: Platform Foundation & Purohit Onboarding** - Purohit completes first-contact WhatsApp onboarding onto a real Supabase-backed system of record, and sees a resolved date card within minutes
+- [x] **Phase 2: Bahi Khata Ingestion** - Purohit populates yajman/event data by voice note or photo, never a typed form, with every AI extraction confirmed before it's saved
 - [ ] **Phase 3: Corroborated Dakshina Ledger** - Purohit and family jointly corroborate a dakshina payment with money flowing only through UPI deep links, never the platform — closes the milestone's core loop
 - [ ] **Phase 4: Daily Brain — Scheduling & Lapse Recovery** - A daily job proactively surfaces upcoming rituals and resurfaces lapsed families for re-engagement
 - [ ] **Phase 5: Schedule Protection** - Purohit can defend festival-season scheduling with an on-demand day-sheet and double-booking warnings
@@ -72,7 +72,13 @@ Plans:
   2. The purohit can tap "Dakshina received" and the family can independently tap "Confirm" — the family's tap corroborates that the ritual happened, never the amount.
   3. A ledger row only reaches `corroborated` after both the purohit's `claimed` tap and the family's confirm tap have landed; no payment webhook exists anywhere in this path, and no single side's assertion alone can mark a row paid.
   4. A real purohit can be walked through the complete loop end to end: onboarded (Phase 1), logs a yajman event (Phase 2), and gets that event's dakshina recorded as corroborated here — proving the milestone's success metric.
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [x] 03-01-PLAN.md — UPI deep link builder & ledger state machine (pending -> claimed -> corroborated)
+- [x] 03-02-PLAN.md — Post-ritual cards + interactive webhook button routing + E2E Playwright test
+- [x] 03-03-PLAN.md — Ops API endpoint GET /ledger/:id (X-Internal-Key gated) + OpenAPI zod schemas
+- [ ] 03-04-PLAN.md — Gap closure: wire ritual-completed trigger + amount capture -> post-ritual card dispatch, E2E test without raw-SQL ledger seeding
 
 ### Phase 4: Daily Brain — Scheduling & Lapse Recovery
 **Goal**: The purohit's calendar starts working for them without being asked — rituals are surfaced ahead of time, and families who've gone quiet are flagged for re-engagement before they're lost.
@@ -82,7 +88,12 @@ Plans:
   1. A daily 6:00 AM job resolves the coming week against every purohit's `events` table (respecting each purohit's own calendar system) and sends pre-ritual cards ~7 and ~2 days ahead with tithi/date, ritual name, samagri list, and a "Confirm ritual" tap — never a payment link.
   2. Any family whose annual ritual has no booking logged for the current cycle triggers a re-engagement nudge to the purohit, and each recovery is counted as a tracked metric.
   3. Shraddh (solemn) and celebratory (birthday/katha) events send from separate, native-speaker-reviewed template packs with distinct copy registers.
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — Daily cron route & date matching engine
+- [ ] 04-02-PLAN.md — Pre-ritual cards with separate registers & webhook confirmations
+- [ ] 04-03-PLAN.md — Lapse recovery detection scanner & E2E tests
 
 ### Phase 5: Schedule Protection
 **Goal**: A purohit heading into festival season can see their real commitments at a glance and gets warned before double-booking a muhurat.
@@ -91,7 +102,11 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. A purohit can send a "my week" / "इस हफ्ते" command and get back their bookings grouped by muhurat window.
   2. Attempting to save a new booking that collides with an existing one in the same muhurat window triggers a warning before it's saved, not after.
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — Muhurat windows & collision check utility in write gates
+- [ ] 05-02-PLAN.md — Day-sheet commands & webhook collision override prompt with E2E tests
 
 ### Phase 6: Family Calendar Subscription
 **Goal**: Families who want their own copy of the ritual calendar can pay for it directly, with the relationship always anchored to their own purohit.
@@ -101,7 +116,11 @@ Plans:
   1. Cards sent to families surface a "Get your family's ritual calendar" offer with a ₹29/month UPI autopay deep link.
   2. Subscription state (active / lapsed / cancelled) is tracked per family, and renewal nudges go out as registered Utility messages.
   3. At no point in this flow can a family discover, compare, or reach any purohit other than their own.
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — UPI Autopay deep link utility & subscription state check background logic
+- [ ] 06-02-PLAN.md — Family offer card & webhook routing isolation checks with E2E tests
 
 ### Phase 7: Referral & Growth Instrumentation
 **Goal**: The single highest-risk assumption in the business case — that purohit-to-purohit referral can sustain observed k ≥ 1.3 — becomes measurable rather than assumed.
@@ -111,7 +130,11 @@ Plans:
   1. A purohit can request their personal referral card on demand from the bot.
   2. A new purohit onboarding via someone else's referral card has `referred_by_purohit_id` set on their record.
   3. A weekly job computes observed k (referred activations ÷ activated purohits, cohort-tagged) — the number the M4 growth gate is decided on.
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 07-01-PLAN.md — Referral card generation & onboarding tracking webhook parsing
+- [ ] 07-02-PLAN.md — Weekly cohort observed-k calculator & E2E tests
 
 ## Progress
 
@@ -120,10 +143,10 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Platform Foundation & Purohit Onboarding | 0/5 | Planned | - |
-| 2. Bahi Khata Ingestion | 0/10 | Planned | - |
-| 3. Corroborated Dakshina Ledger | 0/TBD | Not started | - |
-| 4. Daily Brain — Scheduling & Lapse Recovery | 0/TBD | Not started | - |
-| 5. Schedule Protection | 0/TBD | Not started | - |
-| 6. Family Calendar Subscription | 0/TBD | Not started | - |
-| 7. Referral & Growth Instrumentation | 0/TBD | Not started | - |
+| 1. Platform Foundation & Purohit Onboarding | 5/5 | Completed | 2026-07-15 |
+| 2. Bahi Khata Ingestion | 11/11 | Completed | 2026-07-15 |
+| 3. Corroborated Dakshina Ledger | 0/3 | Planned | - |
+| 4. Daily Brain — Scheduling & Lapse Recovery | 0/3 | Planned | - |
+| 5. Schedule Protection | 0/2 | Planned | - |
+| 6. Family Calendar Subscription | 0/2 | Planned | - |
+| 7. Referral & Growth Instrumentation | 0/2 | Planned | - |
