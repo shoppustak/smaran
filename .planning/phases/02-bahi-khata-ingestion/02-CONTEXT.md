@@ -38,9 +38,9 @@ the permanent record without an explicit tap.
   read) must run before the eval harness bake-off, per the spec's own build order.
 
 ### Confirmation UX
-- **D-03:** Stale `awaiting_confirm` jobs (purohit went quiet) get **no reminder nudge
-  in Phase 2** — that's a lapse-recovery concern matching BRAIN-02's shape, deferred to
-  Phase 4 rather than duplicated here.
+- **D-03 [informational]:** Stale `awaiting_confirm` jobs (purohit went quiet) get **no
+  reminder nudge in Phase 2** — that's a lapse-recovery concern matching BRAIN-02's
+  shape, deferred to Phase 4 rather than duplicated here.
 - **D-04:** Zero-field extraction (garbled audio, unreadable photo) reuses the
   existing `ingest_jobs.status = 'failed'` path plus a friendly re-record/re-photograph
   prompt — no new status or retry-scheduling logic needed.
@@ -57,8 +57,8 @@ the permanent record without an explicit tap.
   a shraddh card is a serious insult per the spec's own framing).
 
 ### DPDP consent
-- **D-06:** `consent_status` capture (per `.planning/intel/constraints.md`'s "consent
-  at family-side first contact") is **deferred to a later phase** — Smaran is
+- **D-06 [informational]:** `consent_status` capture (per `.planning/intel/constraints.md`'s
+  "consent at family-side first contact") is **deferred to a later phase** — Smaran is
   WhatsApp-only and purohit-facing; no family-side contact surface exists yet to
   capture consent from. Phase 2's DPDP minimization story rests on
   `docs/ref-state-2-plan.md` §8's retention policy instead (audio bytes deleted
