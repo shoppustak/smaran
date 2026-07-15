@@ -7,7 +7,7 @@ export function Header() {
   const href = buildWhatsAppLink(content.whatsAppMessage);
 
   return (
-    <header className="w-full bg-transparent border-b border-border/30">
+    <header className="w-full bg-transparent">
       <div className="mx-auto flex h-[72px] max-w-[1200px] items-center justify-between px-8">
         <a href="#" className="flex items-center gap-2">
           <img
