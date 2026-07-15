@@ -20,7 +20,7 @@ export function Footer() {
                 <img
                   src="/logo.svg"
                   alt="Smaran logo mark"
-                  className="h-24 w-auto sm:h-32 object-contain"
+                  className="h-20 w-auto sm:h-20 md:h-[84px] object-contain"
                 />
               </div>
               <p className="fs-body text-text-secondary leading-[1.6] text-center md:text-left">
