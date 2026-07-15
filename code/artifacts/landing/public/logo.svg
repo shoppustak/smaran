@@ -5,10 +5,11 @@
  width="621.000000pt" height="595.000000pt" viewBox="0 0 621.000000 595.000000"
  preserveAspectRatio="xMidYMid meet">
 <defs>
-  <radialGradient id="logo-grad" cx="50%" cy="50%" r="50%">
-    <stop offset="60%" stop-color="#7E22CE"/> <!-- Deep Purple expanded -->
-    <stop offset="100%" stop-color="#EA580C"/> <!-- Deep Orange constrained to the outer edge -->
-  </radialGradient>
+  <linearGradient id="logo-grad" x1="100%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#7E22CE"/>
+    <stop offset="65%" stop-color="#7E22CE"/>
+    <stop offset="100%" stop-color="#EA580C"/>
+  </linearGradient>
 </defs>
 <g transform="translate(0.000000,595.000000) scale(0.100000,-0.100000)"
 fill="url(#logo-grad)" stroke="none">
