@@ -43,9 +43,9 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 
 <!-- Source: REQ-corroborated-payments -->
 
-- [ ] **PAY-01**: A post-ritual card is sent after the ritual date (or the purohit's "completed" tap) with gratitude framing, a dakshina UPI deep link to the purohit's own VPA, and a purohit-side "Dakshina received" tap
-- [ ] **PAY-02**: A family-side "Confirm" tap corroborates the ritual's occurrence only (never the amount), and also opens a free WhatsApp service window
-- [ ] **PAY-03**: The ledger state machine enforces `pending → claimed` (purohit tap) `→ corroborated` (both parties tapped) with no path to `corroborated` from a single side's assertion and no payment webhooks anywhere in the system
+- [x] **PAY-01**: A post-ritual card is sent after the ritual date (or the purohit's "completed" tap) with gratitude framing, a dakshina UPI deep link to the purohit's own VPA, and a purohit-side "Dakshina received" tap
+- [x] **PAY-02**: A family-side "Confirm" tap corroborates the ritual's occurrence only (never the amount), and also opens a free WhatsApp service window
+- [x] **PAY-03**: The ledger state machine enforces `pending → claimed` (purohit tap) `→ corroborated` (both parties tapped) with no path to `corroborated` from a single side's assertion and no payment webhooks anywhere in the system
 
 ### Family Subscription
 
@@ -97,9 +97,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ING-01 | Phase 2 | Pending |
 | ING-02 | Phase 2 | Pending |
 | ING-03 | Phase 2 | Pending |
-| PAY-01 | Phase 3 | Pending |
-| PAY-02 | Phase 3 | Pending |
-| PAY-03 | Phase 3 | Pending |
+| PAY-01 | Phase 3 | Complete |
+| PAY-02 | Phase 3 | Complete |
+| PAY-03 | Phase 3 | Complete |
 | BRAIN-01 | Phase 4 | Pending |
 | BRAIN-02 | Phase 4 | Pending |
 | BRAIN-03 | Phase 4 | Pending |

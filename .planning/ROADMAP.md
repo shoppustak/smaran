@@ -78,7 +78,7 @@ Plans:
 - [x] 03-01-PLAN.md — UPI deep link builder & ledger state machine (pending -> claimed -> corroborated)
 - [x] 03-02-PLAN.md — Post-ritual cards + interactive webhook button routing + E2E Playwright test
 - [x] 03-03-PLAN.md — Ops API endpoint GET /ledger/:id (X-Internal-Key gated) + OpenAPI zod schemas
-- [ ] 03-04-PLAN.md — Gap closure: wire ritual-completed trigger + amount capture -> post-ritual card dispatch, E2E test without raw-SQL ledger seeding
+- [x] 03-04-PLAN.md — Gap closure: wire ritual-completed trigger + amount capture -> post-ritual card dispatch, E2E test without raw-SQL ledger seeding
 
 ### Phase 4: Daily Brain — Scheduling & Lapse Recovery
 **Goal**: The purohit's calendar starts working for them without being asked — rituals are surfaced ahead of time, and families who've gone quiet are flagged for re-engagement before they're lost.
