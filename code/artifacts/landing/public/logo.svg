@@ -6,8 +6,8 @@
  preserveAspectRatio="xMidYMid meet">
 <defs>
   <radialGradient id="logo-grad" cx="50%" cy="50%" r="50%">
-    <stop offset="0%" stop-color="#7E22CE"/> <!-- Deep Purple for the center -->
-    <stop offset="100%" stop-color="#EA580C"/> <!-- Deep Orange for the outer trunk -->
+    <stop offset="60%" stop-color="#7E22CE"/> <!-- Deep Purple expanded -->
+    <stop offset="100%" stop-color="#EA580C"/> <!-- Deep Orange constrained to the outer edge -->
   </radialGradient>
 </defs>
 <g transform="translate(0.000000,595.000000) scale(0.100000,-0.100000)"
