@@ -25,7 +25,7 @@ export function Hero() {
   const [first, second, third, fourth] = content.howItWorks.items;
 
   return (
-    <section className="relative bg-background pt-16 pb-12 md:pt-20 md:pb-16 px-6">
+    <section className="relative bg-background pt-8 pb-12 md:pt-10 md:pb-16 px-6">
 
       <div className="relative z-10 mx-auto max-w-[1200px]">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-center lg:gap-16">
