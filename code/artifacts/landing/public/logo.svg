@@ -7,7 +7,8 @@
 <defs>
   <linearGradient id="logo-grad" x1="100%" y1="0%" x2="0%" y2="100%">
     <stop offset="0%" stop-color="#7E22CE"/>
-    <stop offset="65%" stop-color="#7E22CE"/>
+    <stop offset="55%" stop-color="#7E22CE"/>
+    <stop offset="85%" stop-color="#DB2777"/> <!-- Smooth pink/magenta bridge -->
     <stop offset="100%" stop-color="#EA580C"/>
   </linearGradient>
 </defs>
