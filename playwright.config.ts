@@ -15,6 +15,7 @@ export default defineConfig({
     env: {
       PORT: String(PORT),
       WHATSAPP_VERIFY_TOKEN: "e2e-test-verify-token",
+      CRON_SECRET: process.env.CRON_SECRET || "e2e-local-key",
     },
     url: `${BASE_URL}/api/healthz`,
     reuseExistingServer: !process.env.CI,
