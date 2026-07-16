@@ -50,8 +50,18 @@ pnpm --dir code --filter @workspace/mockup-sandbox run dev
 `knowledgebase/` documents architecture and intent — folders `00-Meta` … `05-Logbook`, Obsidian-
 style. Start at `knowledgebase/00-Meta/smaran-index.md`.
 
-Use the KB to understand **why** something exists and how subsystems relate. It is **git-tracked**
-(unlike some sibling projects' local-only KBs) — it's part of this repo's history.
+Use the KB to understand **why** something exists and how subsystems relate.
+
+## ⚠️ KB is local-only — gitignored, never pushed
+`knowledgebase/` is **gitignored** (`.gitignore`: `knowledgebase/`) and has **no tracked files** —
+by explicit decision at initial push time, since `shoppustak/smaran` is a **public** repo and the KB
+holds internal design/intent notes and infrastructure detail. It is **not** part of this repo's
+history and must not be committed.
+- Verify with `git ls-files knowledgebase/` (expect: empty) before assuming otherwise.
+- Never `git add -f` a KB file, and never use `git add -A`/`git commit -a` expecting the KB to be
+  captured — it won't be, and forcing it publishes internal notes.
+- KB edits are still **part of "done"** (see below) — they just live only on this machine, so they
+  are not backed up by git. Treat the local copy as the only copy.
 
 ## ⚠️ KB is manually synced — code is ground truth
 The KB is updated by hand when features land, so it can lag the codebase.
