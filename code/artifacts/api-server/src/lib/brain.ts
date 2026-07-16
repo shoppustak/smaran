@@ -5,6 +5,7 @@ import { pakshaVocab } from "./vocab/paksha";
 import { tithiVocab } from "./vocab/tithi";
 import { sendWhatsappMessage, sendWhatsappTemplate } from "./whatsapp-client";
 import { logger } from "./logger";
+import { retryFetch } from "./retry";
 import { buildUpcomingPreRitualCard, toHindi, getTithiHindiName, eventTypeMap } from "./confirm-card";
 import { windowFromTime } from "./muhurat";
 
@@ -59,7 +60,7 @@ async function fetchPanchangForDate(dateStr: string) {
   const DEFAULT_TIMEZONE = "+05:30";
 
   const datetime = `${dateStr}T06:00:00${DEFAULT_TIMEZONE}`;
-  const response = await fetch(`${VEDIKA_BASE_URL}/astrology/panchang`, {
+  const response = await retryFetch(`${VEDIKA_BASE_URL}/astrology/panchang`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

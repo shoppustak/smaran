@@ -1,4 +1,5 @@
 import { AsrProvider, AsrError } from "./types";
+import { retryFetch } from "../retry";
 
 export class OpenAiAsrProvider implements AsrProvider {
   private apiKey: string;
@@ -27,7 +28,7 @@ export class OpenAiAsrProvider implements AsrProvider {
     formData.append("language", opts.languageHint === "hi-IN" ? "hi" : "en");
 
     try {
-      const upstream = await fetch(`${this.baseUrl}/audio/transcriptions`, {
+      const upstream = await retryFetch(`${this.baseUrl}/audio/transcriptions`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${this.apiKey}`,

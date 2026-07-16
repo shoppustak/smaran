@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import { resolveUpcomingEventsForWeek, persistResolvedSchedule, dispatchPreRitualAlerts, runLapseDetectionScan } from "../lib/brain";
 import { logger } from "../lib/logger";
+import { captureException } from "../lib/sentry";
 
 const router: IRouter = Router();
 
@@ -48,6 +49,7 @@ router.post("/cron/daily-brain", async (req, res) => {
     });
   } catch (err) {
     logger.error({ err }, "Daily brain cron execution failed");
+    captureException(err, { cron: "daily-brain" });
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -68,9 +70,21 @@ router.post("/cron/subscription-sweep", async (req, res) => {
   try {
     const { runSubscriptionStateCheck } = await import("../lib/subscription");
     await runSubscriptionStateCheck();
-    res.json({ status: "success" });
+
+    // Nightly cleanup of processed webhooks older than 48h
+    const { db, processedWebhooksTable } = await import("@workspace/db");
+    const { lt } = await import("drizzle-orm");
+    const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000);
+    const deleted = await db
+      .delete(processedWebhooksTable)
+      .where(lt(processedWebhooksTable.receivedAt, cutoff))
+      .returning();
+    logger.info({ deletedCount: deleted.length }, "Cleaned up old processed webhook ids in subscription-sweep");
+
+    res.json({ status: "success", cleanedWebhooks: deleted.length });
   } catch (err) {
     logger.error({ err }, "Subscription sweep cron execution failed");
+    captureException(err, { cron: "subscription-sweep" });
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -161,6 +175,7 @@ router.post("/cron/observed-k", async (req, res) => {
     res.json({ status: "success", cohorts: formatted });
   } catch (err) {
     logger.error({ err }, "Observed-k cron execution failed");
+    captureException(err, { cron: "observed-k" });
     res.status(500).json({ error: "Internal server error" });
   }
 });

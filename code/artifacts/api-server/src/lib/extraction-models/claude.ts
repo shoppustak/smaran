@@ -1,4 +1,5 @@
 import { ModelCaller, ExtractionModelError } from "./types";
+import { retryFetch } from "../retry";
 
 export class ClaudeModelCaller implements ModelCaller {
   private apiKey: string;
@@ -38,7 +39,7 @@ export class ClaudeModelCaller implements ModelCaller {
     }
 
     try {
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
+      const response = await retryFetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
           "x-api-key": this.apiKey,

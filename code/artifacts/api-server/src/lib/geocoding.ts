@@ -1,4 +1,5 @@
 import { logger } from "./logger";
+import { retryFetch } from "./retry";
 
 const NOMINATIM_BASE_URL = process.env.NOMINATIM_BASE_URL ?? "https://nominatim.openstreetmap.org";
 
@@ -6,21 +7,21 @@ const slugifyPart = (s: string) => s.trim().toLowerCase().replace(/[^a-z0-9]+/g,
 
 async function searchNominatim(query: string): Promise<{ lat: string; lon: string } | null> {
   const url = `${NOMINATIM_BASE_URL}/search?format=json&limit=1&q=${encodeURIComponent(query)}`;
-  const upstream = await fetch(url, {
-    headers: {
-      "User-Agent": "Smaran/1.0 (contact: shop.pustak@gmail.com)",
+  try {
+    const upstream = await retryFetch(url, {
+      headers: {
+        "User-Agent": "Smaran/1.0 (contact: shop.pustak@gmail.com)",
+      }
+    });
+    const data = await upstream.json() as Array<{ lat: string; lon: string }>;
+    if (!data || data.length === 0) {
+      return null;
     }
-  });
-
-  if (!upstream.ok) {
+    return data[0];
+  } catch (err) {
+    logger.warn({ query, err }, "Nominatim search failed");
     return null;
   }
-  
-  const data = await upstream.json() as Array<{ lat: string; lon: string }>;
-  if (!data || data.length === 0) {
-    return null;
-  }
-  return data[0];
 }
 
 export async function geocodeCity(city: string, ward: string): Promise<{ latitude: number; longitude: number; localityKey: string } | null> {

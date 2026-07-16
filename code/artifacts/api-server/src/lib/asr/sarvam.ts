@@ -1,4 +1,5 @@
 import { AsrProvider, AsrError } from "./types";
+import { retryFetch } from "../retry";
 
 export class SarvamAsrProvider implements AsrProvider {
   private apiKey: string;
@@ -27,7 +28,7 @@ export class SarvamAsrProvider implements AsrProvider {
     formData.append("language_code", opts.languageHint);
 
     try {
-      const upstream = await fetch(`${this.baseUrl}/speech-to-text`, {
+      const upstream = await retryFetch(`${this.baseUrl}/speech-to-text`, {
         method: "POST",
         headers: {
           "api-subscription-key": this.apiKey,

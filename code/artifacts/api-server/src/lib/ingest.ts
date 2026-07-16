@@ -22,6 +22,7 @@ import { tithiVocab } from "./vocab/tithi";
 import { pakshaVocab } from "./vocab/paksha";
 import { gotraVocab } from "./vocab/gotra";
 import { logger } from "./logger";
+import { captureException } from "./sentry";
 import {
   hasMuhuratCollision,
   getMuhuratCollision,
@@ -275,6 +276,7 @@ export async function runIngestPipeline(
     mediaBytes = download.bytes;
   } catch (err: any) {
     logger.error({ err, jobId: job.id }, "Media download failed in pipeline");
+    captureException(err, { jobId: job.id, step: "download" });
     await transitionJob(job.id, "failed", { error: String(err) });
     const apology = job.kind === "voice" ? VOICE_APOLOGY_MESSAGE : PHOTO_APOLOGY_MESSAGE;
     await sendWhatsappMessage(purohit.phoneNumber, {
@@ -294,6 +296,7 @@ export async function runIngestPipeline(
       await transitionJob(job.id, "transcribed", { transcript });
     } catch (err: any) {
       logger.error({ err, jobId: job.id }, "ASR transcription failed");
+      captureException(err, { jobId: job.id, step: "transcribe" });
       await transitionJob(job.id, "failed", { error: String(err) });
       await sendWhatsappMessage(purohit.phoneNumber, {
         type: "text",
@@ -307,6 +310,7 @@ export async function runIngestPipeline(
       extraction = await extractFields(transcript, getExtractionModelCaller());
     } catch (err: any) {
       logger.error({ err, jobId: job.id }, "Field extraction failed");
+      captureException(err, { jobId: job.id, step: "extract" });
       await transitionJob(job.id, "failed", { error: String(err) });
       await sendWhatsappMessage(purohit.phoneNumber, {
         type: "text",
@@ -323,6 +327,7 @@ export async function runIngestPipeline(
       }
     } catch (err: any) {
       logger.error({ err, jobId: job.id }, "Voice finalization failed");
+      captureException(err, { jobId: job.id, step: "finalize-voice" });
       await transitionJob(job.id, "failed", { error: String(err) });
       await sendWhatsappMessage(purohit.phoneNumber, {
         type: "text",
@@ -336,6 +341,7 @@ export async function runIngestPipeline(
       extractionResult = await extractFieldsFromImage(mediaBytes, getExtractionModelCaller());
     } catch (err: any) {
       logger.error({ err, jobId: job.id }, "Vision extraction failed");
+      captureException(err, { jobId: job.id, step: "vision-extract" });
       await transitionJob(job.id, "failed", { error: String(err) });
       await sendWhatsappMessage(purohit.phoneNumber, {
         type: "text",
@@ -367,6 +373,7 @@ export async function runIngestPipeline(
         await finalizeFamilyExtraction(familyJob, purohit, families[i]);
       } catch (err: any) {
         logger.error({ err, index: i, jobId: job.id }, "Failed to process family in photo burst");
+        captureException(err, { jobId: job.id, index: i, step: "photo-burst" });
         const targetJobId = siblingCreated ? familyJob.id : job.id;
         try {
           await transitionJob(targetJobId, "failed", { error: String(err) });

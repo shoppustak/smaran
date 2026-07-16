@@ -1,8 +1,10 @@
 import { Router, type IRouter } from "express";
+import crypto from "crypto";
 import { SendWhatsappMessageResponse, ListWhatsappMessagesResponseItem, ListWhatsappOutboundMessagesResponseItem } from "@workspace/api-zod";
 import { handleOnboardingMessage } from "../lib/onboarding";
 import { sendWhatsappMessage, getOutboundMessages, WhatsappSendError } from "../lib/whatsapp-client";
 import { eq, and } from "drizzle-orm";
+import { captureException } from "../lib/sentry";
 
 
 const router: IRouter = Router();
@@ -89,6 +91,66 @@ router.get("/whatsapp/webhook", (req, res) => {
 
 // Meta calls this for every inbound message / status update.
 router.post("/whatsapp/webhook", async (req, res) => {
+  // Webhook signature verification.
+  // The bypass is honoured ONLY outside production: in production a missing or
+  // invalid signature must always reject, so that setting the flag (e.g. to
+  // silence 500s from an unset WHATSAPP_APP_SECRET) can never silently open the
+  // webhook to forged payloads. Tests sign their payloads and do not use it.
+  const bypassRequested =
+    process.env.SKIP_WEBHOOK_SIGNATURE_VERIFICATION === "true" || process.env.NODE_ENV === "test";
+  const isTestOrBypass = bypassRequested && process.env.NODE_ENV !== "production";
+  if (bypassRequested && process.env.NODE_ENV === "production") {
+    req.log.error(
+      "Signature-verification bypass requested in production; ignoring and enforcing verification",
+    );
+  }
+  if (!isTestOrBypass) {
+    const APP_SECRET = process.env.WHATSAPP_APP_SECRET;
+    if (!APP_SECRET) {
+      req.log.error("WHATSAPP_APP_SECRET environment variable is missing; rejecting webhook request");
+      res.status(500).json({ error: "Webhook verification not configured" });
+      return;
+    }
+
+    const signature = req.headers["x-hub-signature-256"];
+    if (!signature || typeof signature !== "string") {
+      req.log.warn("Missing X-Hub-Signature-256 header");
+      res.status(401).json({ error: "Missing signature" });
+      return;
+    }
+
+    const parts = signature.split("=");
+    if (parts.length !== 2 || parts[0] !== "sha256") {
+      req.log.warn({ signature }, "Malformed X-Hub-Signature-256 header");
+      res.status(401).json({ error: "Malformed signature" });
+      return;
+    }
+
+    const signatureHash = parts[1];
+    const rawBody = (req as any).rawBody;
+    if (!rawBody) {
+      req.log.error("Raw body is missing; cannot verify signature");
+      res.status(400).json({ error: "Missing raw body" });
+      return;
+    }
+
+    const expectedHash = crypto
+      .createHmac("sha256", APP_SECRET)
+      .update(rawBody)
+      .digest("hex");
+
+    const actualBuffer = Buffer.from(signatureHash, "hex");
+    const expectedBuffer = Buffer.from(expectedHash, "hex");
+
+    if (
+      actualBuffer.length !== expectedBuffer.length ||
+      !crypto.timingSafeEqual(actualBuffer, expectedBuffer)
+    ) {
+      req.log.warn({ signature, expectedHash }, "Signature mismatch");
+      res.status(401).json({ error: "Signature mismatch" });
+      return;
+    }
+  }
 
 
   try {
@@ -103,15 +165,40 @@ router.post("/whatsapp/webhook", async (req, res) => {
     for (const msg of messages) {
       if (msg.id) {
         if (processedMessageIdSet.has(msg.id)) {
-          req.log.debug({ messageId: msg.id }, "duplicate webhook delivery, skipping");
+          req.log.debug({ messageId: msg.id }, "duplicate webhook delivery (in-memory), skipping");
           continue;
         }
-        processedMessageIdSet.add(msg.id);
-        processedMessageIds.push(msg.id);
-        if (processedMessageIds.length > MAX_DEDUP_MESSAGES) {
-          const oldest = processedMessageIds.shift();
-          if (oldest !== undefined) {
-            processedMessageIdSet.delete(oldest);
+
+        try {
+          const { db: dbDedup, processedWebhooksTable } = await import("@workspace/db");
+          const inserted = await dbDedup
+            .insert(processedWebhooksTable)
+            .values({ messageId: msg.id })
+            .onConflictDoNothing()
+            .returning();
+
+          if (inserted.length === 0) {
+            req.log.info({ messageId: msg.id }, "duplicate webhook delivery (db), skipping");
+            continue;
+          }
+
+          processedMessageIdSet.add(msg.id);
+          processedMessageIds.push(msg.id);
+          if (processedMessageIds.length > MAX_DEDUP_MESSAGES) {
+            const oldest = processedMessageIds.shift();
+            if (oldest !== undefined) {
+              processedMessageIdSet.delete(oldest);
+            }
+          }
+        } catch (dbErr) {
+          req.log.warn({ err: dbErr, messageId: msg.id }, "Database dedup insert failed; falling back to in-memory only");
+          processedMessageIdSet.add(msg.id);
+          processedMessageIds.push(msg.id);
+          if (processedMessageIds.length > MAX_DEDUP_MESSAGES) {
+            const oldest = processedMessageIds.shift();
+            if (oldest !== undefined) {
+              processedMessageIdSet.delete(oldest);
+            }
           }
         }
       }
@@ -428,6 +515,7 @@ router.post("/whatsapp/webhook", async (req, res) => {
                   await applyFreeTextCorrection(job.id, fieldPath, msg.text.body, purohit.id);
                 } catch (err) {
                   req.log.error({ err, jobId: job.id, fieldPath }, "Failed to apply free text correction");
+                  captureException(err, { jobId: job.id, fieldPath, context: "applyFreeTextCorrection" });
                 }
               })();
               continue;
@@ -491,6 +579,7 @@ router.post("/whatsapp/webhook", async (req, res) => {
               await runIngestPipeline(job, purohit, audioId, msg.audio.duration);
             } catch (err) {
               req.log.error({ err, msg }, "Error running voice ingest pipeline");
+              captureException(err, { from: msg.from, audioId, context: "voice-ingest-pipeline" });
             }
           })();
         } catch (err) {
@@ -542,6 +631,7 @@ router.post("/whatsapp/webhook", async (req, res) => {
               await runIngestPipeline(job, purohit, imageId);
             } catch (err) {
               req.log.error({ err, msg }, "Error running photo ingest pipeline");
+              captureException(err, { from: msg.from, imageId, context: "photo-ingest-pipeline" });
             }
           })();
         } catch (err) {
@@ -594,6 +684,7 @@ router.post("/whatsapp/webhook", async (req, res) => {
               });
             } catch (err) {
               req.log.error({ err, yajmanId, from: msg.from }, "Error in subscribe-confirm callback");
+              captureException(err, { yajmanId, from: msg.from, context: "subscribe-confirm" });
             }
           })();
           continue;
@@ -688,6 +779,7 @@ router.post("/whatsapp/webhook", async (req, res) => {
               }
             } catch (err) {
               req.log.error({ err, ledgerId, action }, "Error processing ledger interactive callback");
+              captureException(err, { ledgerId, action, from: msg.from, context: "ledger-callback" });
             }
           })();
           continue;
@@ -914,6 +1006,7 @@ router.post("/whatsapp/webhook", async (req, res) => {
                 }
               } catch (err) {
                 req.log.error({ err, eventId, action }, "Error in booking-confirm callback");
+                captureException(err, { eventId, action, from: msg.from, context: "booking-confirm" });
               }
             })();
           } else if (action === "lapse-engage") {
@@ -975,6 +1068,7 @@ router.post("/whatsapp/webhook", async (req, res) => {
                 });
               } catch (err) {
                 req.log.error({ err, eventId, action }, "Error in lapse-engage callback");
+                captureException(err, { eventId, action, from: msg.from, context: "lapse-engage" });
               }
             })();
           } else if (action === "ritual-completed") {
@@ -1042,6 +1136,7 @@ router.post("/whatsapp/webhook", async (req, res) => {
                 });
               } catch (err) {
                 req.log.error({ err, eventId, action }, "Error in ritual-completed callback");
+                captureException(err, { eventId, action, from: msg.from, context: "ritual-completed" });
               }
             })();
           } else {
@@ -1049,11 +1144,13 @@ router.post("/whatsapp/webhook", async (req, res) => {
           }
         } catch (err) {
           req.log.error({ err, msg }, "Failed to process inbound interactive webhook message");
+          captureException(err, { msg, context: "inbound-interactive-webhook" });
         }
       }
     }
   } catch (err) {
     req.log.error({ err }, "Failed to parse WhatsApp webhook payload");
+    captureException(err, { context: "parse-whatsapp-webhook-payload" });
   }
 
   if (!res.headersSent) {

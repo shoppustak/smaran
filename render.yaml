@@ -21,6 +21,13 @@ services:
         sync: false
       - key: WHATSAPP_VERIFY_TOKEN
         sync: false
+      # Required: HMAC-SHA256 verification of X-Hub-Signature-256 on inbound
+      # webhooks. Absent => every webhook is rejected 500 (fail closed).
+      - key: WHATSAPP_APP_SECRET
+        sync: false
+      # Optional: unset disables Sentry (no-op).
+      - key: SENTRY_DSN
+        sync: false
       - key: VEDIKA_API_KEY
         sync: false
       - key: VEDIKA_API_BASE_URL
@@ -29,7 +36,7 @@ services:
         sync: false
       - key: CRON_SECRET
         sync: false
-    healthCheckPath: /api/healthz
+    healthCheckPath: /api/health/ready
     customDomains:
       - api.smaran.click
 

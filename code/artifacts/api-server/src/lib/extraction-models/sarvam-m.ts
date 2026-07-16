@@ -1,4 +1,5 @@
 import { ModelCaller, ExtractionModelError } from "./types";
+import { retryFetch } from "../retry";
 
 export class SarvamMModelCaller implements ModelCaller {
   private apiKey: string;
@@ -24,7 +25,7 @@ export class SarvamMModelCaller implements ModelCaller {
     }
 
     try {
-      const response = await fetch(`${this.baseUrl}/v1/chat/completions`, {
+      const response = await retryFetch(`${this.baseUrl}/v1/chat/completions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
