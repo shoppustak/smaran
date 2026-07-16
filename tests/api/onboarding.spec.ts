@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { postSignedWebhook, webhookEnvelope } from "./helpers/webhook";
 
 /**
  * Onboarding conversation E2E test.
@@ -10,21 +11,10 @@ import { test, expect } from "@playwright/test";
  */
 
 async function sendWebhookMessage(request: any, from: string, body: string) {
-  const webhookRes = await request.post("/api/whatsapp/webhook", {
-    data: {
-      entry: [
-        {
-          changes: [
-            {
-              value: {
-                messages: [{ from, type: "text", text: { body } }],
-              },
-            },
-          ],
-        },
-      ],
-    },
-  });
+  const webhookRes = await postSignedWebhook(
+    request,
+    webhookEnvelope({ from, type: "text", text: { body } }),
+  );
   expect(webhookRes.status()).toBe(200);
 }
 

@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { postSignedWebhook, webhookEnvelope } from "./helpers/webhook";
 
 test.describe("WhatsApp Cloud API test layer", () => {
   test("POST /whatsapp/send fails clearly when credentials are not configured", async ({ request }) => {
@@ -37,21 +38,10 @@ test.describe("WhatsApp Cloud API test layer", () => {
     const from = "15559998888";
     const text = `e2e probe ${Date.now()}`;
 
-    const webhookRes = await request.post("/api/whatsapp/webhook", {
-      data: {
-        entry: [
-          {
-            changes: [
-              {
-                value: {
-                  messages: [{ from, type: "text", text: { body: text } }],
-                },
-              },
-            ],
-          },
-        ],
-      },
-    });
+    const webhookRes = await postSignedWebhook(
+      request,
+      webhookEnvelope({ from, type: "text", text: { body: text } }),
+    );
     expect(webhookRes.status()).toBe(200);
 
     const messagesRes = await request.get("/api/whatsapp/messages");

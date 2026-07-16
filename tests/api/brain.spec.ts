@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { Client } from "pg";
 import * as crypto from "crypto";
+import { postSignedWebhook, interactiveMessage } from "./helpers/webhook";
 
 test.describe("Daily Brain Cron and Lapse Recovery E2E Flow", () => {
   let client: Client;
@@ -154,32 +155,10 @@ test.describe("Daily Brain Cron and Lapse Recovery E2E Flow", () => {
 
     // 6. Test lapse recovery webhook
     // First, verify a non-owner cannot recovery it
-    const wrongWebhookRes = await request.post("/api/whatsapp/webhook", {
-      data: {
-        entry: [
-          {
-            changes: [
-              {
-                value: {
-                  messages: [
-                    {
-                      id: `msg-${Date.now()}-wrong`,
-                      from: yajmanPhone,
-                      type: "interactive",
-                      interactive: {
-                        button_reply: {
-                          id: `lapse-engage:${lapsedEventId}`,
-                        },
-                      },
-                    },
-                  ],
-                },
-              },
-            ],
-          },
-        ],
-      },
-    });
+    const wrongWebhookRes = await postSignedWebhook(
+      request,
+      interactiveMessage(yajmanPhone, `lapse-engage:${lapsedEventId}`, `msg-${Date.now()}-wrong`),
+    );
     expect(wrongWebhookRes.status()).toBe(200);
 
     const checkLapseDb1 = await client.query("SELECT * FROM lapse_recoveries WHERE event_id = $1", [lapsedEventId]);
@@ -187,32 +166,10 @@ test.describe("Daily Brain Cron and Lapse Recovery E2E Flow", () => {
     expect(checkLapseDb1.rows[0].recovered_at).toBeNull();
 
     // Then, verify the owner purohit can recover it
-    const webhookRes = await request.post("/api/whatsapp/webhook", {
-      data: {
-        entry: [
-          {
-            changes: [
-              {
-                value: {
-                  messages: [
-                    {
-                      id: `msg-${Date.now()}-ok`,
-                      from: purohitPhone,
-                      type: "interactive",
-                      interactive: {
-                        button_reply: {
-                          id: `lapse-engage:${lapsedEventId}`,
-                        },
-                      },
-                    },
-                  ],
-                },
-              },
-            ],
-          },
-        ],
-      },
-    });
+    const webhookRes = await postSignedWebhook(
+      request,
+      interactiveMessage(purohitPhone, `lapse-engage:${lapsedEventId}`, `msg-${Date.now()}-ok`),
+    );
     expect(webhookRes.status()).toBe(200);
 
     // Wait a brief moment to ensure any asynchronous processing resolves

@@ -1,58 +1,25 @@
 import { test, expect } from "@playwright/test";
 import { Client } from "pg";
 import * as crypto from "crypto";
+import { postSignedWebhook, webhookEnvelope } from "./helpers/webhook";
 
 async function sendWebhookInteractive(request: any, from: string, interactiveId: string) {
-  const webhookRes = await request.post("/api/whatsapp/webhook", {
-    data: {
-      entry: [
-        {
-          changes: [
-            {
-              value: {
-                messages: [
-                  {
-                    from,
-                    type: "interactive",
-                    interactive: {
-                      button_reply: {
-                        id: interactiveId,
-                      },
-                    },
-                  },
-                ],
-              },
-            },
-          ],
-        },
-      ],
-    },
-  });
+  const webhookRes = await postSignedWebhook(
+    request,
+    webhookEnvelope({
+      from,
+      type: "interactive",
+      interactive: { button_reply: { id: interactiveId } },
+    }),
+  );
   expect(webhookRes.status()).toBe(200);
 }
 
 async function sendWebhookText(request: any, from: string, text: string) {
-  const webhookRes = await request.post("/api/whatsapp/webhook", {
-    data: {
-      entry: [
-        {
-          changes: [
-            {
-              value: {
-                messages: [
-                  {
-                    from,
-                    type: "text",
-                    text: { body: text },
-                  },
-                ],
-              },
-            },
-          ],
-        },
-      ],
-    },
-  });
+  const webhookRes = await postSignedWebhook(
+    request,
+    webhookEnvelope({ from, type: "text", text: { body: text } }),
+  );
   expect(webhookRes.status()).toBe(200);
 }
 

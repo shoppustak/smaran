@@ -2,35 +2,10 @@ import { test, expect } from "@playwright/test";
 import { Client } from "pg";
 import * as crypto from "crypto";
 import { buildFamilyCalendarOfferCard } from "../../code/artifacts/api-server/src/lib/confirm-card";
+import { postSignedWebhook, interactiveMessage } from "./helpers/webhook";
 
 async function sendWebhookInteractive(request: any, from: string, interactiveId: string) {
-  const webhookRes = await request.post("/api/whatsapp/webhook", {
-    data: {
-      entry: [
-        {
-          changes: [
-            {
-              value: {
-                messages: [
-                  {
-                    id: `msg-${Date.now()}`,
-                    from,
-                    type: "interactive",
-                    interactive: {
-                      button_reply: {
-                        id: interactiveId,
-                      },
-                    },
-                  },
-                ],
-              },
-            },
-          ],
-        },
-      ],
-    },
-  });
-  return webhookRes;
+  return postSignedWebhook(request, interactiveMessage(from, interactiveId, `msg-${Date.now()}`));
 }
 
 test.describe("Family Subscription E2E Flows & Isolation Gating", () => {
