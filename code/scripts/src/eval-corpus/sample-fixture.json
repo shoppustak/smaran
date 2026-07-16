@@ -1,0 +1,28 @@
+[
+  {
+    "audioPath": "./mock-audio-1.ogg",
+    "expectedFields": [
+      {
+        "family_name": "Sharma",
+        "gotra": "Kashyap",
+        "event_type": "shraddh",
+        "maas": "Bhadrapada",
+        "paksha": "Krishna",
+        "tithi": 12
+      }
+    ]
+  },
+  {
+    "audioPath": "./mock-audio-2.ogg",
+    "expectedFields": [
+      {
+        "family_name": "Mishra",
+        "gotra": "Bharadwaj",
+        "event_type": "katha",
+        "maas": "Kartika",
+        "paksha": "Shukla",
+        "tithi": 15
+      }
+    ]
+  }
+]

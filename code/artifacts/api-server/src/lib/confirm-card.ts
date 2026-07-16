@@ -14,6 +14,7 @@ import {
   GOTRA_MAX_EDITS,
 } from "./fuzzy-match";
 import { sendWhatsappMessage } from "./whatsapp-client";
+import { buildAutopayDeepLink } from "./subscription";
 
 // Static mapping of English canonicals to Hindi Devanagari
 const HINDI_MAPS: Record<string, Record<string, string>> = {
@@ -62,7 +63,7 @@ const fieldVocabMap: Record<string, VocabEntry[]> = {
   tithi_name: tithiVocab,
 };
 
-const eventTypeMap: Record<string, string> = {
+export const eventTypeMap: Record<string, string> = {
   shraddh: "श्राद्ध",
   katha: "कथा",
   birthday: "जन्मदिन",
@@ -116,7 +117,7 @@ export function shouldAskField(score: number, threshold: number): boolean {
   return score < threshold;
 }
 
-function toHindi(field: string, val: string | null | undefined): string {
+export function toHindi(field: string, val: string | null | undefined): string {
   if (!val) return "❓";
   if (/[\u0900-\u097F]/.test(val)) return val;
 
@@ -562,7 +563,7 @@ const HINDI_TITHIS: Record<number, string> = {
   14: "चतुर्दशी",
 };
 
-function getTithiHindiName(tithiNum: number, paksha: "Shukla" | "Krishna"): string {
+export function getTithiHindiName(tithiNum: number, paksha: "Shukla" | "Krishna"): string {
   if (tithiNum === 15) {
     return paksha === "Shukla" ? "पूर्णिमा" : "अमावस्या";
   }
@@ -579,13 +580,28 @@ export function buildUpcomingPreRitualCard(
   const tithi = getTithiHindiName(resolved.hinduDate.tithi, resolved.hinduDate.paksha);
 
   const isSolemn = resolved.event.eventType === "shraddh";
-  let bodyText = "";
-
-  if (isSolemn) {
-    bodyText = `आदरणीय पुरोहित जी, यजमान ${familyName} के परिवार का ${maas} ${paksha} ${tithi} को श्राद्ध अनुष्ठान है (शेष दिन: ${daysRemaining})। क्या आप इस तिथि को उपलब्ध हैं?`;
+  
+  let samagriList = "";
+  if (resolved.event.eventType === "shraddh") {
+    samagriList = "- काले तिल (Black Sesame)\n- जौ (Barley)\n- कुशा घास (Kusha Grass)\n- गंगाजल (Ganga Water)\n- सफेद फूल (White Flowers)\n- कपूर, धूप (Camphor, Incense)";
+  } else if (resolved.event.eventType === "katha") {
+    samagriList = "- पंजीरी, पंचामृत (Panjiri, Panchamrit)\n- केले के पत्ते (Banana Leaves)\n- कलश (Kalash/Pot)\n- नारियल, सुपारी (Coconut, Betel Nut)\n- रोली, अक्षत (Roli, Rice)\n- फूल, फल, मिठाई (Flowers, Fruits, Sweets)";
+  } else if (resolved.event.eventType === "griha_pravesh") {
+    samagriList = "- कलश, नारियल (Kalash, Coconut)\n- आम के पत्ते (Mango Leaves)\n- दूध, दही, शहद (Milk, Curd, Honey)\n- रोली, अक्षत, धूप (Roli, Rice, Incense)\n- हवन सामग्री (Havan Materials)";
+  } else if (resolved.event.eventType === "birthday" || resolved.event.eventType === "anniversary") {
+    samagriList = "- दीपक, आरती थाली (Lamp, Aarti Plate)\n- रोली, अक्षत (Roli, Rice)\n- मौली/रक्षासूत्र (Kalava)\n- फूल, मिठाई (Flowers, Sweets)";
   } else {
-    const eventLabel = resolved.event.label || eventTypeMap[resolved.event.eventType] || resolved.event.eventType;
-    bodyText = `प्रणाम पुरोहित जी! यजमान ${familyName} के परिवार का ${eventLabel} शुभ अवसर आ रहा है (शेष दिन: ${daysRemaining})। पूजा की पुष्टि करें:`;
+    samagriList = "- रोली, अक्षत (Roli, Rice)\n- मौली/रक्षासूत्र (Kalava)\n- धूप, दीप, कपूर (Incense, Lamp, Camphor)\n- फूल, फल, प्रसाद (Flowers, Fruits, Prasad)";
+  }
+
+  const eventName = eventTypeMap[resolved.event.eventType] || resolved.event.eventType;
+  const purohitName = resolved.purohit.name.endsWith("जी") ? resolved.purohit.name : `${resolved.purohit.name} जी`;
+
+  let bodyText = "";
+  if (isSolemn) {
+    bodyText = `आदरणीय ${purohitName}, प्रणाम।\n\nआगामी तिथि को निम्नलिखित श्राद्ध अनुष्ठान निर्धारित है:\n\n📅 तिथि: ${resolved.gregorianDate} (${maas} ${paksha} पक्ष, ${tithi}) (शेष दिन: ${daysRemaining})\n👤 यजमान: ${familyName} परिवार\n📿 अनुष्ठान: श्राद्ध/पुण्यतिथि ${resolved.event.label ? `(${resolved.event.label})` : ""}\n\nआवश्यक सामग्री सूची:\n${samagriList}\n\nकृपया पूजा की पुष्टि करें।`;
+  } else {
+    bodyText = `जय श्री राम ${purohitName}!\n\nआगामी तिथि को निम्नलिखित मांगलिक कार्य निर्धारित है:\n\n📅 तिथि: ${resolved.gregorianDate} (${maas} ${paksha} पक्ष, ${tithi}) (शेष दिन: ${daysRemaining})\n👤 यजमान: ${familyName} परिवार\n🎉 अनुष्ठान: ${eventName} ${resolved.event.label ? `(${resolved.event.label})` : ""}\n\nआवश्यक सामग्री सूची:\n${samagriList}\n\nकृपया पूजा की पुष्टि करें।`;
   }
 
   return {
@@ -601,7 +617,7 @@ export function buildUpcomingPreRitualCard(
             type: "reply",
             reply: {
               id: `booking-confirm:${resolved.event.id}`,
-              title: "हाँ, बुक करें",
+              title: "✓ पूजा की पुष्टि",
             },
           },
         ],
@@ -609,5 +625,64 @@ export function buildUpcomingPreRitualCard(
     },
   };
 }
+
+export function buildFamilyCalendarOfferCard(
+  yajmanId: string,
+  purohitName: string,
+  VPA: string
+): { type: "interactive"; interactive: Record<string, unknown> } {
+  const mandateUrl = buildAutopayDeepLink(yajmanId, VPA, purohitName);
+  
+  return {
+    type: "interactive",
+    interactive: {
+      type: "button",
+      body: {
+        text: `📅 अपने परिवार का पंचांग और अनुष्ठान कैलेंडर सीधे अपने WhatsApp पर प्राप्त करें।\n(वार्षिक अनुष्ठानों के स्मरण पत्र सीधे प्राप्त होंगे)\n\nशुल्क: ₹29/माह (UPI Autopay)\nपुरोहित जी: ${purohitName}\n\nसदस्यता लिंक: ${mandateUrl}`,
+      },
+      action: {
+        buttons: [
+          {
+            type: "reply",
+            reply: {
+              id: `subscribe-confirm:${yajmanId}`,
+              title: "मैंने सदस्यता ले ली",
+            },
+          },
+        ],
+      },
+    },
+  };
+}
+
+export function buildReferralCard(
+  purohitId: string,
+  purohitName: string
+): { type: "interactive"; interactive: Record<string, unknown> } {
+  const botNumber = process.env.WHATSAPP_BOT_NUMBER || "12345";
+  const url = `https://wa.me/${botNumber}?text=invite:${purohitId}`;
+  
+  return {
+    type: "interactive",
+    interactive: {
+      type: "button",
+      body: {
+        text: `🚩 पुरोहित आमंत्रण कार्ड\n\nअपने साथी पुरोहित-जी को स्मरण से जोड़ें। वे इस लिंक पर क्लिक करके सीधे ऑनबोर्ड हो सकते हैं:\n\n${url}`,
+      },
+      action: {
+        buttons: [
+          {
+            type: "reply",
+            reply: {
+              id: "referral-sent",
+              title: "आमंत्रण भेजा गया",
+            },
+          },
+        ],
+      },
+    },
+  };
+}
+
 
 
