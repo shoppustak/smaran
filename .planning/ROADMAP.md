@@ -14,11 +14,11 @@ The existing `code/` workspace already has spike-level scaffolding (a Vedika san
 
 - [x] **Phase 1: Platform Foundation & Purohit Onboarding** - Purohit completes first-contact WhatsApp onboarding onto a real Supabase-backed system of record, and sees a resolved date card within minutes
 - [x] **Phase 2: Bahi Khata Ingestion** - Purohit populates yajman/event data by voice note or photo, never a typed form, with every AI extraction confirmed before it's saved
-- [ ] **Phase 3: Corroborated Dakshina Ledger** - Purohit and family jointly corroborate a dakshina payment with money flowing only through UPI deep links, never the platform — closes the milestone's core loop
-- [ ] **Phase 4: Daily Brain — Scheduling & Lapse Recovery** - A daily job proactively surfaces upcoming rituals and resurfaces lapsed families for re-engagement
-- [ ] **Phase 5: Schedule Protection** - Purohit can defend festival-season scheduling with an on-demand day-sheet and double-booking warnings
-- [ ] **Phase 6: Family Calendar Subscription** - Families can optionally pay for their own ritual calendar, always attributed to their own purohit
-- [ ] **Phase 7: Referral & Growth Instrumentation** - Purohit-to-purohit referral is measurable, powering the observed-k growth gate
+- [x] **Phase 3: Corroborated Dakshina Ledger** - Purohit and family jointly corroborate a dakshina payment with money flowing only through UPI deep links, never the platform — closes the milestone's core loop
+- [x] **Phase 4: Daily Brain — Scheduling & Lapse Recovery** - A daily job proactively surfaces upcoming rituals and resurfaces lapsed families for re-engagement
+- [x] **Phase 5: Schedule Protection** - Purohit can defend festival-season scheduling with an on-demand day-sheet and double-booking warnings
+- [x] **Phase 6: Family Calendar Subscription** - Families can optionally pay for their own ritual calendar, always attributed to their own purohit
+- [x] **Phase 7: Referral & Growth Instrumentation** - Purohit-to-purohit referral is measurable, powering the observed-k growth gate
 
 ## Phase Details
 
@@ -91,9 +91,10 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — Daily cron route & date matching engine
-- [ ] 04-02-PLAN.md — Pre-ritual cards with separate registers & webhook confirmations
-- [ ] 04-03-PLAN.md — Lapse recovery detection scanner & E2E tests
+- [x] 04-01-PLAN.md — Daily cron route & date matching engine
+- [x] 04-02-PLAN.md — Pre-ritual cards with separate registers & webhook confirmations
+- [x] 04-03-PLAN.md — Lapse recovery detection scanner & E2E tests
+- [x] 04-04-PLAN.md — Gap closure: 6 AM scheduler, 7/2 cadence, samagri card, lapse-engage durable metric, template packs (verified 2026-07-16; Meta approval + CRON_SECRET provisioning outstanding as operator checkpoints)
 
 ### Phase 5: Schedule Protection
 **Goal**: A purohit heading into festival season can see their real commitments at a glance and gets warned before double-booking a muhurat.
@@ -145,8 +146,8 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 |-------|----------------|--------|-----------|
 | 1. Platform Foundation & Purohit Onboarding | 5/5 | Completed | 2026-07-15 |
 | 2. Bahi Khata Ingestion | 11/11 | Completed | 2026-07-15 |
-| 3. Corroborated Dakshina Ledger | 0/3 | Planned | - |
-| 4. Daily Brain — Scheduling & Lapse Recovery | 0/3 | Planned | - |
-| 5. Schedule Protection | 0/2 | Planned | - |
-| 6. Family Calendar Subscription | 0/2 | Planned | - |
-| 7. Referral & Growth Instrumentation | 0/2 | Planned | - |
+| 3. Corroborated Dakshina Ledger | 4/4 | Completed | 2026-07-15 |
+| 4. Daily Brain — Scheduling & Lapse Recovery | 3/3 | Completed | 2026-07-15 |
+| 5. Schedule Protection | 2/2 | Completed | 2026-07-15 |
+| 6. Family Calendar Subscription | 2/2 | Completed | 2026-07-15 |
+| 7. Referral & Growth Instrumentation | 2/2 | Completed | 2026-07-15 |

@@ -37,23 +37,24 @@ Ordered by what the purohit will actually pay for, not by build order:
 
 ## Part 4 — Business Model & Revenue Geometry
 
-**Purohit pricing — annual-first, auspicious numbers.** ₹1,100/year (anchor), positioned immediately after a festival season the tool has just visibly carried him through. No separate early-bird tier — one price, for everyone, kept low and round on purpose (auspicious/shagun-register number, not a discount-anchored SaaS price). Monthly (₹151) exists as a fallback plan, never the default — a monthly fee invites churn in every lean month, and the purohit's income rhythm is seasonal.
+**Purohit pricing — annual-first, in shagun denominations.** ₹1,101/year (anchor), positioned immediately after a festival season the tool has just visibly carried him through. **Founding tier: ₹501 for the first year, capped at the first 100 purohits**, renewing at ₹1,101 (revenue drag ~₹1,500/mo at M12 — negligible; its real function is as the commitment device in ground contact). Monthly (₹151) exists as a fallback plan, never the default — a monthly fee invites churn in every lean month, and the purohit's income rhythm is seasonal. All prices are deliberate shagun amounts (₹21/₹151/₹501/₹1,101) — the denominations of dakshina itself; the pricing speaks the customer's register.
 
 **Family layer — load-bearing, not optional.** Families receiving cards may subscribe to their own family ritual calendar — reminders of their tithis and festivals, always attributed to and routed through their purohit — at ₹21/month via UPI autopay. The geometry below does not close without this layer.
 
-**The back-solve (machine-verified, revised for the ₹1,100/₹21 price revision below).** Unit: the purohit hub (~30 actively reached families each). Feasible solo seed: **70 activated purohits by end of month 4** in 2–3 temple-dense wards of one city. Compounding months m = 8 (M4→M12); one-time purohit-to-purohit invite multiplier k; revenue per activated hub r = (conversion × ARPU) + (30 × family attach × ₹21), ARPU = ₹1,100/12 ≈ ₹91.7/mo-eq (previously ₹125/mo-eq at the ₹1,499 anchor).
+**The back-solve (machine-verified — revision #1, July 2026).** Unit: the purohit hub (~30 actively reached families each). At the shagun price points, revenue per activated hub r = (30% × ₹91.75) + (30 × 5% × ₹21) = **₹59**, down from ₹81 at the original prices — so the seed requirement rises under Option B (chosen resolution): **93 activated purohits by end of month 4** in 2–3 temple-dense wards of one city (was 70). Compounding months m = 8 (M4→M12); one-time purohit-to-purohit invite multiplier k. Consequence: ~1 activation per working day from month 1 — **sabha-level seeding is no longer the preferred strategy but an existence requirement** (one presentation ≈ 10–25 purohits; door-to-door cannot reach 93).
 
-| Scenario | k | Conv. | Family attach | M12 MRR |
+| Scenario (seed 93) | k | Conv. | Family attach | M12 MRR |
 |---|---|---|---|---|
-| Conservative | 1.0 | 25% | 3% | ~₹38K |
-| Middle | 1.15 | 30% | 5% | ~₹84K |
-| **Pre-registered** | **1.3** | **30% @ ₹91.7/mo-eq** | **5%** | **~₹1.32L** |
+| Conservative | 1.0 | 25% | 3% | ~₹46K |
+| Middle | 1.15 | 30% | 5% | ~₹92K |
+| **Pre-registered** | **1.3** | **30% @ ₹91.75/mo-eq** | **5% @ ₹21** | **~₹1.76L** |
 
-**Read this honestly: at the revised ₹1,100/₹21 prices, Smaran no longer clears the ₹1.5–2L MRR month-12 bar even at the optimistic edge of every parameter — the Pre-registered scenario lands at ~₹1.32L.** This was a deliberate, acknowledged trade: auspicious/shagun-register pricing was judged more important to this audience's trust and adoption than preserving the original revenue bar, and the product's near-$0/month infra cost (see platform architecture KB) makes ~₹1.32L MRR viable to sustain on. If growth (k) or conversion outperforms the Pre-registered row, the case improves further; it is not re-padded back up to ₹1.5–2L by assumption. A structural fact still drives the shape of this: families cannot recruit priests (a family already has its purohit), so all growth is purohit-to-purohit — sabhas, temple clusters, priest lineages. Social virality, not structural; k is the make-or-break number and it is currently unmeasured.
+**Read this honestly: Smaran clears the ₹1.5–2L MRR month-12 bar only at the optimistic edge of every parameter simultaneously — and revision #1 (the shagun price cut) raised the seed requirement by a third to keep it true.** A structural fact drives this: families cannot recruit priests (a family already has its purohit), so all growth is purohit-to-purohit — sabhas, temple clusters, priest lineages. Social virality, not structural; k is the make-or-break number and it is currently unmeasured.
 
-**Pre-registration record (binding, revised 2026-07-14):**
-- Seed: 70 activated purohits by end M4 · k = 1.3 · purohit conversion 30% at ₹1,100/yr · family attach 5% at ₹21/mo
-- **Voiding thresholds:** observed k < 1.15 at the M4 gate voids the revenue case and reopens the kill question at month 4. Conversion < 22% or attach < 3% at the M8 gate does the same. Parameter revisions in writing only, with the back-solve re-run; a second revision escalates to a full registry review.
+**Pre-registration record (binding — revision #1 of two permitted; the next revision escalates to full registry review):**
+- Seed: **93** activated purohits by end M4 · k = 1.3 · purohit conversion 30% at ₹1,101/yr (₹501 founding year, first 100 purohits) · family attach 5% at ₹21/mo
+- **Measurement separation:** the M5–8 conversion gate is measured on the **full-price (₹1,101) cohort only** — founding-tier conversions at ₹501 are reported separately as directional signal, never counted toward the 30% threshold, or the gate validates a price the steady state doesn't charge.
+- **Voiding thresholds:** observed k < 1.15 at the M4 gate voids the revenue case and reopens the kill question at month 4. Seed < 80 by end M4 (the ₹1.5L-floor minimum) triggers the same review. Full-price conversion < 22% or attach < 3% at the M8 gate does the same.
 - Gates: M0–4 seed (density + observed k; revenue ₹0 by design) → M5–8 geometry (conversion + attach + week-8 retention >60%) → M9–12 replicate.
 
 ## Part 5 — Product Requirements (Agent Doc A)
@@ -87,7 +88,7 @@ There are no payment webhooks in this system and there never can be: raw UPI lin
 4. Each corroborated pair is a deposit into the relationship record — the asset.
 
 ### State 6 — Family calendar subscription
-On cards a family receives, a subtle offer: "Get your family's ritual calendar" — their own tithis and festival dates, reminded directly, always in their purohit's name. ₹29/month UPI autopay deep link. Managed states: active / lapsed / cancelled, renewal nudges as Utility messages. **The family flow must never enable discovery, comparison, or contact with any other purohit.**
+On cards a family receives, a subtle offer: "Get your family's ritual calendar" — their own tithis and festival dates, reminded directly, always in their purohit's name. ₹21/month UPI autopay deep link. Managed states: active / lapsed / cancelled, renewal nudges as Utility messages. **The family flow must never enable discovery, comparison, or contact with any other purohit.**
 
 ### State 7 — Referral (k-instrumentation)
 On demand, the bot generates the purohit's personal referral card ("Share Smaran with a fellow purohit-ji"). Onboardings via it set `referred_by_purohit_id`. A weekly job computes **observed k = referred activations ÷ activated purohits** (cohort-tagged) — this is the M4 gate's primary measurement. Seeding strategy targets sabhas and priest associations (one presentation = many hubs), never door-to-door.
@@ -154,7 +155,7 @@ Density (per-locality activation, event, and corroboration counts) is the leadin
 ## Part 7 — Negative Constraints (Agent Doc C — strict)
 
 1. **NO marketplace, ratings, search, matching, or discovery — ever.** Trust is computed from corroborated interactions, never declared or rated. Families must never see, compare, or reach any other purohit. Every future "growth idea" will disguise itself as this; the answer is permanently no.
-2. **NO consumer app or web UI.** The family-side *WhatsApp flow* is in scope (cards, confirms, ₹29 calendar subscription); an app, portal, or catalog is not.
+2. **NO consumer app or web UI.** The family-side *WhatsApp flow* is in scope (cards, confirms, ₹21 calendar subscription); an app, portal, or catalog is not.
 3. **NO payment gateways or PSP checkout.** Raw dynamic UPI deep links to the purohit's merchant VPA only. Zero commission is the point.
 4. **NO webhook-driven payment states.** No webhook will ever arrive (see State 5). Corroboration buttons are the only path to `corroborated`. Never trust a single side's client-side assertion.
 5. **NO samagri commerce.** The samagri *list* is the value; kits, inventory, and fulfilment break leanness and are someone else's business.
@@ -171,7 +172,7 @@ Density (per-locality activation, event, and corroboration counts) is the leadin
 
 ## Part 9 — The Decision Fork (do this before any code)
 
-**Ground contact: ~10 independent purohits in the intended seed ward.** Validate: (a) tolerance for ₹1,499/year (₹999 early-bird) framed as income protection — does lapse-recovery language change their face; (b) plausibility of their families paying ₹29/month for the family calendar; (c) how they actually keep their bahi khata today (voice/photo ingestion assumptions); (d) sabha/association access for seeding (the k = 1.3 ambition lives or dies here).
+**Ground contact: ~10 independent purohits in the intended seed ward.** Validate: (a) tolerance for ₹1,101/year (₹501 founding year) framed as income protection — does lapse-recovery language change their face; (b) plausibility of their families paying ₹21/month for the family calendar; (c) how they actually keep their bahi khata today (voice/photo ingestion assumptions); (d) sabha/association access for seeding (the k = 1.3 ambition lives or dies here).
 
 **If the interviews support the parameters** → hand Parts 5–7 to the coding agent; build order: State 1–2 (ingestion + wow) → State 3 (brain + lapse) → State 5 (corroboration) → States 4, 6, 7. **If they don't** → Smaran fails the revenue filter as a year-one vehicle and is shelved behind stronger candidates without a line of code written. Both outcomes are wins; only building before asking is a loss.
 
