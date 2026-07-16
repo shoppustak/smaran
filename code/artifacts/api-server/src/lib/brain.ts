@@ -3,9 +3,10 @@ import { matchField, MAAS_MAX_EDITS, PAKSHA_MAX_EDITS, TITHI_MAX_EDITS } from ".
 import { maasVocab } from "./vocab/maas";
 import { pakshaVocab } from "./vocab/paksha";
 import { tithiVocab } from "./vocab/tithi";
-import { sendWhatsappMessage } from "./whatsapp-client";
+import { sendWhatsappMessage, sendWhatsappTemplate } from "./whatsapp-client";
 import { logger } from "./logger";
-import { buildUpcomingPreRitualCard } from "./confirm-card";
+import { buildUpcomingPreRitualCard, toHindi, getTithiHindiName, eventTypeMap } from "./confirm-card";
+import { windowFromTime } from "./muhurat";
 
 export interface ResolvedBrainEvent {
   event: Event;
@@ -19,58 +20,7 @@ export interface ResolvedBrainEvent {
   };
 }
 
-const HINDI_EVENT_TYPES: Record<string, string> = {
-  shraddh: "श्राद्ध / पुण्यतिथि",
-  katha: "सत्यनारायण कथा",
-  birthday: "जन्मदिन पूजा",
-  griha_pravesh: "गृह प्रवेश",
-  anniversary: "वर्षगांठ पूजा",
-  other: "अन्य पूजा",
-};
 
-const HINDI_MONTHS: Record<string, string> = {
-  Chaitra: "चैत्र",
-  Vaishakha: "वैशाख",
-  Jyeshtha: "ज्येष्ठ",
-  Ashadha: "आषाढ़",
-  Shravana: "श्रावण",
-  Bhadrapada: "भाद्रपद",
-  Ashwina: "आश्विन",
-  Kartika: "कार्तिक",
-  Margashirsha: "मार्गशीर्ष",
-  Pausha: "पौष",
-  Magha: "माघ",
-  Phalguna: "फाल्गुन",
-};
-
-const HINDI_PAKSHAS: Record<string, string> = {
-  Shukla: "शुक्ल",
-  Krishna: "कृष्ण",
-};
-
-const HINDI_TITHIS: Record<number, string> = {
-  1: "प्रतिपदा",
-  2: "द्वितीया",
-  3: "तृतीया",
-  4: "चतुर्थी",
-  5: "पंचमी",
-  6: "षष्ठी",
-  7: "सप्तमी",
-  8: "अष्टमी",
-  9: "नवमी",
-  10: "दशमी",
-  11: "एकादशी",
-  12: "द्वादशी",
-  13: "त्रयोदशी",
-  14: "चतुर्दशी",
-};
-
-function getHindiTithiName(tithiNum: number, paksha: "Shukla" | "Krishna"): string {
-  if (tithiNum === 15) {
-    return paksha === "Shukla" ? "पूर्णिमा" : "अमावस्या";
-  }
-  return HINDI_TITHIS[tithiNum] ?? `तिथि ${tithiNum}`;
-}
 
 export function formatDateStr(date: Date): string {
   const yyyy = date.getFullYear();
@@ -178,7 +128,7 @@ export async function resolveUpcomingEventsForWeek(targetDate: Date): Promise<Re
 
   // Generate 7 days starting from targetDate
   const days: { dateStr: string; dateObj: Date }[] = [];
-  for (let i = 0; i < 7; i++) {
+  for (let i = 0; i < 8; i++) {
     const d = new Date(targetDate);
     d.setDate(targetDate.getDate() + i);
     days.push({ dateStr: formatDateStr(d), dateObj: d });
@@ -237,6 +187,24 @@ export async function resolveUpcomingEventsForWeek(targetDate: Date): Promise<Re
           );
 
         for (const match of matches) {
+          // Update resolved cache columns inline in database
+          const cycleYear = new Date(dateStr).getFullYear();
+          const window = windowFromTime(match.event.time);
+
+          await db
+            .update(eventsTable)
+            .set({
+              resolvedDate: new Date(dateStr),
+              resolvedWindow: window,
+              resolvedCycleYear: cycleYear,
+            })
+            .where(eq(eventsTable.id, match.event.id));
+
+          // Reflect in the matched object
+          match.event.resolvedDate = new Date(dateStr);
+          match.event.resolvedWindow = window;
+          match.event.resolvedCycleYear = cycleYear;
+
           resolvedEvents.push({
             event: match.event,
             yajman: match.yajman,
@@ -261,75 +229,54 @@ export async function resolveUpcomingEventsForWeek(targetDate: Date): Promise<Re
   return resolvedEvents;
 }
 
-export async function sendPreRitualAlert(resolved: ResolvedBrainEvent): Promise<void> {
-  const { event, yajman, purohit, gregorianDate, hinduDate } = resolved;
+/**
+ * Persist the current-cycle resolved schedule cache (resolvedDate/window/cycleYear)
+ * onto each matched event. Idempotent per event id — re-running overwrites with the
+ * freshly resolved values ("store + yearly re-resolve"). Called by the daily-brain
+ * cron so the day-sheet reads a warm cache instead of relying on the live fallback.
+ */
+export async function persistResolvedSchedule(events: ResolvedBrainEvent[]): Promise<void> {
+  if (events.length === 0) return;
+  const { db, eventsTable } = await import("@workspace/db");
+  const { eq } = await import("drizzle-orm");
+  const cycleYear = new Date().getFullYear();
 
-  const isSolemn = event.eventType === "shraddh";
-  const hindiMaas = HINDI_MONTHS[hinduDate.maas] ?? hinduDate.maas;
-  const hindiPaksha = HINDI_PAKSHAS[hinduDate.paksha] ?? hinduDate.paksha;
-  const hindiTithi = getHindiTithiName(hinduDate.tithi, hinduDate.paksha);
-
-  let samagriList = "";
-  if (event.eventType === "shraddh") {
-    samagriList = "- काले तिल (Black Sesame)\n- जौ (Barley)\n- कुशा घास (Kusha Grass)\n- गंगाजल (Ganga Water)\n- सफेद फूल (White Flowers)\n- कपूर, धूप (Camphor, Incense)";
-  } else if (event.eventType === "katha") {
-    samagriList = "- पंजीरी, पंचामृत (Panjiri, Panchamrit)\n- केले के पत्ते (Banana Leaves)\n- कलश (Kalash/Pot)\n- नारियल, सुपारी (Coconut, Betel Nut)\n- रोली, अक्षत (Roli, Rice)\n- फूल, फल, मिठाई (Flowers, Fruits, Sweets)";
-  } else if (event.eventType === "griha_pravesh") {
-    samagriList = "- कलश, नारियल (Kalash, Coconut)\n- आम के पत्ते (Mango Leaves)\n- दूध, दही, शहद (Milk, Curd, Honey)\n- रोली, अक्षत, धूप (Roli, Rice, Incense)\n- हवन सामग्री (Havan Materials)";
-  } else if (event.eventType === "birthday" || event.eventType === "anniversary") {
-    samagriList = "- दीपक, आरती थाली (Lamp, Aarti Plate)\n- रोली, अक्षत (Roli, Rice)\n- मौली/रक्षासूत्र (Kalava)\n- फूल, मिठाई (Flowers, Sweets)";
-  } else {
-    samagriList = "- रोली, अक्षत (Roli, Rice)\n- मौली/रक्षासूत्र (Kalava)\n- धूप, दीप, कपूर (Incense, Lamp, Camphor)\n- फूल, फल, प्रसाद (Flowers, Fruits, Prasad)";
-  }
-
-  const eventName = HINDI_EVENT_TYPES[event.eventType] ?? event.eventType;
-  const yajmanName = yajman.familyName;
-
-  let bodyText = "";
-  if (isSolemn) {
-    bodyText = `आदरणीय ${purohit.name} जी, प्रणाम।\n\nआगामी तिथि को निम्नलिखित श्राद्ध अनुष्ठान निर्धारित है:\n\n📅 तिथि: ${gregorianDate} (${hindiMaas} ${hindiPaksha} पक्ष, ${hindiTithi})\n👤 यजमान: ${yajmanName} परिवार\n📿 अनुष्ठान: श्राद्ध/पुण्यतिथि ${event.label ? `(${event.label})` : ""}\n\nआवश्यक सामग्री सूची:\n${samagriList}\n\nकृपया पूजा की पुष्टि करें।`;
-  } else {
-    bodyText = `जय श्री राम ${purohit.name} जी!\n\nआगामी तिथि को निम्नलिखित मांगलिक कार्य निर्धारित है:\n\n📅 तिथि: ${gregorianDate} (${hindiMaas} ${hindiPaksha} पक्ष, ${hindiTithi})\n👤 यजमान: ${yajmanName} परिवार\n🎉 अनुष्ठान: ${eventName} ${event.label ? `(${event.label})` : ""}\n\nआवश्यक सामग्री सूची:\n${samagriList}\n\nकृपया पूजा की पुष्टि करें।`;
-  }
-
-  const payload = {
-    type: "interactive" as const,
-    interactive: {
-      type: "button" as const,
-      body: {
-        text: bodyText,
-      },
-      action: {
-        buttons: [
-          {
-            type: "reply" as const,
-            reply: {
-              id: `confirm-ritual:${event.id}:${gregorianDate}`,
-              title: "✓ पूजा की पुष्टि",
-            },
-          },
-        ],
-      },
-    },
-  };
-
-  await sendWhatsappMessage(purohit.phoneNumber, payload);
+  await Promise.all(
+    events.map(async (e) => {
+      try {
+        // gregorianDate is "YYYY-MM-DD"; parse as local midnight to match the
+        // day-sheet's local [today, +7] BETWEEN filter.
+        const resolvedDate = new Date(`${e.gregorianDate}T00:00:00`);
+        const resolvedWindow = windowFromTime(e.event.time);
+        await db
+          .update(eventsTable)
+          .set({ resolvedDate, resolvedWindow, resolvedCycleYear: cycleYear })
+          .where(eq(eventsTable.id, e.event.id));
+      } catch (err) {
+        logger.error({ err, eventId: e.event.id }, "Failed to persist resolved schedule cache");
+      }
+    })
+  );
 }
 
 export async function dispatchPreRitualAlerts(alerts: ResolvedBrainEvent[]): Promise<void> {
   const CHUNK_SIZE = 20;
+  const PRE_RITUAL_ALERT_DAYS = [7, 2];
   for (let i = 0; i < alerts.length; i += CHUNK_SIZE) {
     const chunk = alerts.slice(i, i + CHUNK_SIZE);
     await Promise.all(
       chunk.map(async (alert) => {
         try {
           const today = new Date();
-          today.setHours(0, 0, 0, 0);
-          const targetDate = new Date(alert.gregorianDate);
-          targetDate.setHours(0, 0, 0, 0);
-          const diffTime = targetDate.getTime() - today.getTime();
-          const daysRemaining = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
-          await sendPreRitualAlerts(alert, daysRemaining);
+          const todayUTC = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
+          const parts = alert.gregorianDate.split("-");
+          const targetUTC = new Date(Date.UTC(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10)));
+          const diffTime = targetUTC.getTime() - todayUTC.getTime();
+          const daysRemaining = Math.max(0, Math.round(diffTime / (1000 * 60 * 60 * 24)));
+          
+          if (PRE_RITUAL_ALERT_DAYS.includes(daysRemaining)) {
+            await sendPreRitualAlerts(alert, daysRemaining);
+          }
         } catch (err) {
           logger.error(err, `Failed to send alert for event ${alert.event.id}`);
         }
@@ -342,8 +289,57 @@ export async function dispatchPreRitualAlerts(alerts: ResolvedBrainEvent[]): Pro
 }
 
 export async function sendPreRitualAlerts(event: ResolvedBrainEvent, daysRemaining: number): Promise<void> {
-  const card = buildUpcomingPreRitualCard(event, daysRemaining);
-  await sendWhatsappMessage(event.purohit.phoneNumber, card);
+  const isSolemn = event.event.eventType === "shraddh";
+  const templateName = isSolemn ? "smaran_pre_ritual_solemn" : "smaran_pre_ritual_celebratory";
+
+  const purohitName = event.purohit.name.endsWith("जी") ? event.purohit.name : `${event.purohit.name} जी`;
+  const maas = toHindi("maas", event.hinduDate.maas);
+  const paksha = toHindi("paksha", event.hinduDate.paksha);
+  const tithi = getTithiHindiName(event.hinduDate.tithi, event.hinduDate.paksha);
+  const eventName = eventTypeMap[event.event.eventType] || event.event.eventType;
+
+  let samagriList = "";
+  if (event.event.eventType === "shraddh") {
+    samagriList = "- काले तिल (Black Sesame)\n- जौ (Barley)\n- कुशा घास (Kusha Grass)\n- गंगाजल (Ganga Water)\n- सफेद फूल (White Flowers)\n- कपूर, धूप (Camphor, Incense)";
+  } else if (event.event.eventType === "katha") {
+    samagriList = "- पंजीरी, पंचामृत (Panjiri, Panchamrit)\n- केले के पत्ते (Banana Leaves)\n- कलश (Kalash/Pot)\n- नारियल, सुपारी (Coconut, Betel Nut)\n- रोली, अक्षत (Roli, Rice)\n- फूल, फल, मिठाई (Flowers, Fruits, Sweets)";
+  } else if (event.event.eventType === "griha_pravesh") {
+    samagriList = "- कलश, नारियल (Kalash, Coconut)\n- आम के पत्ते (Mango Leaves)\n- दूध, दही, शहद (Milk, Curd, Honey)\n- रोली, अक्षत, धूप (Roli, Rice, Incense)\n- हवन सामग्री (Havan Materials)";
+  } else if (event.event.eventType === "birthday" || event.event.eventType === "anniversary") {
+    samagriList = "- दीपक, आरती थाली (Lamp, Aarti Plate)\n- रोली, अक्षत (Roli, Rice)\n- मौली/रक्षासूत्र (Kalava)\n- फूल, मिठाई (Flowers, Sweets)";
+  } else {
+    samagriList = "- रोली, अक्षत (Roli, Rice)\n- मौली/रक्षासूत्र (Kalava)\n- धूप, दीप, कपूर (Incense, Lamp, Camphor)\n- फूल, फल, प्रसाद (Flowers, Fruits, Prasad)";
+  }
+
+  const components = [
+    {
+      type: "body",
+      parameters: [
+        { type: "text", text: purohitName },
+        { type: "text", text: event.gregorianDate },
+        { type: "text", text: `${maas} ${paksha} पक्ष, ${tithi} (शेष दिन: ${daysRemaining})` },
+        { type: "text", text: `${event.yajman.familyName} परिवार` },
+        { type: "text", text: isSolemn ? `श्राद्ध/पुण्यतिथि ${event.event.label ? `(${event.event.label})` : ""}` : `${eventName} ${event.event.label ? `(${event.event.label})` : ""}` },
+        { type: "text", text: samagriList }
+      ]
+    },
+    {
+      type: "button",
+      sub_type: "quick_reply",
+      index: "0",
+      parameters: [
+        { type: "payload", payload: `booking-confirm:${event.event.id}` }
+      ]
+    }
+  ];
+
+  try {
+    await sendWhatsappTemplate(event.purohit.phoneNumber, templateName, components);
+  } catch (err) {
+    logger.warn({ err, eventId: event.event.id }, "Template send failed, falling back to free-form interactive");
+    const card = buildUpcomingPreRitualCard(event, daysRemaining);
+    await sendWhatsappMessage(event.purohit.phoneNumber, card);
+  }
 }
 
 export async function runLapseDetectionScan(): Promise<void> {
@@ -351,7 +347,7 @@ export async function runLapseDetectionScan(): Promise<void> {
     logger.error("runLapseDetectionScan failed: DATABASE_URL is not set");
     return;
   }
-  const { db, eventsTable, yajmansTable, purohitsTable, ledgerTable } = await import("@workspace/db");
+  const { db, eventsTable, yajmansTable, purohitsTable, ledgerTable, lapseRecoveriesTable } = await import("@workspace/db");
   const { eq, and, lt, gte, lte } = await import("drizzle-orm");
 
   const currentYear = new Date().getFullYear();
@@ -401,11 +397,11 @@ export async function runLapseDetectionScan(): Promise<void> {
     await Promise.all(
       chunk.map(async ({ event, yajman, purohit }) => {
         try {
-          const hindiMaas = HINDI_MONTHS[event.maas] ?? event.maas;
-          const hindiPaksha = HINDI_PAKSHAS[event.paksha] ?? event.paksha;
-          const hindiTithi = getHindiTithiName(event.tithi, event.paksha as any);
+          const hindiMaas = toHindi("maas", event.maas);
+          const hindiPaksha = toHindi("paksha", event.paksha);
+          const hindiTithi = getTithiHindiName(event.tithi, event.paksha as any);
 
-          const eventLabel = event.label || HINDI_EVENT_TYPES[event.eventType] || event.eventType;
+          const eventLabel = event.label || eventTypeMap[event.eventType] || event.eventType;
           const familyName = yajman.familyName;
           const purohitGreeting = purohit.name.endsWith("जी") ? purohit.name : `${purohit.name} जी`;
 
@@ -432,7 +428,50 @@ export async function runLapseDetectionScan(): Promise<void> {
             },
           };
 
-          await sendWhatsappMessage(purohit.phoneNumber, payload);
+          // Try template send first
+          const templateName = "smaran_lapse_recovery_nudge";
+          const components = [
+            {
+              type: "body",
+              parameters: [
+                { type: "text", text: purohitGreeting },
+                { type: "text", text: familyName },
+                { type: "text", text: eventLabel },
+                { type: "text", text: `${hindiMaas} ${hindiPaksha} ${hindiTithi}` }
+              ]
+            },
+            {
+              type: "button",
+              sub_type: "quick_reply",
+              index: "0",
+              parameters: [
+                { type: "payload", payload: `lapse-engage:${event.id}` }
+              ]
+            }
+          ];
+
+          try {
+            await sendWhatsappTemplate(purohit.phoneNumber, templateName, components);
+          } catch (err) {
+            logger.warn({ err, eventId: event.id }, "Template send failed for lapse nudge, falling back to free-form interactive");
+            await sendWhatsappMessage(purohit.phoneNumber, payload);
+          }
+
+          // Durably record the nudge in lapse_recoveries table
+          await db
+            .insert(lapseRecoveriesTable)
+            .values({
+              eventId: event.id,
+              purohitId: purohit.id,
+              yajmanId: yajman.id,
+              cycleYear: currentYear,
+              nudgedAt: new Date(),
+            })
+            .onConflictDoUpdate({
+              target: [lapseRecoveriesTable.eventId, lapseRecoveriesTable.cycleYear],
+              set: { nudgedAt: new Date() },
+            });
+
           logger.info({ eventId: event.id, purohitId: purohit.id, yajmanId: yajman.id }, "Lapse recovery nudge dispatched");
         } catch (err) {
           logger.error({ err, eventId: event.id }, `Failed to send lapse nudge for event ${event.id}`);
@@ -444,5 +483,40 @@ export async function runLapseDetectionScan(): Promise<void> {
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
   }
+}
+
+export async function resolveEventGregorianForCycle(
+  event: { maas: string; paksha: string; tithi: number; time: string | null },
+  purohit: Purohit,
+  targetDate: Date
+): Promise<{ gregorianDate: Date; window: "morning" | "afternoon" | "evening" | "night" } | null> {
+  const window = windowFromTime(event.time);
+
+  // Check the 7 days starting from targetDate
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(targetDate);
+    d.setDate(targetDate.getDate() + i);
+    const dateStr = formatDateStr(d);
+    try {
+      const panchang = await fetchPanchangForDate(dateStr);
+      const targetMaas = purohit.calendarSystem === "purnimanta"
+        ? resolvePurnimantaMaas(panchang.maas, panchang.paksha)
+        : panchang.maas;
+
+      if (
+        event.maas === targetMaas &&
+        event.paksha === panchang.paksha &&
+        event.tithi === panchang.tithi
+      ) {
+        return {
+          gregorianDate: d,
+          window,
+        };
+      }
+    } catch (err) {
+      logger.error({ err, date: dateStr }, "Failed to fetch panchang in resolveEventGregorianForCycle");
+    }
+  }
+  return null;
 }
 

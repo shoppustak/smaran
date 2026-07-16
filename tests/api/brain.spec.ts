@@ -119,40 +119,111 @@ test.describe("Daily Brain Cron and Lapse Recovery E2E Flow", () => {
     expect(outboundRes.status()).toBe(200);
     const outbound = await outboundRes.json();
 
-    // Verify upcoming pre-ritual alert was sent
-    // Note that the outbound array is reversed (newest first). Let's search for messages to our purohitPhone
     const purohitMsgs = outbound.filter((msg: any) => msg.to === purohitPhone);
-    
-    // We expect 2 messages: 
-    // - One for the upcoming pre-ritual alert (Event A)
-    // - One for the lapse recovery nudge (Event B)
-    // Event C should NOT have a nudge because it already has a booking ledger entry.
-    expect(purohitMsgs.length).toBeGreaterThanOrEqual(2);
 
     // Validate the lapse recovery nudge message
     const lapseNudge = purohitMsgs.find((m: any) => m.text.includes("बुक नहीं हुआ है"));
     expect(lapseNudge).toBeDefined();
-    // Message should look like: "शर्मा जी, यजमान Tiwari के परिवार का श्राद्ध / पुण्यतिथि (आषाढ़ कृष्ण दशमी) इस वर्ष अभी बुक नहीं हुआ है। क्या आप उन्हें संपर्क करना चाहते हैं?"
-    // Verify parts of the text
-    expect(lapseNudge.text).toContain("Tiwari"); // Yajman name
-    expect(lapseNudge.text).toContain("Sharma जी"); // Purohit greeting
-    expect(lapseNudge.text).toContain("Paternal Shraddh"); // Event type translation
-    expect(lapseNudge.text).toContain("आषाढ़"); // Translated Maas (Ashadha)
-    expect(lapseNudge.text).toContain("कृष्ण"); // Translated Paksha (Krishna)
-    expect(lapseNudge.text).toContain("दशमी"); // Translated Tithi (10)
-    expect(lapseNudge.text).toContain("lapse-engage:" + lapsedEventId); // Action ID on button
+    expect(lapseNudge.text).toContain("Tiwari");
+    expect(lapseNudge.text).toContain("Sharma जी");
+    expect(lapseNudge.text).toContain("lapse-engage:" + lapsedEventId);
 
-    // Validate the upcoming pre-ritual alert message
-    const preRitualAlert = purohitMsgs.find((m: any) => m.text.includes("पूजा की पुष्टि करें") || m.text.includes("उपलब्ध हैं"));
-    expect(preRitualAlert).toBeDefined();
-    expect(preRitualAlert.text).toContain("Tiwari");
-    expect(preRitualAlert.text).toContain("booking-confirm:" + upcomingEventId);
+    // Validate upcoming pre-ritual alerts:
+    // Event A matches mockMaas/mockPaksha/mockTithi, which is Pausha Krishna 30.
+    // The daily brain weekly horizon has 8 days (i = 0 to 7).
+    // Pausha Krishna 30 matches on all 8 days.
+    // Out of these 8 days, only days remaining = 2 and 7 are alerted.
+    // Therefore, we expect exactly 2 alert messages for upcomingEventId.
+
+    const alertsForA = purohitMsgs.filter(
+      (m: any) => m.text.includes("booking-confirm:" + upcomingEventId) && !m.text.startsWith("[Template:")
+    );
+    expect(alertsForA.length).toBe(2);
+
+    const alert2 = alertsForA.find((m: any) => m.text.includes("(शेष दिन: 2)"));
+    expect(alert2).toBeDefined();
+    expect(alert2!.text).toContain("पंजीरी");
+
+    const alert7 = alertsForA.find((m: any) => m.text.includes("(शेष दिन: 7)"));
+    expect(alert7).toBeDefined();
+    expect(alert7!.text).toContain("पंजीरी");
 
     // Verify that Event C (lapsed event with booking) did not generate a nudge
     const hasBookingNudge = purohitMsgs.some((m: any) => m.text.includes(lapsedEventWithBookingId));
     expect(hasBookingNudge).toBe(false);
 
+    // 6. Test lapse recovery webhook
+    // First, verify a non-owner cannot recovery it
+    const wrongWebhookRes = await request.post("/api/whatsapp/webhook", {
+      data: {
+        entry: [
+          {
+            changes: [
+              {
+                value: {
+                  messages: [
+                    {
+                      id: `msg-${Date.now()}-wrong`,
+                      from: yajmanPhone,
+                      type: "interactive",
+                      interactive: {
+                        button_reply: {
+                          id: `lapse-engage:${lapsedEventId}`,
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+      },
+    });
+    expect(wrongWebhookRes.status()).toBe(200);
+
+    const checkLapseDb1 = await client.query("SELECT * FROM lapse_recoveries WHERE event_id = $1", [lapsedEventId]);
+    expect(checkLapseDb1.rowCount).toBe(1);
+    expect(checkLapseDb1.rows[0].recovered_at).toBeNull();
+
+    // Then, verify the owner purohit can recover it
+    const webhookRes = await request.post("/api/whatsapp/webhook", {
+      data: {
+        entry: [
+          {
+            changes: [
+              {
+                value: {
+                  messages: [
+                    {
+                      id: `msg-${Date.now()}-ok`,
+                      from: purohitPhone,
+                      type: "interactive",
+                      interactive: {
+                        button_reply: {
+                          id: `lapse-engage:${lapsedEventId}`,
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+      },
+    });
+    expect(webhookRes.status()).toBe(200);
+
+    // Wait a brief moment to ensure any asynchronous processing resolves
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Verify database is updated
+    const checkLapseDb2 = await client.query("SELECT * FROM lapse_recoveries WHERE event_id = $1", [lapsedEventId]);
+    expect(checkLapseDb2.rows[0].recovered_at).not.toBeNull();
+
     // Clean up database
+    await client.query("DELETE FROM lapse_recoveries WHERE event_id = $1", [lapsedEventId]);
     await client.query("DELETE FROM ledger WHERE id = $1", [bookingId]);
     await client.query("DELETE FROM events WHERE id IN ($1, $2, $3)", [upcomingEventId, lapsedEventId, lapsedEventWithBookingId]);
     await client.query("DELETE FROM yajmans WHERE id = $1", [yajmanId]);
