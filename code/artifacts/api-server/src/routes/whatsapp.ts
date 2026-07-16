@@ -89,14 +89,16 @@ router.get("/whatsapp/webhook", (req, res) => {
 
 // Meta calls this for every inbound message / status update.
 router.post("/whatsapp/webhook", async (req, res) => {
-  // Always 200 immediately -- Meta retries aggressively on non-2xx responses.
-  res.sendStatus(200);
+
 
   try {
     const entry = req.body?.entry?.[0];
     const change = entry?.changes?.[0];
     const messages = change?.value?.messages;
-    if (!Array.isArray(messages)) return;
+    if (!Array.isArray(messages)) {
+      if (!res.headersSent) res.sendStatus(200);
+      return;
+    }
 
     for (const msg of messages) {
       if (msg.id) {
@@ -110,6 +112,70 @@ router.post("/whatsapp/webhook", async (req, res) => {
           const oldest = processedMessageIds.shift();
           if (oldest !== undefined) {
             processedMessageIdSet.delete(oldest);
+          }
+        }
+      }
+
+      // RELATIONSHIP ISOLATION CHECK (FAM-03)
+      const { db: dbIso, yajmansTable } = await import("@workspace/db");
+      const yajmans = await dbIso
+        .select()
+        .from(yajmansTable)
+        .where(eq(yajmansTable.whatsappNumber, msg.from))
+        .limit(1);
+
+      if (yajmans.length > 0) {
+        const yajman = yajmans[0];
+        let resourceId: string | null = null;
+        if (msg.type === "interactive") {
+          const interactiveId = msg.interactive?.button_reply?.id ?? msg.interactive?.list_reply?.id;
+          if (interactiveId) {
+            const parts = interactiveId.split(":");
+            if (parts.length >= 2) {
+              resourceId = parts[1];
+            }
+          }
+        } else if (msg.type === "text") {
+          const uuidRegex = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+          const match = (msg.text?.body ?? "").match(uuidRegex);
+          if (match) {
+            resourceId = match[0];
+          }
+        }
+
+        if (resourceId) {
+          const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+          if (uuidRegex.test(resourceId)) {
+            const { ledgerTable, eventsTable } = await import("@workspace/db");
+            const [ledger] = await dbIso
+              .select()
+              .from(ledgerTable)
+              .where(eq(ledgerTable.id, resourceId))
+              .limit(1);
+
+            if (ledger && ledger.purohitId !== yajman.purohitId) {
+              req.log.error(
+                { from: msg.from, yajmanPurohitId: yajman.purohitId, ledgerPurohitId: ledger.purohitId },
+                "Tenant isolation violation: cross-purohit ledger access blocked"
+              );
+              res.status(403).json({ error: "Forbidden" });
+              return;
+            }
+
+            const [event] = await dbIso
+              .select()
+              .from(eventsTable)
+              .where(eq(eventsTable.id, resourceId))
+              .limit(1);
+
+            if (event && event.purohitId !== yajman.purohitId) {
+              req.log.error(
+                { from: msg.from, yajmanPurohitId: yajman.purohitId, eventPurohitId: event.purohitId },
+                "Tenant isolation violation: cross-purohit event access blocked"
+              );
+              res.status(403).json({ error: "Forbidden" });
+              return;
+            }
           }
         }
       }
@@ -133,6 +199,143 @@ router.post("/whatsapp/webhook", async (req, res) => {
 
           if (purohits.length > 0) {
             const purohit = purohits[0];
+
+            const normalizedText = (msg.text?.body ?? "").trim().toLowerCase();
+            if (normalizedText === "my week" || normalizedText === "इस हफ्ते") {
+              let responseText = "";
+              try {
+                const { db, eventsTable, yajmansTable } = await import("@workspace/db");
+                const { and, eq, gte, lte, asc } = await import("drizzle-orm");
+                const { windowFromTime } = await import("../lib/muhurat");
+
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const endOfWeek = new Date(today);
+                endOfWeek.setDate(today.getDate() + 7);
+                endOfWeek.setHours(23, 59, 59, 999);
+                const currentYear = today.getFullYear();
+
+                let weeklyEvents = await db
+                  .select({
+                    event: eventsTable,
+                    yajman: yajmansTable,
+                  })
+                  .from(eventsTable)
+                  .innerJoin(yajmansTable, eq(eventsTable.yajmanId, yajmansTable.id))
+                  .where(
+                    and(
+                      eq(eventsTable.purohitId, purohit.id),
+                      eq(eventsTable.resolvedCycleYear, currentYear),
+                      gte(eventsTable.resolvedDate, today),
+                      lte(eventsTable.resolvedDate, endOfWeek)
+                    )
+                  )
+                  .orderBy(asc(eventsTable.resolvedDate), asc(eventsTable.time));
+
+                // Fallback to live resolution if cache is empty / cold
+                if (weeklyEvents.length === 0) {
+                  const { resolveUpcomingEventsForWeek } = await import("../lib/brain");
+                  const liveEvents = await resolveUpcomingEventsForWeek(today);
+                  
+                  // Filter to this purohit. Carry the live-resolved gregorianDate
+                  // onto the row: cold-cache events have a null resolvedDate (that's
+                  // why the fallback ran), and the grouping loop below skips any row
+                  // whose resolvedDate is null.
+                  const filtered = liveEvents.filter(e => e.purohit.id === purohit.id);
+                  weeklyEvents = filtered.map(e => ({
+                    event: {
+                      ...e.event,
+                      resolvedDate: new Date(`${e.gregorianDate}T00:00:00`),
+                      resolvedWindow: e.event.resolvedWindow ?? windowFromTime(e.event.time),
+                    },
+                    yajman: e.yajman,
+                  }));
+                }
+
+                const formatDaySheetHeader = (d: Date) => {
+                  const dd = String(d.getDate()).padStart(2, "0");
+                  const mm = String(d.getMonth() + 1).padStart(2, "0");
+                  const yyyy = d.getFullYear();
+                  const hindiDays = ["रविवार", "सोमवार", "मंगलवार", "बुधवार", "गुरुवार", "शुक्रवार", "शनिवार"];
+                  const dayName = hindiDays[d.getDay()];
+                  return `${dd}-${mm}-${yyyy} (${dayName})`;
+                };
+
+                const getWindowDisplayName = (window: string) => {
+                  if (window === "morning") return "🌅 सुबह";
+                  if (window === "afternoon") return "☀️ दोपहर";
+                  if (window === "evening") return "🌇 शाम";
+                  return "🌙 रात";
+                };
+
+                // Groups will map: dateKey -> window -> Array of events
+                const groups: { [dateKey: string]: { [window: string]: Array<{ time: string; label: string; familyName: string }> } } = {};
+
+                for (const row of weeklyEvents) {
+                  const resolvedDate = row.event.resolvedDate;
+                  if (!resolvedDate || !row.event.time) continue;
+                  const dateObj = new Date(resolvedDate);
+                  const dateKey = formatDaySheetHeader(dateObj);
+                  
+                  const window = row.event.resolvedWindow ?? windowFromTime(row.event.time);
+                  
+                  if (!groups[dateKey]) {
+                    groups[dateKey] = {};
+                  }
+                  if (!groups[dateKey][window]) {
+                    groups[dateKey][window] = [];
+                  }
+                  groups[dateKey][window].push({
+                    time: row.event.time,
+                    label: row.event.label || row.event.eventType,
+                    familyName: row.yajman.familyName,
+                  });
+                }
+
+                responseText = "📅 आपका साप्ताहिक कार्यक्रम:\n";
+                if (Object.keys(groups).length === 0) {
+                  responseText += "\nइस हफ्ते कोई अनुष्ठान निर्धारित नहीं है।";
+                } else {
+                  for (const [dateHeader, windows] of Object.entries(groups)) {
+                    responseText += `\n*${dateHeader}*\n`;
+                    const windowOrder = ["morning", "afternoon", "evening", "night"];
+                    for (const w of windowOrder) {
+                      const events = windows[w];
+                      if (events && events.length > 0) {
+                        responseText += `  ${getWindowDisplayName(w)}:\n`;
+                        for (const e of events) {
+                          responseText += `    • ${e.time} - ${e.label} (यजमान: ${e.familyName})\n`;
+                        }
+                      }
+                    }
+                  }
+                }
+              } catch (err) {
+                console.error("DAY-SHEET ERROR:", err);
+                req.log.error({ err, from: msg.from }, "Failed to generate day-sheet report");
+                responseText = "साप्ताहिक कार्यक्रम प्राप्त करने में त्रुटि हुई।";
+              }
+
+              try {
+                await sendWhatsappMessage(msg.from, {
+                  type: "text",
+                  text: { body: responseText },
+                });
+              } catch (sendErr) {
+                req.log.error({ err: sendErr, to: msg.from }, "Failed to send day-sheet report message");
+              }
+              continue;
+            }
+
+            if (normalizedText === "referral" || normalizedText === "आमंत्रण") {
+              const { buildReferralCard } = await import("../lib/confirm-card");
+              try {
+                await sendWhatsappMessage(msg.from, buildReferralCard(purohit.id, purohit.name));
+              } catch (sendErr) {
+                req.log.error({ sendErr, purohitId: purohit.id }, "Failed to send referral card");
+              }
+              continue;
+            }
 
             try {
               const { findAwaitingAmountEntry, recordDakshinaAmount } = await import("../lib/ledger");
@@ -357,6 +560,45 @@ router.post("/whatsapp/webhook", async (req, res) => {
         const action = parts[0];
         const idParam = parts[1];
 
+        if (action === "subscribe-confirm") {
+          const yajmanId = idParam;
+          (async () => {
+            try {
+              if (!process.env.DATABASE_URL) {
+                req.log.warn("Database URL not set; skipping subscribe-confirm operation");
+                return;
+              }
+              const { db, yajmansTable } = await import("@workspace/db");
+              const { activateSubscriptionForYajman } = await import("../lib/subscription");
+
+              // Resolve the sender's yajman
+              const [senderYajman] = await db
+                .select()
+                .from(yajmansTable)
+                .where(eq(yajmansTable.whatsappNumber, msg.from))
+                .limit(1);
+
+              if (!senderYajman) {
+                req.log.warn({ from: msg.from }, "Unregistered yajman number for subscribe-confirm");
+                return;
+              }
+
+              // Activate subscription (ownership check is inside the helper)
+              await activateSubscriptionForYajman(yajmanId, senderYajman.purohitId);
+
+              await sendWhatsappMessage(msg.from, {
+                type: "text",
+                text: {
+                  body: "आपकी सदस्यता सक्रिय कर दी गई है। धन्यवाद!",
+                },
+              });
+            } catch (err) {
+              req.log.error({ err, yajmanId, from: msg.from }, "Error in subscribe-confirm callback");
+            }
+          })();
+          continue;
+        }
+
         if (action === "ledger-claim" || action === "ledger-confirm") {
           const ledgerId = idParam;
           (async () => {
@@ -429,6 +671,20 @@ router.post("/whatsapp/webhook", async (req, res) => {
                   type: "text",
                   text: { body: "पुष्टि के लिए धन्यवाद।" },
                 });
+
+                if (yajman.familySubStatus === "none" || !yajman.familySubStatus) {
+                  const [purohit] = await db
+                    .select()
+                    .from(purohitsTable)
+                    .where(eq(purohitsTable.id, yajman.purohitId))
+                    .limit(1);
+
+                  if (purohit && purohit.upiId) {
+                    const { buildFamilyCalendarOfferCard } = await import("../lib/confirm-card");
+                    const offerCard = buildFamilyCalendarOfferCard(yajman.id, purohit.name, purohit.upiId);
+                    await sendWhatsappMessage(msg.from, offerCard);
+                  }
+                }
               }
             } catch (err) {
               req.log.error({ err, ledgerId, action }, "Error processing ledger interactive callback");
@@ -462,12 +718,55 @@ router.post("/whatsapp/webhook", async (req, res) => {
             beginFreeTextCorrection,
           } = await import("../lib/ingest");
 
-          if (action === "confirm") {
+          const handleConfirmWithCollision = async (
+            fn: () => Promise<any>,
+            errContext: string
+          ) => {
             try {
-              await confirmJob(jobId, purohit.id);
+              await fn();
             } catch (err) {
-              req.log.error({ err, jobId, action }, "Error in confirmJob");
+              const { MuhuratCollisionError } = await import("../lib/muhurat");
+              if (err instanceof Error && (err.name === "MuhuratCollisionError" || err.constructor.name === "MuhuratCollisionError")) {
+                const payload = {
+                  type: "interactive" as const,
+                  interactive: {
+                    type: "button" as const,
+                    body: {
+                      text: "⚠️ चेतावनी: इस समय पर पहले से एक अनुष्ठान बुक है। क्या आप फिर भी इसे सहेजना चाहते हैं?",
+                    },
+                    action: {
+                      buttons: [
+                        {
+                          type: "reply" as const,
+                          reply: {
+                            id: `booking-force:${jobId}`,
+                            title: "हाँ, सहेजें",
+                          },
+                        },
+                        {
+                          type: "reply" as const,
+                          reply: {
+                            id: `booking-cancel:${jobId}`,
+                            title: "रद्द करें",
+                          },
+                        },
+                      ],
+                    },
+                  },
+                };
+                try {
+                  await sendWhatsappMessage(msg.from, payload);
+                } catch (sendErr) {
+                  req.log.error({ sendErr, jobId }, "Failed to send collision warning card");
+                }
+              } else {
+                req.log.error({ err, jobId, action }, `Error in confirmJob ${errContext}`);
+              }
             }
+          };
+
+          if (action === "confirm") {
+            await handleConfirmWithCollision(() => confirmJob(jobId, purohit.id), "confirm");
           } else if (action === "reject") {
             try {
               await rejectJob(jobId);
@@ -475,16 +774,54 @@ router.post("/whatsapp/webhook", async (req, res) => {
               req.log.error({ err, jobId, action }, "Error in rejectJob");
             }
           } else if (action === "collision-yes") {
-            try {
-              await confirmJob(jobId, purohit.id, "reuse");
-            } catch (err) {
-              req.log.error({ err, jobId, action }, "Error in confirmJob collision-yes");
-            }
+            await handleConfirmWithCollision(() => confirmJob(jobId, purohit.id, "reuse"), "collision-yes");
           } else if (action === "collision-no") {
+            await handleConfirmWithCollision(() => confirmJob(jobId, purohit.id, "new"), "collision-no");
+          } else if (action === "booking-force") {
             try {
-              await confirmJob(jobId, purohit.id, "new");
+              const { db: dbInner, ingestJobsTable } = await import("@workspace/db");
+              const [jobRow] = await dbInner
+                .select()
+                .from(ingestJobsTable)
+                .where(eq(ingestJobsTable.id, jobId))
+                .limit(1);
+
+              if (!jobRow || jobRow.purohitId !== purohit.id) {
+                req.log.warn({ jobId, purohitId: purohit.id, jobPurohitId: jobRow?.purohitId }, "Unauthorized booking-force attempt");
+                return;
+              }
+
+              const res = await confirmJob(jobId, purohit.id, { force: true });
+              if (res.status === "written") {
+                await sendWhatsappMessage(msg.from, {
+                  type: "text",
+                  text: { body: "अनुष्ठान बुक कर लिया गया है (ओवरराइड)।" },
+                });
+              }
             } catch (err) {
-              req.log.error({ err, jobId, action }, "Error in confirmJob collision-no");
+              req.log.error({ err, jobId, action }, "Error in booking-force confirmJob");
+            }
+          } else if (action === "booking-cancel") {
+            try {
+              const { db: dbInner, ingestJobsTable } = await import("@workspace/db");
+              const [jobRow] = await dbInner
+                .select()
+                .from(ingestJobsTable)
+                .where(eq(ingestJobsTable.id, jobId))
+                .limit(1);
+
+              if (!jobRow || jobRow.purohitId !== purohit.id) {
+                req.log.warn({ jobId, purohitId: purohit.id, jobPurohitId: jobRow?.purohitId }, "Unauthorized booking-cancel attempt");
+                return;
+              }
+
+              await rejectJob(jobId);
+              await sendWhatsappMessage(msg.from, {
+                type: "text",
+                text: { body: "अनुष्ठान रद्द कर दिया गया है।" },
+              });
+            } catch (err) {
+              req.log.error({ err, jobId, action }, "Error in booking-cancel rejectJob");
             }
           } else if (action === "edit") {
             try {
@@ -579,6 +916,67 @@ router.post("/whatsapp/webhook", async (req, res) => {
                 req.log.error({ err, eventId, action }, "Error in booking-confirm callback");
               }
             })();
+          } else if (action === "lapse-engage") {
+            const eventId = idParam;
+            (async () => {
+              try {
+                if (!process.env.DATABASE_URL) {
+                  req.log.warn("Database URL not set; skipping lapse-engage operation");
+                  return;
+                }
+                const { db, eventsTable, yajmansTable, lapseRecoveriesTable } = await import("@workspace/db");
+                const { eq, and } = await import("drizzle-orm");
+
+                // Fetch event and associated yajman
+                const results = await db
+                  .select({
+                    event: eventsTable,
+                    yajman: yajmansTable,
+                  })
+                  .from(eventsTable)
+                  .innerJoin(yajmansTable, eq(eventsTable.yajmanId, yajmansTable.id))
+                  .where(eq(eventsTable.id, eventId))
+                  .limit(1);
+
+                if (results.length === 0) {
+                  req.log.warn({ eventId }, "Event or yajman not found for lapse-engage");
+                  return;
+                }
+
+                const { event, yajman } = results[0];
+
+                // Verify caller ownership
+                if (event.purohitId !== purohit.id) {
+                  req.log.warn(
+                    { from: msg.from, eventPurohitId: event.purohitId, purohitId: purohit.id },
+                    "Unauthorized lapse-engage attempt"
+                  );
+                  return;
+                }
+
+                const currentYear = new Date().getFullYear();
+
+                // Update recovered_at = now()
+                await db
+                  .update(lapseRecoveriesTable)
+                  .set({ recoveredAt: new Date() })
+                  .where(
+                    and(
+                      eq(lapseRecoveriesTable.eventId, eventId),
+                      eq(lapseRecoveriesTable.cycleYear, currentYear)
+                    )
+                  );
+
+                await sendWhatsappMessage(msg.from, {
+                  type: "text",
+                  text: {
+                    body: "सम्पर्क करने के लिए धन्यवाद। इस परिवार का अनुष्ठान शीघ्र ही नियत किया जाएगा।",
+                  },
+                });
+              } catch (err) {
+                req.log.error({ err, eventId, action }, "Error in lapse-engage callback");
+              }
+            })();
           } else if (action === "ritual-completed") {
             const eventId = idParam;
             (async () => {
@@ -657,6 +1055,12 @@ router.post("/whatsapp/webhook", async (req, res) => {
   } catch (err) {
     req.log.error({ err }, "Failed to parse WhatsApp webhook payload");
   }
+
+  if (!res.headersSent) {
+    res.sendStatus(200);
+  }
 });
 
 export default router;
+
+

@@ -36,6 +36,119 @@ export const ListWhatsappMessagesResponse = zod.array(ListWhatsappMessagesRespon
 
 
 /**
+ * @summary List recently sent WhatsApp outbound messages
+ */
+export const ListWhatsappOutboundMessagesResponseItem = zod.object({
+  "to": zod.string(),
+  "text": zod.string(),
+  "sentAt": zod.string()
+})
+export const ListWhatsappOutboundMessagesResponse = zod.array(ListWhatsappOutboundMessagesResponseItem)
+
+
+/**
+ * @summary Get a purohit's persisted onboarding record by phone number
+ */
+export const GetPurohitByPhoneParams = zod.object({
+  "phoneNumber": zod.coerce.string()
+})
+
+export const GetPurohitByPhoneHeader = zod.object({
+  "X-Internal-Key": zod.string().describe('Shared secret gating this PII-exposing inspection endpoint -- must match INTERNAL_API_KEY')
+})
+
+export const GetPurohitByPhoneResponse = zod.object({
+  "id": zod.string(),
+  "phoneNumber": zod.string(),
+  "name": zod.string(),
+  "city": zod.string(),
+  "latitude": zod.number(),
+  "longitude": zod.number(),
+  "localityKey": zod.string(),
+  "upiId": zod.string(),
+  "calendarSystem": zod.string(),
+  "plan": zod.string(),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Get an ingest job status by ID
+ */
+export const GetIngestJobParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const GetIngestJobHeader = zod.object({
+  "X-Internal-Key": zod.string().describe('Shared secret gating this PII-adjacent inspection endpoint -- must match INTERNAL_API_KEY')
+})
+
+export const GetIngestJobResponse = zod.object({
+  "id": zod.string(),
+  "purohitId": zod.string(),
+  "kind": zod.enum(['voice', 'photo']),
+  "status": zod.enum(['received', 'transcribed', 'extracted', 'awaiting_confirm', 'confirmed', 'rejected', 'failed']),
+  "fieldScores": zod.record(zod.string(), zod.number()).nullish(),
+  "error": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Purge sensitive data from old terminal ingest jobs and expire stale ones
+ */
+export const PurgeIngestJobsResponse = zod.object({
+  "purgedTranscripts": zod.number(),
+  "purgedExtractions": zod.number(),
+  "expiredAwaitingConfirm": zod.number(),
+  "deletedRows": zod.number()
+})
+
+
+/**
+ * @summary Get ledger entry status by ID
+ */
+export const GetLedgerEntryParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const GetLedgerEntryHeader = zod.object({
+  "X-Internal-Key": zod.string().describe('Shared secret gating this payment inspection endpoint -- must match INTERNAL_API_KEY')
+})
+
+export const GetLedgerEntryResponse = zod.object({
+  "id": zod.string(),
+  "purohitId": zod.string(),
+  "yajmanId": zod.string(),
+  "eventId": zod.string().nullish(),
+  "amountCollected": zod.union([zod.string(),zod.number()]).nullish(),
+  "paymentStatus": zod.enum(['pending', 'claimed', 'corroborated']),
+  "purohitClaimedAt": zod.coerce.date().nullish(),
+  "familyConfirmedAt": zod.coerce.date().nullish(),
+  "localityKey": zod.string(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * Returns cohort sizes and growth values grouped by week. Gated by X-Internal-Key.
+ * @summary Get weekly cohort growth metrics (observed k value)
+ */
+export const GetObservedKHeader = zod.object({
+  "X-Internal-Key": zod.string().describe('Shared secret gating this growth telemetry endpoint -- must match INTERNAL_API_KEY')
+})
+
+export const GetObservedKResponseItem = zod.object({
+  "week": zod.string(),
+  "cohortSize": zod.number(),
+  "referredActivations": zod.number(),
+  "observedK": zod.number()
+})
+export const GetObservedKResponse = zod.array(GetObservedKResponseItem)
+
+
+/**
  * Returns Panchang (Hindu lunar calendar) data for a given date and location, sourced from the Vedika API sandbox.
  * @summary Get today's Panchang
  */

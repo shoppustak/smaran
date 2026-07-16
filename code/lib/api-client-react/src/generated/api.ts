@@ -21,12 +21,18 @@ import type {
 
 import type {
   ApiErrorMessage,
+  CohortMetricsList,
   GetPanchangParams,
   HealthStatus,
+  IngestJobStatus,
   KeepaliveStatus,
+  LedgerStatus,
   Panchang,
+  PurgeResult,
+  PurohitRecord,
   WhatsappInboundMessage,
   WhatsappMessageInput,
+  WhatsappOutboundMessage,
   WhatsappSendResult
 } from './api.schemas';
 
@@ -195,6 +201,463 @@ export function useListWhatsappMessages<TData = Awaited<ReturnType<typeof listWh
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getListWhatsappMessagesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListWhatsappOutboundMessagesUrl = () => {
+
+
+
+
+  return `/api/whatsapp/outbound`
+}
+
+/**
+ * @summary List recently sent WhatsApp outbound messages
+ */
+export const listWhatsappOutboundMessages = async ( options?: RequestInit): Promise<WhatsappOutboundMessage[]> => {
+
+  return customFetch<WhatsappOutboundMessage[]>(getListWhatsappOutboundMessagesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListWhatsappOutboundMessagesQueryKey = () => {
+    return [
+    `/api/whatsapp/outbound`
+    ] as const;
+    }
+
+
+export const getListWhatsappOutboundMessagesQueryOptions = <TData = Awaited<ReturnType<typeof listWhatsappOutboundMessages>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listWhatsappOutboundMessages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListWhatsappOutboundMessagesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listWhatsappOutboundMessages>>> = ({ signal }) => listWhatsappOutboundMessages({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listWhatsappOutboundMessages>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListWhatsappOutboundMessagesQueryResult = NonNullable<Awaited<ReturnType<typeof listWhatsappOutboundMessages>>>
+export type ListWhatsappOutboundMessagesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List recently sent WhatsApp outbound messages
+ */
+
+export function useListWhatsappOutboundMessages<TData = Awaited<ReturnType<typeof listWhatsappOutboundMessages>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listWhatsappOutboundMessages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListWhatsappOutboundMessagesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetPurohitByPhoneUrl = (phoneNumber: string,) => {
+
+
+
+
+  return `/api/purohits/${phoneNumber}`
+}
+
+/**
+ * @summary Get a purohit's persisted onboarding record by phone number
+ */
+export const getPurohitByPhone = async (phoneNumber: string, options?: RequestInit): Promise<PurohitRecord> => {
+
+  return customFetch<PurohitRecord>(getGetPurohitByPhoneUrl(phoneNumber),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPurohitByPhoneQueryKey = (phoneNumber: string,) => {
+    return [
+    `/api/purohits/${phoneNumber}`
+    ] as const;
+    }
+
+
+export const getGetPurohitByPhoneQueryOptions = <TData = Awaited<ReturnType<typeof getPurohitByPhone>>, TError = ErrorType<ApiErrorMessage>>(phoneNumber: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPurohitByPhone>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPurohitByPhoneQueryKey(phoneNumber);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPurohitByPhone>>> = ({ signal }) => getPurohitByPhone(phoneNumber, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: phoneNumber !== null && phoneNumber !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPurohitByPhone>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPurohitByPhoneQueryResult = NonNullable<Awaited<ReturnType<typeof getPurohitByPhone>>>
+export type GetPurohitByPhoneQueryError = ErrorType<ApiErrorMessage>
+
+
+/**
+ * @summary Get a purohit's persisted onboarding record by phone number
+ */
+
+export function useGetPurohitByPhone<TData = Awaited<ReturnType<typeof getPurohitByPhone>>, TError = ErrorType<ApiErrorMessage>>(
+ phoneNumber: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPurohitByPhone>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPurohitByPhoneQueryOptions(phoneNumber,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetIngestJobUrl = (id: string,) => {
+
+
+
+
+  return `/api/ingest-jobs/${id}`
+}
+
+/**
+ * @summary Get an ingest job status by ID
+ */
+export const getIngestJob = async (id: string, options?: RequestInit): Promise<IngestJobStatus> => {
+
+  return customFetch<IngestJobStatus>(getGetIngestJobUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetIngestJobQueryKey = (id: string,) => {
+    return [
+    `/api/ingest-jobs/${id}`
+    ] as const;
+    }
+
+
+export const getGetIngestJobQueryOptions = <TData = Awaited<ReturnType<typeof getIngestJob>>, TError = ErrorType<ApiErrorMessage>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIngestJob>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetIngestJobQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getIngestJob>>> = ({ signal }) => getIngestJob(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getIngestJob>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetIngestJobQueryResult = NonNullable<Awaited<ReturnType<typeof getIngestJob>>>
+export type GetIngestJobQueryError = ErrorType<ApiErrorMessage>
+
+
+/**
+ * @summary Get an ingest job status by ID
+ */
+
+export function useGetIngestJob<TData = Awaited<ReturnType<typeof getIngestJob>>, TError = ErrorType<ApiErrorMessage>>(
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIngestJob>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetIngestJobQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getPurgeIngestJobsUrl = () => {
+
+
+
+
+  return `/api/ingest-jobs/purge`
+}
+
+/**
+ * @summary Purge sensitive data from old terminal ingest jobs and expire stale ones
+ */
+export const purgeIngestJobs = async ( options?: RequestInit): Promise<PurgeResult> => {
+
+  return customFetch<PurgeResult>(getPurgeIngestJobsUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getPurgeIngestJobsMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof purgeIngestJobs>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof purgeIngestJobs>>, TError,void, TContext> => {
+
+const mutationKey = ['purgeIngestJobs'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof purgeIngestJobs>>, void> = () => {
+
+
+          return  purgeIngestJobs(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PurgeIngestJobsMutationResult = NonNullable<Awaited<ReturnType<typeof purgeIngestJobs>>>
+
+    export type PurgeIngestJobsMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Purge sensitive data from old terminal ingest jobs and expire stale ones
+ */
+export const usePurgeIngestJobs = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof purgeIngestJobs>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof purgeIngestJobs>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getPurgeIngestJobsMutationOptions(options));
+    }
+
+export const getGetLedgerEntryUrl = (id: string,) => {
+
+
+
+
+  return `/api/ledger/${id}`
+}
+
+/**
+ * @summary Get ledger entry status by ID
+ */
+export const getLedgerEntry = async (id: string, options?: RequestInit): Promise<LedgerStatus> => {
+
+  return customFetch<LedgerStatus>(getGetLedgerEntryUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetLedgerEntryQueryKey = (id: string,) => {
+    return [
+    `/api/ledger/${id}`
+    ] as const;
+    }
+
+
+export const getGetLedgerEntryQueryOptions = <TData = Awaited<ReturnType<typeof getLedgerEntry>>, TError = ErrorType<ApiErrorMessage>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getLedgerEntry>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetLedgerEntryQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getLedgerEntry>>> = ({ signal }) => getLedgerEntry(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getLedgerEntry>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetLedgerEntryQueryResult = NonNullable<Awaited<ReturnType<typeof getLedgerEntry>>>
+export type GetLedgerEntryQueryError = ErrorType<ApiErrorMessage>
+
+
+/**
+ * @summary Get ledger entry status by ID
+ */
+
+export function useGetLedgerEntry<TData = Awaited<ReturnType<typeof getLedgerEntry>>, TError = ErrorType<ApiErrorMessage>>(
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getLedgerEntry>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetLedgerEntryQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetObservedKUrl = () => {
+
+
+
+
+  return `/api/metrics/observed-k`
+}
+
+/**
+ * Returns cohort sizes and growth values grouped by week. Gated by X-Internal-Key.
+ * @summary Get weekly cohort growth metrics (observed k value)
+ */
+export const getObservedK = async ( options?: RequestInit): Promise<CohortMetricsList> => {
+
+  return customFetch<CohortMetricsList>(getGetObservedKUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetObservedKQueryKey = () => {
+    return [
+    `/api/metrics/observed-k`
+    ] as const;
+    }
+
+
+export const getGetObservedKQueryOptions = <TData = Awaited<ReturnType<typeof getObservedK>>, TError = ErrorType<ApiErrorMessage>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getObservedK>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetObservedKQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getObservedK>>> = ({ signal }) => getObservedK({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getObservedK>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetObservedKQueryResult = NonNullable<Awaited<ReturnType<typeof getObservedK>>>
+export type GetObservedKQueryError = ErrorType<ApiErrorMessage>
+
+
+/**
+ * @summary Get weekly cohort growth metrics (observed k value)
+ */
+
+export function useGetObservedK<TData = Awaited<ReturnType<typeof getObservedK>>, TError = ErrorType<ApiErrorMessage>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getObservedK>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetObservedKQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

@@ -14,6 +14,14 @@ tags:
     description: Hindu lunar calendar (Panchang) operations, backed by the Vedika API
   - name: whatsapp
     description: WhatsApp messaging test layer, backed by the Meta WhatsApp Cloud API
+  - name: purohits
+    description: Purohit onboarding profile lookups, backed by Supabase Postgres
+  - name: ingestion
+    description: Ingestion job operations
+  - name: ledger
+    description: Ledger and Payment Corroboration Operations
+  - name: metrics
+    description: Growth Telemetry and Cohort Metrics
 paths:
   /whatsapp/send:
     post:
@@ -55,6 +63,166 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/WhatsappInboundMessage"
+  /whatsapp/outbound:
+    get:
+      operationId: listWhatsappOutboundMessages
+      tags: [whatsapp]
+      summary: List recently sent WhatsApp outbound messages
+      responses:
+        "200":
+          description: Recent outbound messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WhatsappOutboundMessage"
+  /purohits/{phoneNumber}:
+    get:
+      operationId: getPurohitByPhone
+      tags: [purohits]
+      summary: Get a purohit's persisted onboarding record by phone number
+      parameters:
+        - name: phoneNumber
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: X-Internal-Key
+          in: header
+          required: true
+          description: Shared secret gating this PII-exposing inspection endpoint -- must match INTERNAL_API_KEY
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Purohit onboarding record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PurohitRecord"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorMessage"
+        "404":
+          description: Purohit not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorMessage"
+  /ingest-jobs/{id}:
+    get:
+      operationId: getIngestJob
+      tags: [ingestion]
+      summary: Get an ingest job status by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: X-Internal-Key
+          in: header
+          required: true
+          description: Shared secret gating this PII-adjacent inspection endpoint -- must match INTERNAL_API_KEY
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Ingest job status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IngestJobStatus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorMessage"
+        "404":
+          description: Ingest job not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorMessage"
+  /ingest-jobs/purge:
+    post:
+      operationId: purgeIngestJobs
+      tags: [ingestion]
+      summary: Purge sensitive data from old terminal ingest jobs and expire stale ones
+      responses:
+        "200":
+          description: Purge and expiry results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PurgeResult"
+  /ledger/{id}:
+    get:
+      operationId: getLedgerEntry
+      tags: [ledger]
+      summary: Get ledger entry status by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: X-Internal-Key
+          in: header
+          required: true
+          description: Shared secret gating this payment inspection endpoint -- must match INTERNAL_API_KEY
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Ledger entry status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LedgerStatus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorMessage"
+        "404":
+          description: Ledger entry not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorMessage"
+  /metrics/observed-k:
+    get:
+      operationId: getObservedK
+      tags: [metrics]
+      summary: Get weekly cohort growth metrics (observed k value)
+      description: Returns cohort sizes and growth values grouped by week. Gated by X-Internal-Key.
+      parameters:
+        - name: X-Internal-Key
+          in: header
+          required: true
+          description: Shared secret gating this growth telemetry endpoint -- must match INTERNAL_API_KEY
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Weekly cohort metrics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CohortMetricsList"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorMessage"
   /panchang:
     get:
       operationId: getPanchang
@@ -253,4 +421,162 @@ components:
         - from
         - text
         - receivedAt
+    WhatsappOutboundMessage:
+      type: object
+      properties:
+        to:
+          type: string
+        text:
+          type: string
+        sentAt:
+          type: string
+      required:
+        - to
+        - text
+        - sentAt
+    PurohitRecord:
+      type: object
+      properties:
+        id:
+          type: string
+        phoneNumber:
+          type: string
+        name:
+          type: string
+        city:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        localityKey:
+          type: string
+        upiId:
+          type: string
+        calendarSystem:
+          type: string
+        plan:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - phoneNumber
+        - name
+        - city
+        - latitude
+        - longitude
+        - localityKey
+        - upiId
+        - calendarSystem
+        - plan
+        - createdAt
+    IngestJobStatus:
+      type: object
+      properties:
+        id:
+          type: string
+        purohitId:
+          type: string
+        kind:
+          type: string
+          enum: [voice, photo]
+        status:
+          type: string
+          enum: [received, transcribed, extracted, awaiting_confirm, confirmed, rejected, failed]
+        fieldScores:
+          type: object
+          additionalProperties:
+            type: number
+          nullable: true
+        error:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - purohitId
+        - kind
+        - status
+        - createdAt
+        - updatedAt
+    PurgeResult:
+      type: object
+      properties:
+        purgedTranscripts:
+          type: integer
+        purgedExtractions:
+          type: integer
+        expiredAwaitingConfirm:
+          type: integer
+        deletedRows:
+          type: integer
+      required:
+        - purgedTranscripts
+        - purgedExtractions
+        - expiredAwaitingConfirm
+        - deletedRows
+    LedgerStatus:
+      type: object
+      properties:
+        id:
+          type: string
+        purohitId:
+          type: string
+        yajmanId:
+          type: string
+        eventId:
+          type: string
+          nullable: true
+        amountCollected:
+          oneOf:
+            - type: string
+            - type: number
+          nullable: true
+        paymentStatus:
+          type: string
+          enum: [pending, claimed, corroborated]
+        purohitClaimedAt:
+          type: string
+          format: date-time
+          nullable: true
+        familyConfirmedAt:
+          type: string
+          format: date-time
+          nullable: true
+        localityKey:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - purohitId
+        - yajmanId
+        - paymentStatus
+        - localityKey
+        - createdAt
+    CohortMetricsList:
+      type: array
+      items:
+        $ref: "#/components/schemas/CohortMetrics"
+    CohortMetrics:
+      type: object
+      properties:
+        week:
+          type: string
+        cohortSize:
+          type: integer
+        referredActivations:
+          type: integer
+        observedK:
+          type: number
+      required:
+        - week
+        - cohortSize
+        - referredActivations
+        - observedK
 

@@ -25,6 +25,49 @@ services:
         sync: false
       - key: VEDIKA_API_BASE_URL
         sync: false
+      - key: INTERNAL_API_KEY
+        sync: false
+      - key: CRON_SECRET
+        sync: false
     healthCheckPath: /api/healthz
     customDomains:
       - api.smaran.click
+
+  - type: cron
+    name: smaran-daily-brain
+    env: node
+    region: singapore
+    plan: free
+    branch: main
+    schedule: "30 0 * * *"
+    buildCommand: ""
+    startCommand: "curl -X POST https://api.smaran.click/api/cron/daily-brain -H \"x-cron-secret: $CRON_SECRET\""
+    envVars:
+      - key: CRON_SECRET
+        sync: false
+
+  - type: cron
+    name: smaran-subscription-sweep
+    env: node
+    region: singapore
+    plan: free
+    branch: main
+    schedule: "30 1 * * *"
+    buildCommand: ""
+    startCommand: "curl -X POST https://api.smaran.click/api/cron/subscription-sweep -H \"x-cron-secret: $CRON_SECRET\""
+    envVars:
+      - key: CRON_SECRET
+        sync: false
+
+  - type: cron
+    name: smaran-observed-k
+    env: node
+    region: singapore
+    plan: free
+    branch: main
+    schedule: "0 2 * * 1"
+    buildCommand: ""
+    startCommand: "curl -X POST https://api.smaran.click/api/cron/observed-k -H \"x-cron-secret: $CRON_SECRET\""
+    envVars:
+      - key: CRON_SECRET
+        sync: false

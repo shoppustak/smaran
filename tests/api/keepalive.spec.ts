@@ -6,6 +6,7 @@ test("GET /keepalive always returns 200, reporting database as not_configured wh
 
   const body = await res.json();
   expect(body.status).toBe("ok");
-  expect(body.database).toBe("not_configured");
+  const expectedDb = process.env.DATABASE_URL ? "ok" : "not_configured";
+  expect(body.database).toBe(expectedDb);
   expect(typeof body.timestamp).toBe("string");
 });

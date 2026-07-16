@@ -104,6 +104,98 @@ export interface WhatsappInboundMessage {
   receivedAt: string;
 }
 
+export interface WhatsappOutboundMessage {
+  to: string;
+  text: string;
+  sentAt: string;
+}
+
+export interface PurohitRecord {
+  id: string;
+  phoneNumber: string;
+  name: string;
+  city: string;
+  latitude: number;
+  longitude: number;
+  localityKey: string;
+  upiId: string;
+  calendarSystem: string;
+  plan: string;
+  createdAt: string;
+}
+
+export type IngestJobStatusKind = typeof IngestJobStatusKind[keyof typeof IngestJobStatusKind];
+
+
+export const IngestJobStatusKind = {
+  voice: 'voice',
+  photo: 'photo',
+} as const;
+
+export type IngestJobStatusStatus = typeof IngestJobStatusStatus[keyof typeof IngestJobStatusStatus];
+
+
+export const IngestJobStatusStatus = {
+  received: 'received',
+  transcribed: 'transcribed',
+  extracted: 'extracted',
+  awaiting_confirm: 'awaiting_confirm',
+  confirmed: 'confirmed',
+  rejected: 'rejected',
+  failed: 'failed',
+} as const;
+
+export type IngestJobStatusFieldScores = {[key: string]: number} | null;
+
+export interface IngestJobStatus {
+  id: string;
+  purohitId: string;
+  kind: IngestJobStatusKind;
+  status: IngestJobStatusStatus;
+  fieldScores?: IngestJobStatusFieldScores;
+  error?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PurgeResult {
+  purgedTranscripts: number;
+  purgedExtractions: number;
+  expiredAwaitingConfirm: number;
+  deletedRows: number;
+}
+
+export type LedgerStatusPaymentStatus = typeof LedgerStatusPaymentStatus[keyof typeof LedgerStatusPaymentStatus];
+
+
+export const LedgerStatusPaymentStatus = {
+  pending: 'pending',
+  claimed: 'claimed',
+  corroborated: 'corroborated',
+} as const;
+
+export interface LedgerStatus {
+  id: string;
+  purohitId: string;
+  yajmanId: string;
+  eventId?: string | null;
+  amountCollected?: string | number | null;
+  paymentStatus: LedgerStatusPaymentStatus;
+  purohitClaimedAt?: string | null;
+  familyConfirmedAt?: string | null;
+  localityKey: string;
+  createdAt: string;
+}
+
+export interface CohortMetrics {
+  week: string;
+  cohortSize: number;
+  referredActivations: number;
+  observedK: number;
+}
+
+export type CohortMetricsList = CohortMetrics[];
+
 export type GetPanchangParams = {
 /**
  * Date to resolve, ISO 8601 (defaults to today)

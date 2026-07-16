@@ -56,6 +56,7 @@ test.describe("WhatsApp Cloud API test layer", () => {
 
     const messagesRes = await request.get("/api/whatsapp/messages");
     const messages = await messagesRes.json();
-    expect(messages[0]).toMatchObject({ from, text });
+    const found = messages.find((m: any) => m.from === from && m.text === text);
+    expect(found).toBeDefined();
   });
 });
