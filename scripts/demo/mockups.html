@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<title>Smaran — WhatsApp mockups</title>
+<style>
+  /* All copy below is verbatim from code/artifacts/api-server/src/lib/confirm-card.ts
+     and a real production day-sheet response. Nothing here is invented. */
+  :root{
+    --wa-header:#f6f6f6; --wa-chat:#e5ddd5; --wa-in:#ffffff; --wa-out:#dcf8c6;
+    --wa-meta:#667781; --wa-tick:#53bdeb; --wa-btn:#00a5f4; --wa-div:#e9edef;
+    --ios-blue:#007aff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:#8a8a8e; padding:32px; display:flex; flex-wrap:wrap; gap:28px;
+    justify-content:center; align-items:flex-start;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Devanagari","Kohinoor Devanagari","Devanagari Sangam MN",sans-serif;
+  }
+  .wrap{display:flex;flex-direction:column;gap:8px;align-items:center}
+  .cap{color:#fff;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;opacity:.85}
+  /* 390x844 = iPhone logical resolution; screenshot each .phone at 2x for retina */
+  .phone{
+    width:390px;height:844px;background:var(--wa-chat);border-radius:38px;overflow:hidden;
+    display:flex;flex-direction:column;box-shadow:0 18px 50px rgba(0,0,0,.35);position:relative;
+  }
+  .phone.auto{height:auto;min-height:520px}
+  .status{
+    height:44px;background:var(--wa-header);display:flex;align-items:flex-end;justify-content:space-between;
+    padding:0 22px 2px;font-size:13px;font-weight:600;color:#000;flex:none;
+  }
+  .status .r{display:flex;gap:5px;align-items:center;font-size:11px}
+  .hdr{
+    background:var(--wa-header);display:flex;align-items:center;gap:10px;padding:6px 12px 10px;
+    border-bottom:.5px solid #d1d1d6;flex:none;
+  }
+  .back{color:var(--ios-blue);font-size:26px;line-height:1;margin-right:-2px}
+  .avatar{
+    width:36px;height:36px;border-radius:50%;flex:none;background:#fff;
+    background-image:url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/Pgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDIwMDEwOTA0Ly9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9UUi8yMDAxL1JFQy1TVkctMjAwMTA5MDQvRFREL3N2ZzEwLmR0ZCI+CjxzdmcgdmVyc2lvbj0iMS4wIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiB3aWR0aD0iNjIxLjAwMDAwMHB0IiBoZWlnaHQ9IjU5NS4wMDAwMDBwdCIgdmlld0JveD0iMCAwIDYyMS4wMDAwMDAgNTk1LjAwMDAwMCIKIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiPgo8ZGVmcz4KICA8bGluZWFyR3JhZGllbnQgaWQ9ImxvZ28tZ3JhZCIgeDE9IjEwMCUiIHkxPSIwJSIgeDI9IjAlIiB5Mj0iMTAwJSI+CiAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjN0UyMkNFIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjU1JSIgc3RvcC1jb2xvcj0iIzdFMjJDRSIvPgogICAgPHN0b3Agb2Zmc2V0PSI4NSUiIHN0b3AtY29sb3I9IiNEQjI3NzciLz4gPCEtLSBTbW9vdGggcGluay9tYWdlbnRhIGJyaWRnZSAtLT4KICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI0VBNTgwQyIvPgogIDwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsNTk1LjAwMDAwMCkgc2NhbGUoMC4xMDAwMDAsLTAuMTAwMDAwKSIKZmlsbD0idXJsKCNsb2dvLWdyYWQpIiBzdHJva2U9Im5vbmUiPgo8cGF0aCBkPSJNMzc3MCA1NzQwIGMyMCAtMTMgNTMgLTEzIDQ1IDAgLTMgNiAtMTggMTAgLTMzIDEwIC0yMSAwIC0yNCAtMiAtMTIKLTEweiIvPgo8cGF0aCBkPSJNMzAyNSA1NzI5IGMtNCAtNiAtMSAtMTUgNiAtMjAgMTQgLTkgNiAtOSAtNjUgNiAtMTMgMyAtNDUgLTEgLTcyCi05IC03MiAtMTkgLTE5MyAtMjEgLTIwMCAtMiAtNSAxMiAtMjEgMTQgLTc3IDExIC0xMTMgLTYgLTE3MyAtMTQgLTIwNCAtMjYKLTE1IC02IC00OCAtMTQgLTczIC0xOSAtOTYgLTE4IC0zMjYgLTg2IC0zNTIgLTEwNCAtMTIgLTkgLTI4IC0xNiAtMzUgLTE2IC03CjAgLTc3IC0zNCAtMTU1IC03NiAtMTUwIC04MCAtMzcwIC0yMjIgLTQ3MyAtMzA1IC0zMyAtMjcgLTY1IC00OSAtNzEgLTQ5IC0xNwowIC0xNTQgLTE0NiAtMTU0IC0xNjQgMCAtOSAtMTUgLTMzIC0zMyAtNTMgLTE4IC0yMSAtNDAgLTQ5IC00OSAtNjMgLTEwIC0xNAotMzkgLTU3IC02NyAtOTYgLTEwMyAtMTUwIC0yMDkgLTM4NiAtMjIwIC00OTQgLTQgLTM2IC0xMSAtNzQgLTE3IC04NSAtMTAKLTE4IC0yMCAtNzMgLTQwIC0yMTAgLTQgLTI3IC04IC0yMDcgLTkgLTQwMCAtMSAtMzQzIC0yIC0zNTEgLTI0IC00MDUgLTI2Ci02MCAtNjcgLTEwNiAtMTA1IC0xMTYgLTEzIC0zIC0zOSAxIC01OSA5IC01MCAyMSAtNzEgNjYgLTY5IDE0NCAxIDU5IDAgNjMKLTI0IDY5IC0zMiA4IC0xMDIgLTM5IC0xMjAgLTgxIC0xMyAtMjkgLTE0IC0yOSAtMjAgLTcgLTEwIDM0IC0zMSAyNiAtMzggLTE1Ci0xMCAtNjIgLTcgLTEwMCA5IC0xMTMgOSAtNyAxMiAtMjIgOSAtMzggLTcgLTM5IDI3IC05NyA4NiAtMTQ4IDU1IC00NyA1NwotNDggMTUwIC02NyA0MiAtOCA4NSAtMTAgMTIyIC01IDEzNyAxOCAyMjAgODYgMjkyIDIzOCA2MyAxMzYgODYgMjQ3IDk3IDQ3MAoxMyAyOTkgMzcgNDk3IDcyIDYxNSA4IDI4IDI1IDg0IDM3IDEyNSAzNCAxMTMgMTE5IDI3NyAxNzcgMzM4IDcgNyAyNiAzMiA0Mwo1NSA0NiA2NCAyMDkgMjA3IDM0OCAzMDUgNDYgMzEgODUgNDYgNDYgMTcgLTE3IC0xMyAtMTggLTE0IC0xIC0xNSAxMCAwIDIwIDcKMjMgMTUgNCA5IDE5IDE1IDM1IDE1IDE2IDAgNDYgNyA2NyAxNiA3MyAzMSA4MiAzNCA4MiAyNCAwIC02IC0xMSAtMTUgLTI1Ci0yMCAtMzYgLTE0IC0zMSAtMjQgOCAtMTYgMTcgNCA0OCA5IDY3IDEyIDE5IDMgNDkgOSA2NSAxNCA5NCAzMCAzMTEgODAgMzQ0CjgwIDEyIDAgMzggNyA1OCAxNSAzNSAxNSAxMzggMzUgMTk4IDM5IDE3IDEgMzcgNSA0NSA4IDI2IDkgMTE0IDMwIDE0NSAzNCA4NQoxMiAzNDQgMTkgNTA1IDE1IDYzIC0xIDEyNSAwIDEzOCAzIDEzIDMgMzIgMCA0MyAtNyAxNCAtOSAyMSAtOSAzMSAxIDYgNiAyMQoxMiAzMyAxMSAxMSAwIDE0IC0zIDggLTYgLTcgLTIgLTEzIC05IC0xMyAtMTQgMCAtMTMgNTEgMCA3MSAxOCAxNiAxMyA0OSA5CjQ5IC03IDAgLTE2IDI3IC0xNyA2NSAtNCAzMiAxMiA0NyAxMiA3OCAzIDIwIC03IDM3IC0xOCAzNyAtMjYgMCAtOSAxNCAtMTMKNDYgLTEzIDI1IDAgNDMgMyA0MCA4IC0yIDQgMiAxNiA5IDI2IDE1IDE5IDI0IDE5IDExMCAtMiAyMiAtNiA1OCAtMTMgODAgLTE2CjUwIC02IDExNSAtMjIgMTIyIC0zMCA0IC0zIC04IC02IC0yNSAtNiAtNjggMCAtODIgLTIzIC0yNCAtMzkgNTYgLTE2IDcyIC0xMwo4MiAxMyA5IDI1IDExIDI1IDEzNSAtNSAyMiAtNiA2MyAtMTUgOTAgLTIwIDc4IC0xNiAyOTYgLTExMyAzNzcgLTE2OCA0MCAtMjgKMTAwIC03NSAxMzMgLTEwNiAzMyAtMzEgNzMgLTY0IDg4IC03MyAxNiAtOSAzOSAtMzggNTIgLTYzIDEzIC0yNSAzMCAtNTEgMzkKLTU4IDggLTcgMzQgLTQ3IDU3IC04OSAyMyAtNDMgNTEgLTkwIDY0IC0xMDcgMjAgLTI3IDM4IC03OSA1MiAtMTQ1IDIgLTE0IDcKLTMyIDEwIC00MCAxMCAtMjYgMTIgLTM0IDIzIC04NCA1IC0yNyAxNSAtNTUgMjAgLTYyIDYgLTcgMTAgLTIzIDggLTM2IC0zCi0zMyAxMyAtMTM4IDIyIC0xMzggNiAwIDExIC0zNCAxMSAtODAgMCAtOCA1IC00NiAxMSAtODMgMTAgLTcwIDE3IC0xNDkgMTgKLTIwNCAwIC0xOCA3IC0zNiAxNSAtNDAgMTQgLTggMTUgLTE0IDI5IC0zMzUgMyAtNTYgMCAtODcgLTYgLTg1IC02IDEgLTEzIC00Ci0xNSAtMTAgLTMgLTcgMiAtMTMgMTEgLTEzIDEzIDAgMTMgLTQgMCAtMzUgLTE4IC00NSAtMTggLTc5IDIgLTExNyAyMSAtNDEKMTEgLTE5NiAtMTIgLTE3NyAtOCA3IC0xOCA5IC0yMiA1IC00IC00IDEgLTE0IDExIC0yMSAxNyAtMTIgMTggLTIwIDcgLTExMgotMTUgLTExNyAtOTUgLTM3MSAtMTczIC01NDMgLTQ2IC0xMDMgLTE5MiAtMzM5IC0yMTkgLTM1NiAtOCAtNSAtOSA3IC01IDM3Cmw3IDQ0IC00MCAtNDUgYy0yMiAtMjUgLTQ2IC01OSAtNTUgLTc3IC05IC0xOCAtMjEgLTM2IC0yOCAtNDAgLTcgLTQgLTI0IC0yNAotMzggLTQzIC00MiAtNTYgLTE0NSAtMTYwIC0xNTcgLTE2MCAtNyAwIC0xMiAtNiAtMTIgLTE0IDAgLTE4IC0yMCAtMjUgLTUxCi0xOSAtMTkgMyAtMzEgLTUgLTY0IC00NyAtMzUgLTQ0IC00MSAtNDggLTQ1IC0zMCAtNSAyMSAtNiAyMSAtMjkgLTQgLTEzIC0xNAotMzkgLTMwIC01OCAtMzcgLTI2IC04IC0zMyAtMTYgLTMxIC0zMiAyIC0xMSAtMyAtMjIgLTExIC0yNSAtMTAgLTMgLTEyIDAgLTgKMTIgOSAyMyAtMTAgMjAgLTIzIC00IC02IC0xMSAtMTQgLTE5IC0xOCAtMTggLTE0IDMgLTQyIC0xNCAtMzcgLTIyIDExIC0xOAotMTk4IC0xNjcgLTI0NyAtMTc2IC0xOCAtNCAtNDYgLTE3IC02MyAtMjkgLTQzIC0zMiAtMTExIC02NSAtMTY4IC04MiAtMjggLTgKLTY3IC0yNiAtODggLTM5IC0yMSAtMTMgLTQ3IC0yNCAtNTcgLTI0IC0xMSAwIC00MSAtMTEgLTY3IC0yNiAtNTkgLTMxIC05NAotMjUgLTUwIDEwIDM2IDI5IDIwIDQxIC0zNCAyNiAtNDYgLTEyIC01OCAtMjUgLTQxIC00NSA5IC0xMSA3IC0xNiAtOSAtMjQKLTIzIC0xMyAtMzQgLTE0IC0yNyAtMyAyIDQgLTIgMTYgLTkgMjYgLTEzIDE3IC0xNyAxNyAtNzYgMiAtMzQgLTggLTY0IC0xOAotNjggLTIxIC04IC05IDI4IC0zNSA0OCAtMzUgMjQgLTEgLTE1MSAtNjAgLTE3NyAtNjAgLTM1IDAgLTE2IDE4IDI2IDI2IDUyIDkKNzIgMjIgNzIgNDQgMCAyNCAtMjUgMjcgLTM0IDQgLTUgLTE0IC0xNiAtMTYgLTY2IC0xMSAtNTIgNiAtNjMgNCAtODAgLTEzCi0yNCAtMjQgLTM0IC0yNSAtNDkgLTcgLTExIDE0IC05MSAxNiAtMTIyIDMgLTkgLTQgLTMzIC0zIC01NSAxIC0yMSA1IC01OCA2Ci04MiAzIC0yNCAtNCAtNDUgLTMgLTQ4IDEgLTIgNCAtMjYgMTEgLTUyIDE0IC0xNTkgMjEgLTQwOSAxMDMgLTU1NyAxODIgLTMyCjE3IC0xMzUgODQgLTIwMCAxMzAgLTEwMyA3MiAtMjEyIDIyMSAtMjcwIDM2OCAtMTUgMzkgLTMzIDgxIC00MCA5NSAtMzIgNjIKLTU2IDEyOSAtNjUgMTc4IC01IDI5IC0xNCA2MCAtMTkgNzAgLTIyIDQxIC0zNCAyNjIgLTE5IDM2MiAxNCA5OSAxNCAxMDEgMzEKMTU4IDkgMjkgMTYgNTUgMTYgNTcgMCAxOSAxNSAxMDkgMjcgMTU2IDggMzEgMTYgNzYgMTkgOTkgNSAzOCA0IDQxIC0xMCAzMAotMTMgLTExIC0xNCAtMTAgLTYgMTEgNSAxMyAxNCAyMyAyMCAyMSAxNSAtMyA0OCA1MyA2NiAxMTIgOCAyNyAxOSA1NCAyMyA2MAoxNCAxNyA0MiAxMDcgNDIgMTMyIDAgMjcgODUgMTkyIDE1OSAzMTAgMTcgMjYgMzEgNTIgMzEgNTcgMCA2IDE1IDI4IDMzIDUxCjE4IDIzIDQzIDU4IDU1IDc5IDMzIDU4IDExNSAxNDcgMTM0IDE0NyA5IDAgMTkgNCAyMiA5IDMgNSAxNCA3IDI0IDQgMTMgLTMKMzUgMTEgNjggNDMgMzEgMzEgNTYgNDcgNjkgNDYgMTIgLTIgMzEgOCA0NSAyMyAxNCAxNSAzMCAyMyA0MSAyMCAxMSAtNCAxOCAxCjIyIDE1IDMgMTMgMTMgMjAgMjkgMjAgMTMgMCAzMiA2IDQzIDE0IDExIDcgNTYgMjUgMTAwIDQwIDQ0IDE1IDg5IDMxIDEwMCAzNgo2MiAyNyAxMzAgNDEgMjA2IDQxIDE2NiAtMSAyMzQgNSAyNTcgMTkgMjEgMTMgMjUgMTMgMzYgLTIgMTAgLTEzIDI1IC0xNyA2NAotMTUgMjkgMSA1MiAtMiA1MiAtNiAwIC01IDkgLTUgMjAgLTIgMTIgNCAyNyAxIDM1IC01IDggLTYgMTggLTkgMjQgLTYgNSA0CjE2IC0xIDI0IC05IDkgLTggMzMgLTE4IDU0IC0yMSAyMSAtMyA0MiAtOSA0NyAtMTQgNSAtNSAxNSAtNiAyMyAtMyA3IDMgMjIKLTQgMzIgLTE2IDEwIC0xMiAyNSAtMTkgMzMgLTE2IDggMyAxOSAtNCAyNiAtMTcgNyAtMTMgNDAgLTQxIDczIC02MiAzNCAtMjIKNzcgLTU5IDk3IC04MyAyMCAtMjQgNDEgLTQzIDQ3IC00MyAxMCAwIDYxIC0xMTYgODUgLTE5MiA2IC0yMCAyMyAtNTQgMzcgLTc0CjUzIC03OCA3MCAtMTM1IDgyIC0yNzIgNyAtNzMgMTAgLTE1MyA2IC0xNzkgLTkgLTcwIC02NiAtMjU0IC04NyAtMjgzIC0xMAotMTQgLTQyIC02MSAtNzEgLTEwNCAtNjcgLTEwMyAtMTYxIC0xOTUgLTI2MiAtMjU1IC0xMTYgLTcwIC0xMzggLTgwIC0yMTgKLTEwMCAtNzkgLTE5IC0yNDEgLTIwIC0yNzYgLTEgLTExIDUgLTMwIDEwIC00MyAxMCAtMzYgMCAtODUgMzUgLTE2OCAxMjEgLTc2Cjc4IC05NSA5MCAtMTAyIDY3IC0zIC03IC0xMSAtNCAtMjQgMTAgLTEwIDEzIC0zMiAzNiAtNDkgNTIgLTE2IDE3IC0yNyAzMAotMjMgMzAgMyAwIC0xNiAyMyAtNDQgNTIgbC01MCA1MiA0IDEwMSBjMyA3NyAxMCAxMTIgMjcgMTUwIDcwIDE1MyA3NSAxNTkKMTg3IDIzNCAxMTUgNzcgMjEwIDgwIDMxMCAxMiA0MyAtMjggNTcgLTQ0IDY2IC03NiAyOSAtMTAzIDEyIC0xNjYgLTQ5IC0xODYKLTIxIC02IC00MSAtMTcgLTQ1IC0yMyAtNSAtOCAtMTEgLTcgLTIwIDIgLTE1IDE1IC0zOCAxNiAtMzggMiAwIC0yMSA3OCAtODcKMTEwIC05NCAyOCAtNSAzMSAtOCAyMCAtMjEgLTcgLTkgLTEwIC0xOSAtNiAtMjIgOSAtOSA5MyAtNCAxMjIgNyAxMiA1IDI1IDYKMjggMiA0IC0zIDIzIC03IDQzIC04IDI5IC0xIDQyIDUgNjYgMzMgMzEgMzUgNDkgMzYgNDAgMyAtOSAtMzQgMTIgLTIyIDM2IDIwCjEyIDIyIDIwIDQwIDE3IDQwIC0zIDAgOCAyNiAyNCA1OCAxOSAzOSAzMCA3OSAzMyAxMjIgMyAzNiA4IDczIDEyIDgzIDQgOSAzCjE3IC0xIDE3IC01IDAgLTkgMjAgLTEwIDQ0IC0xIDU1IC05MyAyNDYgLTExOCAyNDYgLTYgMCAtMTcgOSAtMjQgMjAgLTcgMTEKLTE3IDIwIC0yMyAyMCAtNiAwIC0yOSAxMyAtNTIgMjkgLTQ2IDMxIC0xNTMgNzEgLTE5MSA3MSAtMTQgMCAtMjggNSAtMzIgMTEKLTEwIDE3IC0yMzQgNCAtMzA0IC0xNiAtMzAgLTkgLTc0IC0yMiAtOTcgLTI4IC0yNCAtNiAtNDMgLTE1IC00MyAtMTkgMCAtNQotOSAtOCAtMTkgLTggLTEwIDAgLTQyIC0xNiAtNzEgLTM1IC0yOSAtMTkgLTY4IC00MiAtODYgLTUxIC0xOSAtOSAtMzkgLTI1Ci00NCAtMzUgLTYgLTEwIC0zMCAtMzIgLTUzIC00OCAtNDYgLTMxIC0xMzkgLTE2MyAtMTUxIC0yMTMgLTMgLTE2IC0xMiAtMjgKLTIwIC0yOCAtNyAwIC0xOSAtMTUgLTI3IC0zMiAtNyAtMTggLTE1IC0zNSAtMTggLTM4IC0xMiAtMTAgLTM5IC03NyAtNTAKLTEyNSAtMjcgLTEwOCAtMzEgLTE5MSAtMTMgLTI3MyA3IC0zMyA4IC02MSAyIC03NiAtNiAtMTYgLTQgLTMyIDUgLTQ5IDcgLTE0CjExIC0yOCA4IC0zMSAtNyAtNiA1NiAtMTYyIDg0IC0yMDggMTMgLTIxIDIzIC00MiAyMyAtNDYgMCAtMzQgMTQ1IC0xNzQgMzAwCi0yODkgODIgLTYxIDIxOCAtMTI0IDI3MSAtMTI1IDI0IC0xIDcwIC05IDEwMSAtMjAgMzggLTEyIDg4IC0xOCAxNDUgLTE4IDQ4CjAgMTIxIC01IDE2MSAtMTAgMTA3IC0xNCAzNDUgMjQgNDI4IDY4IDEwIDUgMzkgMTMgNjQgMTcgMTEyIDE4IDIzMCA4MyAzNTUKMTkzIDI4IDI1IDY0IDUxIDgxIDU4IDUxIDIyIDE5MyAxNzIgMjA4IDIyMSA0IDEzIDExIDIyIDE2IDIwIDEyIC0zIDkwIDgyIDkwCjk5IDAgOCA0IDE0IDkgMTQgMTEgMCA4MSAxMTcgODEgMTM1IDAgOCAxMCAzMSAyMiA1MiA0MiA3NCA0OSA5MyA2OSAxODAgMTEKNDggMjcgMTE5IDM1IDE1NiAxOSA4MCAxMiAxOTUgLTEyIDIwNCAtOCAzIC0xNCAxMiAtMTQgMjEgMCAxMyAzIDEyIDE1IC00IDE1Ci0xOCAxNSAtMTggMTMgMTEgLTIgMTcgLTkgMzUgLTE1IDQwIC03IDYgLTE2IDM3IC0xOSA2OSAtNyA1NCAtNiA1OSAxMSA1MyAxNAotNiAxNiAtMyAxMSAxNyAtMyAxNCAtMiAyNyAzIDMxIDMwIDE4IDIxIDE4NCAtMTggMzMxIC0yMCA3OCAtMTI4IDMxMCAtMTU4CjMzOSAtMTAgMTAgLTIyIDI2IC0yOCAzNiAtNzcgMTM0IC0xMDcgMTcwIC0yMjEgMjY3IC00MyAzNiAtMjM0IDE2MiAtMjQ3IDE2MgotNCAwIC0yNCAxMSAtNDUgMjQgLTIwIDE0IC01OSAzMiAtODcgNDEgLTI3IDkgLTY4IDI1IC05MCAzNSAtNjAgMjYgLTEzNCA1MQotMTg1IDYyIC00OSAxMCAtMjY2IDEyIC0yODIgMiAtNSAtMyAtNzggLTggLTE2MSAtMTAgLTg0IC0zIC0xODQgLTExIC0yMjQKLTE5IC00MCAtOCAtODQgLTE1IC05OCAtMTUgLTE1IDAgLTM2IC01IC00OCAtMTIgLTEyIC03IC00NCAtMTUgLTcyIC0xOSAtMjcKLTQgLTc3IC0xNSAtMTEwIC0yMyAtMzMgLTggLTg1IC0yMCAtMTE1IC0yNyAtNjMgLTEzIC0yNDAgLTgxIC0yODYgLTExMCAtMTcKLTEwIC00MiAtMTkgLTU2IC0xOSAtMTMgMCAtMzkgLTExIC01OCAtMjUgLTE5IC0xNCAtNTEgLTMwIC03MiAtMzYgLTQ2IC0xMgotMjE0IC0xMjQgLTIzNSAtMTU2IC04IC0xMyAtMjIgLTIzIC0yOSAtMjMgLTggMCAtMTQgLTcgLTE0IC0xNSAwIC05IC05IC0xNQotMjQgLTE1IC0yMyAwIC0xNjUgLTk4IC0xOTYgLTEzNSAtNyAtOCAtMTkgLTE1IC0yNiAtMTUgLTggMCAtMTQgLTkgLTE0IC0yMAowIC0xMSAtMTUgLTM3IC0zNCAtNTcgLTE4IC0yMSAtNDMgLTU0IC01NSAtNzMgLTE4IC0zMCAtMjEgLTMyIC0yMSAtMTIgMCAzMQotMTMgMjggLTU5IC0xOCAtNTQgLTUzIC03OCAtOTkgLTU5IC0xMTIgMTAgLTcgOCAtOCAtNSAtNCAtMTIgNCAtMjAgMCAtMjMKLTEyIC0xNiAtNDggLTM2IC04MiAtNDkgLTgyIC04IDAgLTE1IC03IC0xNSAtMTUgMCAtMTYgLTY3IC0xMjUgLTc2IC0xMjUgLTQKMCAtNCA5IC0xIDIwIDMgMTEgMSAyMCAtNCAyMCAtOSAwIC0xMyAtMzUgLTEwIC03MiAxIC0xMCAtMyAtMTggLTggLTE4IC02IDAKLTExIC0xNSAtMTEgLTMyIDAgLTQzIC03IC01MyAtNTMgLTcyIC0zMSAtMTMgLTM3IC0xOSAtMzIgLTM2IDQgLTExIDIgLTIwIC00Ci0yMCAtNiAwIC0xMSAtNiAtMTEgLTE0IDAgLTggLTcgLTIxIC0xNSAtMzAgLTggLTggLTE3IC0yNyAtMTkgLTQzIC0yIC0xNSAtNwotMzYgLTExIC00NiAtNiAtMTUgLTQgLTE4IDExIC0xNSAxNSAyIDE4IC0yIDE3IC0xOSAtMiAtMTUgMyAtMjMgMTIgLTIzIDggMAoxNSAtNyAxNSAtMTUgMCAtMTggLTEyIC0xOSAtMjcgLTQgLTE1IDE1IC0zMyAzIC0zMyAtMjIgMCAtMTMgLTcgLTE5IC0yNCAtMTkKLTIxIDAgLTI0IC01IC0yOSAtNjIgLTMgLTM1IC0xMiAtODEgLTIwIC0xMDQgLTkgLTI0IC0xMiAtNDcgLTcgLTU0IDYgLTkgMQotMjUgLTEyIC00MyAtMjcgLTM4IC0zOCAtMTI3IC0xNSAtMTI3IDkgMCAyMCA4IDI2IDE3IDE0IDI2IDE3IDE0IDEwIC0zNyAtMwotMjUgLTcgLTM3IC03IC0yNyAtMSA5IC01IDE3IC05IDE3IC0yMiAtMSAtMzggLTI0IC01OSAtODYgLTI3IC04MiAtMzMgLTE0NgotMTUgLTE2OCAxMCAtMTIgMTAgLTIwIDMgLTI5IC0yMiAtMjYgLTEyIC00MDcgMTEgLTQzNSA3IC05IDYgLTIwIC0yIC0zNiAtMTEKLTE5IC0xMCAtMzAgOCAtNjkgMTMgLTI5IDE5IC01NiAxNSAtNzUgLTQgLTE5IDEgLTQ1IDE1IC03NSAxMiAtMjUgMjEgLTUzIDIxCi02MSAwIC04IDE0IC00MSAzMCAtNzMgMTcgLTMxIDMwIC02OSAzMCAtODMgMSAtMzkgMzcgLTExMCA1NyAtMTExIDEwIC0xIDI1Ci0yIDMzIC0zIDggMCAxNiAtOSAxOCAtMTggMiAtMTMgLTEgLTE2IC0xMiAtMTIgLTIyIDggLTIwIC04IDQgLTMzIDEwIC0xMiAyMgotMzIgMjUgLTQ1IDggLTMxIDI1IC01MiA1MyAtNjcgMTMgLTcgMjEgLTE1IDE4IC0xOCAtMTIgLTEyIDE3IC0zMyA0NCAtMzMgMTkKMCAzMyAtOCA0NCAtMjUgMTUgLTIzIDE1IC0yNSAwIC0yNSAtMTMgMCAtMTQgLTMgLTQgLTE1IDcgLTggMTkgLTE1IDI2IC0xNSA4CjAgMTQgLTQgMTQgLTEwIDAgLTMxIDE3IC02MSAzMyAtNTggNyAxIDI1IC0xMCA0MiAtMjUgMTggLTE4IDM2IC0yNiA0OCAtMjMKMjQgNiA1MyAtMTIgMTUwIC05NCA1MCAtNDEgNzIgLTY2IDYyIC02OCAtMTkgLTQgLTE5IC0xMSAxIC0zMyAxMyAtMTQgMjEgLTE2CjM2IC04IDI2IDE0IDQ2IDUgNTAgLTIzIDIgLTEzIDE1IC0yOCAzMCAtMzYgMTYgLTcgMjggLTE3IDI4IC0yMiAwIC0xNSA2NAotNTAgNzEgLTM4IDQgNiAxMiAxIDE5IC0xMyAxNyAtMzIgMzEgLTQwIDU4IC0zNCAxNCA0IDIxIDIgMTggLTQgLTQgLTUgLTIKLTEyIDMgLTE1IDUgLTQgMTMgLTIgMTYgNCA4IDEzIDQzIDQgNjYgLTE2IDkgLTggMzEgLTEzIDUwIC0xMiAyOCAyIDMzIDAgMzEKLTE0IC0zIC0xOCA5IC0yMiA1NCAtMTkgMTIgMSAyOSAtNiAzOCAtMTUgMTAgLTkgMzQgLTE5IDU0IC0yMSAyMCAtMiA0MSAtOAo0NyAtMTIgMTQgLTEyIDczIC0xMiA4MCAwIDEwIDE1IDM1IDEwIDM1IC02IDAgLTE1IDQwIC0zMCA2MiAtMjIgNyAyIDI0IDAgMzgKLTUgMTQgLTYgODQgLTExIDE1NSAtMTMgNzIgLTIgMTUzIC03IDE4MCAtMTEgMjggLTQgNTUgLTYgNjAgLTUgNiAyIDc2IDUgMTU4CjcgMTAxIDIgMTU2IDggMTc1IDE4IDE1IDggNTQgMTcgODcgMjEgMzMgNCA3NyAxNCA5OSAyMSAyMSA4IDUxIDE0IDY2IDE0IDE2CjAgNTggMTMgOTUgMzAgMzcgMTYgNzggMzIgOTIgMzUgMTUgMiAzMSA5IDM3IDE1IDUgNSAxNyAxMCAyNyAxMCA5IDAgMjggOSA0MgoyMCAxNCAxMSAzNiAyMCA0OSAyMCAyMiAwIDU2IDM2IDQ0IDQ3IC0yIDMgLTQwIC05IC04MyAtMjUgLTExNiAtNDQgLTI4OCAtOTcKLTMwNSAtOTQgLTQgMSAtMjYgLTYgLTUwIC0xNSAtMzIgLTEyIC04NyAtMTYgLTIxOCAtMTkgLTExNyAtMiAtMTYyIDAgLTEzNSA2CjIyIDUgNzUgOSAxMTggOSA0NSAxIDkzIDcgMTEzIDE2IDIwIDggNzcgMjAgMTI3IDI2IDUxIDcgMTAzIDE3IDExNyAyNSAxNCA3CjQ0IDE1IDY1IDE5IDQxIDcgNjcgMTcgMjQ1IDEwMyA1OCAyNyAxNjAgNzUgMjI4IDEwNiAxMTMgNTAgMjUyIDEzMiAyNjYgMTU1CjQgNSAyMyAxNSA0NCAyMiAyMCA2IDQ4IDIwIDYxIDMwIDEzIDExIDMyIDE5IDQzIDE5IDEwIDAgMzcgMTIgNTkgMjcgMzMgMjIKNDQgMjUgNTkgMTUgMTQgLTkgMjEgLTcgMzYgOSA5IDEwIDIzIDE5IDI5IDE5IDcgMCAxOCA3IDI1IDE1IDExIDEzIDggMTMgLTE4CjQgLTE3IC02IC0zNiAtMTcgLTQzIC0yNSAtMTMgLTE1IC0yOSAtMTkgLTI5IC02IDAgMTMgNzIgNTAgMTA4IDU1IDMzIDUgNDQKMTMgMTAyIDY3IDE1IDE0IDU4IDUwIDk2IDgwIDg0IDY3IDE5MSAxNzUgMTk5IDIwMSA0IDEwIDE0IDE5IDI0IDE5IDI1IDAgMjExCjIwMCAyMTEgMjI3IDAgNiA4IDE4IDE4IDI1IDExIDcgMjUgMjQgMzIgMzggNyAxNCAyMiAzNiAzNSA1MCAyOCAzMSAxNDUgMjQ1CjE0NSAyNjUgMCA4IDUgMTUgMTAgMTUgNiAwIDEwIDUgMTAgMTEgMCA2IDkgMTggMTkgMjcgMTEgMTAgMjQgMzMgMzAgNTIgNSAxOQoyMSA2MiAzNSA5NSAxNCAzMyAyNiA2OCAyNiA3OCAwIDM0IC0yOSAxNiAtNTEgLTMzIC0yNSAtNTYgLTM0IC02MSAtMTggLTkgNQoxOSAxNCA1NCAxOSA3OSA0IDI1IDE1IDcwIDI0IDEwMCA5IDMwIDIzIDEwNyAzMSAxNzAgOCA2MyAxOSAxMzEgMjQgMTUwIDMzCjEyMiA0NCAyMTUgNTYgNDc5IDMgNjMgOCAxMTggMTEgMTIyIDIgNSA3IDQzIDEwIDg2IDQgNDMgMTAgODQgMTQgOTIgNiAxMSAyMAotODkgMjEgLTE1NCAxIC0zNCA5IC02NSAxNyAtNjUgMzUgMCA0NCAzNjcgMTIgNTMwIC0xOCA5NyAtMjMgMTMyIC00MSAyNzcKLTEwIDg2IC0yNiAxMzYgLTQwIDEyNyAtMTEgLTYgLTEwIC03IC0xNSA3NCAtMSAzNCAtOCA4NyAtMTQgMTE3IC02IDMwIC05IDU5Ci01IDY1IDMgNiAtMSAxMyAtMTAgMTcgLTEzIDQgLTE1IDEzIC0xMSAzNCAzIDE2IDEgMjkgLTQgMjkgLTUgMCAtMTYgMTMgLTI1CjMwIC0xMiAyMyAtMTMgMzQgLTQgNTQgMTMgMjcgNiA1NiAtMTIgNTYgLTggMCAtOCAtNCAtMSAtMTMgMTMgLTE1IC0xIC00MgotMTcgLTMzIC02IDQgLTExIDEyIC0xMSAxNyAwIDYgLTExIDI3IC0yNSA0NyAtMTQgMjAgLTI1IDQzIC0yNSA1MSAwIDcgLTEyCjI1IC0yNiAzOCAtMzMgMzEgLTI0IDQyIDEyIDE0IDE1IC0xMiAzMCAtMTggMzMgLTE1IDMgNCAwIDkgLTYgMTEgLTcgMyAtMTMKMTMgLTEzIDI0IDAgMTEgLTkgMjcgLTIwIDM2IC0yMCAxOCAtMjggMzkgLTEwIDI4IDIxIC0xMyA5IDMyIC0yMCA3NSAtMTYgMjUKLTMwIDUwIC0zMCA1NSAwIDExIC03NCA4MSAtMTQ0IDEzNSAtMjUgMTkgLTQ4IDQzIC01MSA1MyAtNCA5IC0xOSAyNCAtMzUgMzIKLTM3IDE5IC00NCAxOSAtMzYgMCA1IC0xNCAyIC0xNCAtMjMgMCAtMTYgOCAtMzggMjUgLTQ4IDM3IC0xMCAxMyAtMzEgMzAgLTQ3CjM4IC0xNiA4IC00NyAzMiAtNjkgNTMgLTIzIDIyIC00OCAzNyAtNjMgMzcgLTE1IDAgLTIyIDQgLTE5IDEwIDcgMTEgLTgyIDUzCi05NSA0NSAtNSAtMyAtMTEgMyAtMTQgMTIgLTMgMTAgLTE4IDIzIC0zMyAzMCAtNTYgMjMgLTIxOSA4MiAtMjQ4IDg5IC0xNiA0Ci0zNCA5IC00MCAxMiAtNSAzIC0yMiA3IC0zNyA5IC0xNiAyIC04NyAxMiAtMTU5IDIzIC03MiAxMSAtMTM1IDE4IC0xNDAgMTQKLTUgLTMgLTIxIDIgLTM1IDExIC0xNCA5IC0zMyAxNCAtNDEgMTEgLTkgLTQgLTIxIC0yIC0yNyA0IC03IDUgLTI4IDEyIC00NwoxNCAtMTkgMyAtNDkgOCAtNjggMTAgLTE5IDMgLTM5IDEwIC00NSAxNiAtNSA1IC0yMSAxMCAtMzQgMTAgLTE0IDAgLTIxIDQKLTE2IDExIDEyIDIwIC0xOCAyNyAtNTIgMTMgLTM0IC0xNCAtMTExIC0xMCAtMTI5IDcgLTEyIDEyIC01MiAxMSAtNjAgLTEgLTEwCi0xNiAtNjUgLTEyIC02NSA1IDAgOCAtNyAxNSAtMTUgMTUgLTggMCAtMTUgLTQgLTE1IC05IDAgLTEyIC01NSAtMjEgLTkwIC0xNAotMTYgMyAtMzAgMTIgLTMwIDE5IDAgOCAtOSAxNCAtMjAgMTQgLTE4IDAgLTI1IC0xMCAtMjEgLTMyIDAgLTUgLTE2IC04IC0zNgotNyAtMzUgMCAtMzYgMSAtMTMgMTAgMjAgOCAyMiAxMiAxMCAxOSAtOSA1IC0xOSA1IC0yNyAtMiAtNyAtNSAtMjAgLTggLTI4Ci00IC04IDMgLTE1IDEgLTE1IC00IDAgLTUgOCAtMTEgMTggLTEzIDExIC0zIDcgLTUgLTEwIC02IC0xNSAwIC0zMCA0IC0zMyA5Ci01IDggLTEyIDcgLTIzIC0yIC0xMyAtMTEgLTE1IC0xMCAtOSA0IDUgMTQgLTIgMTggLTM3IDIzIC00MSA3IC04NiAtNiAtODYKLTIzIDAgLTQgLTQ0IC04IC05OCAtOSAtOTMgLTEgLTk1IC0xIC01NyAxMiAyMiA3IDM2IDE0IDMwIDE1IC02MSA5IC05NCA5Ci0xMDAgLTF6IG0zMTkgLTE0IGM0IC0xMSAtMSAtMTQgLTIwIC0xMyAtMjMgMiAtMjQgNCAtOCAxNSAyMiAxNiAyMSAxNiAyOCAtMnoKbTE2ODUgLTQxNCBjLTEyIC00IC03OSAzMCAtNzkgNDEgMCA0IDIwIC0zIDQ1IC0xNSAyNSAtMTIgNDAgLTI0IDM0IC0yNnogbTc5Ci0zNSBjMjEgLTEzIDY2IC0zOCAxMDAgLTU1IDM0IC0xNyA2MiAtMzYgNjIgLTQxIDAgLTYgNiAtMTAgMTMgLTEwIDggMCAyNwotMTMgNDMgLTMwIDE2IC0xNiAzNCAtMzAgMzkgLTMwIDEzIC0xIDQ5IC01MCAzNyAtNTAgLTUgMCAtMTYgNyAtMjMgMTYgLTE5CjIzIC0xOTMgMTQ1IC0yNjEgMTgzIC01MyAyOSAtNjcgNDEgLTUzIDQxIDMgMCAyMiAtMTEgNDMgLTI0eiBtLTMxNDggLTI0NgpjLTggLTUgLTE5IC0xMCAtMjUgLTEwIC01IDAgLTMgNSA1IDEwIDggNSAyMCAxMCAyNSAxMCA2IDAgMyAtNSAtNSAtMTB6Cm0zNjkwIC0yNTEgYzExIC0yMSAxNiAtMzkgMTAgLTM5IC01IDAgLTE3IDE3IC0yNyAzOCAtOSAyMCAtMTkgNDEgLTIxIDQ2IC0zCjUgMSA2IDcgMiA2IC00IDIwIC0yNSAzMSAtNDd6IG0xMTAgLTE3MCBjOCAtMTUgOCAtMTkgLTIgLTE3IC0xNiA0IC0yOCAxOQotMjggMzYgMCAxNyAxNyA2IDMwIC0xOXogbS0xOTcwIC05OSBjMCAtNSAtMiAtMTAgLTQgLTEwIC0zIDAgLTggNSAtMTEgMTAgLTMKNiAtMSAxMCA0IDEwIDYgMCAxMSAtNCAxMSAtMTB6IG0tNDEwIC00MTkgYzIgLTEgLTExIC0xMiAtMzAgLTI1IC0yOSAtMTkgLTQwCi0yMiAtNjMgLTE0IC0zMiAxMiAtMjkgMTggMTYgMzMgMjcgOSA0OSAxMSA3NyA2eiBtMjU0NiAtNTQ2IGMxIC0xNCAtMiAtMjUKLTcgLTI1IC01IDAgLTkgMTEgLTkgMjUgMCAzMyAxNSAzMyAxNiAweiBtLTQ4NzAgLTk3MiBjLTIgLTE2IC00IC0zNCAtNSAtNDAKMCAtNyAtNCAtMTMgLTggLTEzIC01IDAgLTcgMTcgLTYgMzcgMiA0NiAxIDQzIDEyIDQzIDYgMCA4IC0xMiA3IC0yN3ogbTEyODkKLTE3MyBjMyAtNiAtMSAtNyAtOSAtNCAtMTggNyAtMjEgMTQgLTcgMTQgNiAwIDEzIC00IDE2IC0xMHogbTIyNSAtNjUgYzAgLTE3Ci0xOSAxIC0zMyAzMCAtMjQgNTAgLTIxIDU0IDggMTEgMTQgLTIwIDI1IC0zOSAyNSAtNDF6IG0tMTUyNyAtNzAgYy05IC01NQotMTMgLTYyIC0yNCAtNDMgLTYgMTEgLTUgMzEgMyA1NyAxNCA0NSAzMCAzNSAyMSAtMTR6IG00MjggLTY1IGMtOSAtMjMgLTEwCi0yMSAtMTAgMTUgLTEgMjIgMyA1MSA3IDY1IDYgMjIgNyAyMCAxMCAtMTUgMiAtMjMgLTEgLTUyIC03IC02NXogbS00ODQgMzgKYy0zIC03IC01IC0yIC01IDEyIDAgMTQgMiAxOSA1IDEzIDIgLTcgMiAtMTkgMCAtMjV6IG00MSAtMjI2IGMtMSAtNCAyIC0yOSA2Ci01NyAxNSAtMTA2IDI1IC0xODEgMjkgLTIxNSAzIC0xOSAxMiAtNTYgMjAgLTgyIDkgLTI2IDE3IC02NCAxOCAtODUgMCAtMjEgNgotNjIgMTIgLTkxIDUgLTI4IDcgLTU1IDQgLTU4IC0xNCAtMTQgLTM3IDIwIC0zNyA1NSAwIDIwIC02IDQ1IC0xMyA1NiAtOCAxMQotMTkgMzYgLTI2IDU1IC05IDI4IC05IDM1IDQgNDIgMjAgMTIgMTkgMjcgLTIgNTAgLTkgMTAgLTE3IDI2IC0xOCAzNiAwIDkgLTQKMjMgLTkgMzAgLTEyIDIwIC0yNCAxMTIgLTE0IDExOCA0IDMgNiAxMCAyIDE1IC0zIDUgLTEwIDcgLTE1IDQgLTE4IC0xMiAtMTkKMjEgLTMgNjEgMTAgMjEgMTYgNDkgMTUgNjEgLTIgMTcgMiAyMSAxMyAxNyA4IC0zIDE1IC05IDE0IC0xMnogbTQ1MiAtMTEyIGMwCi0yMCAtMiAtMjIgLTEwIC0xMCAtNSA4IC0xMCAyNiAtMTAgNDAgMCAyMCAyIDIyIDEwIDEwIDUgLTggMTAgLTI2IDEwIC00MHoKbTMxIC0xODIgYzExIC0yMSAxMSAtMjIgLTQgLTkgLTEwIDcgLTE3IDE3IC0xNyAyMiAwIDE1IDkgMTAgMjEgLTEzeiBtLTM1OQotMzYxIGMxNSAtMjggMzAgLTYyIDMzIC03NCAxMCAtMzUgLTE0IC0yOCAtMjYgNyAtNiAxNyAtMTUgMzAgLTIwIDMwIC0xNCAwCi0zOSA1NyAtMzMgNzQgMTAgMjUgMTcgMTkgNDYgLTM3eiBtMTk5IC0zNjQgYzEzIC0xNyAxMyAtMTcgLTYgLTMgLTExIDggLTIyCjE2IC0yNCAxNyAtMiAyIDAgMyA2IDMgNiAwIDE3IC04IDI0IC0xN3ogbTE2OSAtMTgzIGMwIC01IC00IC0xMCAtMTAgLTEwIC01CjAgLTEwIDUgLTEwIDEwIDAgNiA1IDEwIDEwIDEwIDYgMCAxMCAtNCAxMCAtMTB6IG0xOTkwIC02MCBjMCAtNSAtNSAtMTAgLTExCi0xMCAtNSAwIC03IDUgLTQgMTAgMyA2IDggMTAgMTEgMTAgMiAwIDQgLTQgNCAtMTB6IG0tNzgwIC00NiBjMCAtMiAtNyAtNAotMTUgLTQgLTggMCAtMTUgNCAtMTUgMTAgMCA1IDcgNyAxNSA0IDggLTQgMTUgLTggMTUgLTEweiBtMzYzIC0zMSBjLTcgLTIKLTE5IC0yIC0yNSAwIC03IDMgLTIgNSAxMiA1IDE0IDAgMTkgLTIgMTMgLTV6Ii8+CjxwYXRoIGQ9Ik0zOTg4IDUxMzkgYy0yMSAtMTMgLTMgLTIwIDY1IC0yNiA2MCAtNSA5MyA2IDY3IDIyIC0xNSA5IC0xMTcgMTMKLTEzMiA0eiIvPgo8cGF0aCBkPSJNNDM0MiA1MDY3IGMtMTAgLTEyIC00IC0xNyAzMyAtMzEgMjQgLTEwIDQ5IC0xNSA1NCAtMTIgNSAzIDI1IC0xCjQ1IC05IDQwIC0xNyA4MCAtMjAgNzEgLTUgLTMgNiAtMTUgMTAgLTI3IDEwIC0xMSAwIC0yMiA4IC0yNSAxOSAtNyAyOSAtMTMyCjUyIC0xNTEgMjh6Ii8+CjxwYXRoIGQ9Ik00Njk0IDQ5MzggYzI1IC0xNiA1MCAtMjcgNTUgLTI0IDUgMyAyOSAtNSA1MyAtMTkgNDggLTI4IDcwIC0zMiA2MgotMTEgLTcgMTggLTE0MCA3OCAtMTgyIDgyIGwtMzMgMiA0NSAtMzB6Ii8+CjxwYXRoIGQ9Ik0xNTY4IDQ2MjYgYy0xMDYgLTM5IC0xNzMgLTEwMSAtMjA3IC0xOTIgLTI2IC02OCAtMTkgLTk5IDI5IC0xMzEKNDMgLTMwIDEwMSAtMjkgMTY1IDEgMTA4IDUwIDE1NSAxMTUgMTU1IDIxNSAwIDQ4IC01IDY1IC0yMiA4NSAtMjggMzIgLTcyIDQwCi0xMjAgMjJ6Ii8+CjxwYXRoIGQ9Ik0xNTY2IDM3OTEgYy00IC03IC01IC0xNSAtMiAtMTggOSAtOSAxOSA0IDE0IDE4IC00IDExIC02IDExIC0xMiAweiIvPgo8cGF0aCBkPSJNMTIxNyAzMzAzIGMtNCAtMyAtNyAtMTEgLTcgLTE3IDAgLTYgNSAtNSAxMiAyIDYgNiA5IDE0IDcgMTcgLTMgMwotOSAyIC0xMiAtMnoiLz4KPHBhdGggZD0iTTIxMCAzMjIwIGMwIC01IDcgLTEwIDE1IC0xMCA4IDAgMTUgNSAxNSAxMCAwIDYgLTcgMTAgLTE1IDEwIC04IDAKLTE1IC00IC0xNSAtMTB6Ii8+CjxwYXRoIGQ9Ik01OTcwIDMxMTMgYzAgLTQxIDMgLTU0IDEwIC00MyAxMyAyMCAxMyAxMDAgMCAxMDAgLTYgMCAtMTAgLTI2IC0xMAotNTd6Ii8+CjxwYXRoIGQ9Ik01OTUwIDI5ODEgYy0xMyAtMjYgLTEzIC00OCAxIC01NyAxNSAtOSAyOSAxNCAyOSA0OSAwIDMxIC0xNSAzNgotMzAgOHoiLz4KPHBhdGggZD0iTTEwNjMgMjk1MCBjMSAtMTEgNSAtMjAgOSAtMjAgNCAwIDggOSA4IDIwIDAgMTEgLTQgMjAgLTkgMjAgLTYgMAotOSAtOSAtOCAtMjB6Ii8+CjxwYXRoIGQ9Ik01OTQ3IDI4MzAgYy0zIC0xMSAtMSAtMjMgNCAtMjYgNSAtMyA5IDYgOSAyMCAwIDMxIC02IDM0IC0xMyA2eiIvPgo8cGF0aCBkPSJNNTkyNSAyNzEwIGMtMyAtNSAtMyAtMTUgMSAtMjEgNiAtMTEgMjMgNiAyNCAyNCAwIDEwIC0xOCA5IC0yNSAtM3oiLz4KPHBhdGggZD0iTTU4OTAgMjUyMCBjMCAtNSA1IC0xMCAxMCAtMTAgNiAwIDEwIDUgMTAgMTAgMCA2IC00IDEwIC0xMCAxMCAtNSAwCi0xMCAtNCAtMTAgLTEweiIvPgo8cGF0aCBkPSJNMzg5MCA5MjAgYzAgLTUgNCAtMTAgOSAtMTAgNiAwIDEzIDUgMTYgMTAgMyA2IC0xIDEwIC05IDEwIC05IDAKLTE2IC00IC0xNiAtMTB6Ii8+CjxwYXRoIGQ9Ik0zNzUzIDg2NCBjLTMzIC0xNCAtNDEgLTI4IC0yNCAtMzkgNSAtMyAyNCA4IDQyIDI1IDM2IDMzIDMyIDM2IC0xOAoxNHoiLz4KPHBhdGggZD0iTTE1MjkgNzE5IGMtMTEgLTcgLTEwIC0xMCA4IC0xNSAxNSAtNCAyMCAtMTEgMTYgLTIyIC01IC0xNCAtMyAtMTUKNyAtNSAxMCA5IDE3IDEwIDI3IDIgNyAtNyAxMyAtOCAxMyAtMyAtMSAyOCAtNDkgNTcgLTcxIDQzeiIvPgo8cGF0aCBkPSJNMTYyOCA2NDMgYzcgLTMgMTYgLTIgMTkgMSA0IDMgLTIgNiAtMTMgNSAtMTEgMCAtMTQgLTMgLTYgLTZ6Ii8+CjwvZz4KPC9zdmc+Cg==");
+    background-size:80%;background-position:center;background-repeat:no-repeat;
+    box-shadow:inset 0 0 0 .5px rgba(0,0,0,.08);
+  }
+  .who{display:flex;flex-direction:column;line-height:1.2}
+  .who b{font-size:16px;font-weight:600}
+  .who span{font-size:11px;color:var(--wa-meta)}
+  .hdr .icons{margin-left:auto;display:flex;gap:20px;color:var(--ios-blue);font-size:17px}
+  .chat{
+    flex:1;overflow:hidden;padding:14px 10px 18px;display:flex;flex-direction:column;gap:8px;
+    background-color:var(--wa-chat);
+    background-image:
+      radial-gradient(circle at 12% 18%, rgba(0,0,0,.028) 0 8px, transparent 9px),
+      radial-gradient(circle at 78% 32%, rgba(0,0,0,.024) 0 10px, transparent 11px),
+      radial-gradient(circle at 40% 62%, rgba(0,0,0,.022) 0 7px, transparent 8px),
+      radial-gradient(circle at 88% 78%, rgba(0,0,0,.026) 0 9px, transparent 10px);
+    background-size:180px 180px;
+  }
+  .day{align-self:center;background:#e1f2fb;color:#54656f;font-size:11.5px;font-weight:600;
+       padding:5px 11px;border-radius:7px;margin-bottom:2px}
+  .row{display:flex;max-width:88%}
+  .row.in{align-self:flex-start}
+  .row.out{align-self:flex-end}
+  .bub{
+    position:relative;border-radius:8px;padding:6px 8px 7px 9px;font-size:14.6px;line-height:1.42;
+    color:#111b21;box-shadow:0 1px .5px rgba(11,20,26,.13);white-space:pre-wrap;word-wrap:break-word;
+  }
+  .in .bub{background:var(--wa-in);border-top-left-radius:0}
+  .out .bub{background:var(--wa-out);border-top-right-radius:0}
+  .in .bub::before,.out .bub::before{content:"";position:absolute;top:0;width:9px;height:13px}
+  .in .bub::before{left:-8px;background:var(--wa-in);clip-path:polygon(100% 0,0 0,100% 100%)}
+  .out .bub::before{right:-8px;background:var(--wa-out);clip-path:polygon(0 0,100% 0,0 100%)}
+  .meta{float:right;margin:6px 0 -2px 8px;font-size:10.5px;color:var(--wa-meta);
+        display:inline-flex;gap:3px;align-items:center;white-space:nowrap}
+  .tick{color:var(--wa-tick);font-size:12px;letter-spacing:-3px}
+  /* interactive reply buttons, attached under the bot bubble */
+  .card{display:flex;flex-direction:column;max-width:88%;align-self:flex-start;position:relative}
+  /* .card has no .in ancestor, so it must set its own bubble fill + tail */
+  .card .bub{
+    background:var(--wa-in);border-top-left-radius:0;
+    border-bottom-left-radius:0;border-bottom-right-radius:0;box-shadow:none;
+  }
+  .card .bub::before{
+    content:"";position:absolute;top:0;left:-8px;width:9px;height:13px;
+    background:var(--wa-in);clip-path:polygon(100% 0,0 0,100% 100%);
+  }
+  .btns{background:var(--wa-in);border-radius:0 0 8px 8px;box-shadow:0 1px .5px rgba(11,20,26,.13);overflow:hidden}
+  .btn{padding:11px;text-align:center;color:var(--wa-btn);font-size:14.6px;border-top:1px solid var(--wa-div)}
+  .lnk{color:#0b8bd6;text-decoration:underline;word-break:break-all}
+  .voice{display:flex;align-items:center;gap:9px;min-width:190px}
+  .play{width:26px;height:26px;border-radius:50%;background:#25d366;color:#fff;display:flex;
+        align-items:center;justify-content:center;font-size:11px;flex:none}
+  .wave{flex:1;height:22px;display:flex;align-items:center;gap:2px}
+  .wave i{flex:1;background:#9aa4a8;border-radius:1px;display:block}
+  .dur{font-size:11px;color:var(--wa-meta)}
+  .composer{
+    background:var(--wa-header);border-top:.5px solid #d1d1d6;padding:8px 10px 22px;
+    display:flex;align-items:center;gap:10px;flex:none;
+  }
+  .field{flex:1;background:#fff;border:.5px solid #d1d1d6;border-radius:18px;padding:8px 12px;
+         font-size:14px;color:#9aa0a6}
+  .cico{color:var(--ios-blue);font-size:20px}
+  @media print{body{background:#fff}}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ 1. DAY-SHEET — verbatim production output, 2026-07-16T17:29:54Z ═══════════ -->
+<div class="wrap">
+  <div class="cap">1 · Day-sheet</div>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span class="r">••••&nbsp;&nbsp;⌁&nbsp;&nbsp;100%</span></div>
+    <div class="hdr">
+      <div class="back">‹</div>
+      <div class="avatar"></div>
+      <div class="who"><b>Smaran</b><span>online</span></div>
+      <div class="icons"><span>📹</span><span>📞</span></div>
+    </div>
+    <div class="chat">
+      <div class="day">TODAY</div>
+      <div class="row out"><div class="bub">my week<span class="meta">9:41 AM<span class="tick">✓✓</span></span></div></div>
+      <div class="row in"><div class="bub"><b>आपका साप्ताहिक कार्यक्रम</b>
+──────────────────
+
+<b>17-07-2026 (शुक्रवार)</b>
+  <i>सुबह</i>
+  • 07:30 — पितृ श्राद्ध (मिश्रा)
+
+<b>18-07-2026 (शनिवार)</b>
+  <i>सुबह</i>
+  • 09:00 — सत्यनारायण कथा (शर्मा)
+  <i>शाम</i>
+  • 18:30 — जन्मदिन पूजा (वर्मा)
+
+<b>20-07-2026 (सोमवार)</b>
+  <i>दोपहर</i>
+  • 13:00 — रुद्राभिषेक (तिवारी)
+
+<b>22-07-2026 (बुधवार)</b>
+  <i>सुबह</i>
+  • 08:00 — अमावस्या श्राद्ध (गुप्ता)<span class="meta">9:41 AM</span></div></div>
+    </div>
+    <div class="composer"><span class="cico">＋</span><div class="field">Message</div><span class="cico">🎤</span></div>
+  </div>
+</div>
+
+<!-- ═══════════ 2. VOICE NOTE → CONFIRM CARD ═══════════ -->
+<div class="wrap">
+  <div class="cap">2 · Voice → confirm</div>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span class="r">••••&nbsp;&nbsp;⌁&nbsp;&nbsp;100%</span></div>
+    <div class="hdr">
+      <div class="back">‹</div><div class="avatar"></div>
+      <div class="who"><b>Smaran</b><span>online</span></div>
+      <div class="icons"><span>📹</span><span>📞</span></div>
+    </div>
+    <div class="chat">
+      <div class="day">TODAY</div>
+      <div class="row out"><div class="bub"><div class="voice">
+        <div class="play">▶</div>
+        <div class="wave">
+          <i style="height:6px"></i><i style="height:11px"></i><i style="height:17px"></i><i style="height:9px"></i>
+          <i style="height:20px"></i><i style="height:13px"></i><i style="height:7px"></i><i style="height:15px"></i>
+          <i style="height:19px"></i><i style="height:8px"></i><i style="height:12px"></i><i style="height:16px"></i>
+          <i style="height:6px"></i><i style="height:14px"></i><i style="height:10px"></i><i style="height:18px"></i>
+          <i style="height:7px"></i><i style="height:11px"></i>
+        </div><span class="dur">0:09</span>
+      </div><span class="meta">9:41 AM<span class="tick">✓✓</span></span></div></div>
+
+      <div class="card">
+        <div class="bub">📝 <b>कृपया जाँच लें:</b>
+
+परिवार: शर्मा
+गोत्र: कश्यप
+कार्य: सत्यनारायण कथा
+मास: श्रावण
+पक्ष: शुक्ल
+तिथि: एकादशी
+
+सही है तो नीचे टैप करें।<span class="meta">9:41 AM</span></div>
+        <div class="btns">
+          <div class="btn">✓ सही है</div>
+          <div class="btn">✏ सुधारें</div>
+        </div>
+      </div>
+    </div>
+    <div class="composer"><span class="cico">＋</span><div class="field">Message</div><span class="cico">🎤</span></div>
+  </div>
+</div>
+
+<!-- ═══════════ 3. COLLISION WARNING — verbatim from muhurat.ts ═══════════ -->
+<div class="wrap">
+  <div class="cap">3 · Double-booking</div>
+  <div class="phone">
+    <div class="status"><span>9:42</span><span class="r">••••&nbsp;&nbsp;⌁&nbsp;&nbsp;100%</span></div>
+    <div class="hdr">
+      <div class="back">‹</div><div class="avatar"></div>
+      <div class="who"><b>Smaran</b><span>online</span></div>
+      <div class="icons"><span>📹</span><span>📞</span></div>
+    </div>
+    <div class="chat">
+      <div class="day">TODAY</div>
+      <div class="row out"><div class="bub">✓ सही है<span class="meta">9:42 AM<span class="tick">✓✓</span></span></div></div>
+      <div class="card">
+        <div class="bub">⚠️ <b>चेतावनी</b>
+──────────────────
+इस समय पर पहले से एक अनुष्ठान बुक है। क्या आप फिर भी इसे सहेजना चाहते हैं?
+
+<b>तिथि:</b> 18-07-2026
+<b>समय:</b> सुबह
+<b>अनुष्ठान:</b> सत्यनारायण कथा (शर्मा)<span class="meta">9:42 AM</span></div>
+        <div class="btns">
+          <div class="btn">फिर भी बुक करें</div>
+          <div class="btn">रद्द करें</div>
+        </div>
+      </div>
+    </div>
+    <div class="composer"><span class="cico">＋</span><div class="field">Message</div><span class="cico">🎤</span></div>
+  </div>
+</div>
+
+<!-- ═══════════ 4. PRE-RITUAL ALERT — verbatim from buildUpcomingPreRitualCard (shraddh register) ═══════════ -->
+<div class="wrap">
+  <div class="cap">4 · 6 AM pre-ritual</div>
+  <div class="phone">
+    <div class="status"><span>6:00</span><span class="r">••••&nbsp;&nbsp;⌁&nbsp;&nbsp;100%</span></div>
+    <div class="hdr">
+      <div class="back">‹</div><div class="avatar"></div>
+      <div class="who"><b>Smaran</b><span>online</span></div>
+      <div class="icons"><span>📹</span><span>📞</span></div>
+    </div>
+    <div class="chat">
+      <div class="day">TODAY</div>
+      <div class="card">
+        <div class="bub">🙏 आदरणीय पं. रमेश शर्मा जी, प्रणाम।
+
+आगामी तिथि को निम्नलिखित श्राद्ध अनुष्ठान निर्धारित है:
+
+──────────────────
+<b>तिथि:</b> 2026-07-22
+<b>पंचांग:</b> श्रावण कृष्ण पक्ष, अमावस्या
+<b>शेष दिन:</b> 2
+
+<b>यजमान:</b> गुप्ता परिवार
+<b>अनुष्ठान:</b> श्राद्ध/पुण्यतिथि (अमावस्या श्राद्ध)
+──────────────────
+
+<b>आवश्यक सामग्री</b>
+- काले तिल (Black Sesame)
+- जौ (Barley)
+- कुशा घास (Kusha Grass)
+- गंगाजल (Ganga Water)
+- सफेद फूल (White Flowers)
+- कपूर, धूप (Camphor, Incense)
+
+👇 कृपया पूजा की पुष्टि करें।<span class="meta">6:00 AM</span></div>
+        <div class="btns"><div class="btn">✓ पूजा की पुष्टि</div></div>
+      </div>
+    </div>
+    <div class="composer"><span class="cico">＋</span><div class="field">Message</div><span class="cico">🎤</span></div>
+  </div>
+</div>
+
+<!-- ═══════════ 5. DAKSHINA — verbatim from buildRitualCompletedCard + buildPostRitualPurohitCard ═══════════ -->
+<div class="wrap">
+  <div class="cap">5 · Dakshina (purohit)</div>
+  <div class="phone">
+    <div class="status"><span>7:15</span><span class="r">••••&nbsp;&nbsp;⌁&nbsp;&nbsp;100%</span></div>
+    <div class="hdr">
+      <div class="back">‹</div><div class="avatar"></div>
+      <div class="who"><b>Smaran</b><span>online</span></div>
+      <div class="icons"><span>📹</span><span>📞</span></div>
+    </div>
+    <div class="chat">
+      <div class="day">TODAY</div>
+      <div class="card">
+        <div class="bub">📿 <b>अनुष्ठान की स्थिति</b>
+──────────────────
+<b>यजमान:</b> गुप्ता
+<b>अनुष्ठान:</b> अमावस्या श्राद्ध
+
+👇 क्या अनुष्ठान पूर्ण हो गया है? नीचे टैप करें:<span class="meta">7:12 AM</span></div>
+        <div class="btns"><div class="btn">पूजा संपन्न ✓</div></div>
+      </div>
+      <div class="row in"><div class="bub">कृपया दक्षिणा राशि (₹ में) भेजें — केवल संख्या में, जैसे 1100<span class="meta">7:14 AM</span></div></div>
+      <div class="row out"><div class="bub">2100<span class="meta">7:14 AM<span class="tick">✓✓</span></span></div></div>
+      <div class="card">
+        <div class="bub">📿 <b>दक्षिणा</b>
+──────────────────
+<b>यजमान:</b> गुप्ता
+<b>अनुष्ठान:</b> अमावस्या श्राद्ध
+
+<b>भुगतान लिंक:</b> <span class="lnk">upi://pay?pa=ramesh.sharma@okhdfcbank&am=2100.00&tr=00000011</span>
+
+👇 दक्षिणा प्राप्त होने पर पुष्टि करें:<span class="meta">7:15 AM</span></div>
+        <div class="btns"><div class="btn">Dakshina received ✓</div></div>
+      </div>
+    </div>
+    <div class="composer"><span class="cico">＋</span><div class="field">Message</div><span class="cico">🎤</span></div>
+  </div>
+</div>
+
+<!-- ═══════════ 6. FAMILY SIDE — verbatim buildPostRitualFamilyCard + buildFamilyCalendarOfferCard ═══════════ -->
+<div class="wrap">
+  <div class="cap">6 · Family + ₹21 offer</div>
+  <div class="phone">
+    <div class="status"><span>7:16</span><span class="r">••••&nbsp;&nbsp;⌁&nbsp;&nbsp;100%</span></div>
+    <div class="hdr">
+      <div class="back">‹</div><div class="avatar"></div>
+      <div class="who"><b>Smaran</b><span>online</span></div>
+      <div class="icons"><span>📹</span><span>📞</span></div>
+    </div>
+    <div class="chat">
+      <div class="day">TODAY</div>
+      <div class="card">
+        <div class="bub">📿 <b>दक्षिणा अर्पण</b>
+──────────────────
+<b>पुरोहित:</b> पं. रमेश शर्मा
+<b>अनुष्ठान:</b> अमावस्या श्राद्ध
+
+<b>अर्पण लिंक:</b> <span class="lnk">upi://pay?pa=ramesh.sharma@okhdfcbank&am=2100.00&tr=00000011</span>
+
+👇 दक्षिणा अर्पण की पुष्टि करें (अनुष्ठान संपन्न हुआ):<span class="meta">7:15 AM</span></div>
+        <div class="btns"><div class="btn">Confirm ✓</div></div>
+      </div>
+      <div class="row out"><div class="bub">Confirm ✓<span class="meta">7:16 AM<span class="tick">✓✓</span></span></div></div>
+      <div class="row in"><div class="bub">🤝 पुष्टि के लिए धन्यवाद।<span class="meta">7:16 AM</span></div></div>
+      <div class="card">
+        <div class="bub">🪔 <b>परिवार का पंचांग</b>
+──────────────────
+अपने परिवार का पंचांग और अनुष्ठान कैलेंडर सीधे अपने WhatsApp पर प्राप्त करें।
+<i>वार्षिक अनुष्ठानों के स्मरण पत्र सीधे प्राप्त होंगे</i>
+
+<b>शुल्क:</b> ₹21/माह (UPI Autopay)
+<b>पुरोहित जी:</b> पं. रमेश शर्मा
+
+<b>सदस्यता लिंक:</b> <span class="lnk">upi://mandate?pa=ramesh.sharma@okhdfcbank&am=21.00&cu=INR&recur=MONTHLY&tr=00000011</span><span class="meta">7:16 AM</span></div>
+        <div class="btns"><div class="btn">मैंने सदस्यता ले ली</div></div>
+      </div>
+    </div>
+    <div class="composer"><span class="cico">＋</span><div class="field">Message</div><span class="cico">🎤</span></div>
+  </div>
+</div>
+
+<!-- ═══════════ 7. REFERRAL — verbatim buildReferralCard ═══════════ -->
+<div class="wrap">
+  <div class="cap">7 · Referral</div>
+  <div class="phone">
+    <div class="status"><span>9:50</span><span class="r">••••&nbsp;&nbsp;⌁&nbsp;&nbsp;100%</span></div>
+    <div class="hdr">
+      <div class="back">‹</div><div class="avatar"></div>
+      <div class="who"><b>Smaran</b><span>online</span></div>
+      <div class="icons"><span>📹</span><span>📞</span></div>
+    </div>
+    <div class="chat">
+      <div class="day">TODAY</div>
+      <div class="row out"><div class="bub">referral<span class="meta">9:50 AM<span class="tick">✓✓</span></span></div></div>
+      <div class="card">
+        <div class="bub">✉️ <b>पुरोहित आमंत्रण कार्ड</b>
+──────────────────
+अपने साथी पुरोहित-जी को स्मरण से जोड़ें। वे इस लिंक पर क्लिक करके सीधे ऑनबोर्ड हो सकते हैं:
+
+<span class="lnk">https://wa.me/15551363612?text=invite:d0000000-0000-4000-8000-000000000001</span><span class="meta">9:50 AM</span></div>
+        <div class="btns"><div class="btn">आमंत्रण भेजा गया</div></div>
+      </div>
+    </div>
+    <div class="composer"><span class="cico">＋</span><div class="field">Message</div><span class="cico">🎤</span></div>
+  </div>
+</div>
+
+</body>
+</html>
