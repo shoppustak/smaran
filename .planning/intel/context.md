@@ -42,15 +42,16 @@ source: /Users/maulik/smaran/docs/smaran-blueprint-v3.md (Part 3, lines 29-36)
 
 ## Topic: Business Model & Revenue Geometry
 
-- Purohit pricing: ₹1,499/year anchor (₹999/year early-bird for seed-ward cohort); ₹149/month fallback only, never default (monthly invites churn given seasonal income).
-- Family layer: ₹29/month via UPI autopay — described as load-bearing to the revenue geometry, not optional.
+- Purohit pricing: ₹1,101/year anchor (₹501 first year, first 100 purohits); ₹151/month fallback only, never default (monthly invites churn given seasonal income). [REVISED 2026-07-16 — shagun alignment; was ₹1,499 / ₹999 / ₹149]
+- Family layer: ₹21/month via UPI autopay — load-bearing to the revenue geometry, not optional. [REVISED 2026-07-16 — shagun alignment; was ₹29]
 - Back-solve unit: purohit hub (~30 reached families each). Feasible solo seed: 70 activated purohits by end of month 4 in 2-3 temple-dense wards of one city.
 - Scenario table (k = referral multiplier, conversion, family attach, M12 MRR):
   - Conservative: k=1.0, conv=25%, attach=3% → ~₹52K MRR
   - Middle: k=1.15, conv=30%, attach=5% → ~₹1.15L MRR
-  - Pre-registered: k=1.3, conv=30% @ ₹125/mo-eq, attach=5% → ~₹1.81L MRR
+  - Pre-registered (ORIGINAL, now void): k=1.3, conv=30% @ ₹125/mo-eq, attach=5% → ~₹1.81L MRR
+  - Pre-registered (REVISED @ live prices): k=1.3, conv=30% @ ₹91.75/mo-eq, attach=5% → ~₹1.32L MRR — BELOW the ₹1.5-2L bar
 - Honest read: ₹1.5-2L MRR month-12 bar is cleared only at the optimistic edge of every parameter simultaneously. Growth is structurally purohit-to-purohit only (families cannot recruit priests); k is called "the make-or-break number" and is currently unmeasured.
-- Pre-registration record (binding): seed 70 purohits by M4, k=1.3, conversion 30% @ ₹1,499/yr, family attach 5% @ ₹29/mo. Voiding thresholds: observed k<1.15 at M4 gate voids the case (reopens kill question); conversion<22% or attach<3% at M8 gate does the same. Parameter revisions require written re-run of the back-solve; a second revision escalates to full registry review.
+- Pre-registration record (binding): seed 70 purohits by M4, k=1.3, conversion 30% @ ₹1,499/yr, family attach 5% @ ₹21/mo (revised 2026-07-16). Voiding thresholds: observed k<1.15 at M4 gate voids the case (reopens kill question); conversion<22% or attach<3% at M8 gate does the same. Parameter revisions require written re-run of the back-solve; a second revision escalates to full registry review.
 - Gates: M0-4 seed (density + observed k; revenue ₹0 by design) → M5-8 geometry (conversion + attach + week-8 retention >60%) → M9-12 replicate.
 
 source: /Users/maulik/smaran/docs/smaran-blueprint-v3.md (Part 4, lines 38-57)
@@ -59,7 +60,7 @@ source: /Users/maulik/smaran/docs/smaran-blueprint-v3.md (Part 4, lines 38-57)
 
 ## Topic: Validation Plan / Decision Fork
 
-Ground contact plan: ~10 independent purohits in the intended seed ward, validating (a) price tolerance for ₹1,499/yr (₹999 early-bird) framed as income protection; (b) family willingness to pay ₹29/month; (c) actual current bahi-khata-keeping habits (validates voice/photo ingestion assumption); (d) sabha/association access for seeding (tests the k=1.3 ambition).
+Ground contact plan: ~10 independent purohits in the intended seed ward, validating (a) price tolerance for ₹1,101/yr (₹501 early-bird) framed as income protection; (b) family willingness to pay ₹21/month; (c) actual current bahi-khata-keeping habits (validates voice/photo ingestion assumption); (d) sabha/association access for seeding (tests the k=1.3 ambition).
 
 If interviews support the parameters → hand Parts 5-7 to the coding agent; build order: State 1-2 (ingestion + wow) → State 3 (brain + lapse) → State 5 (corroboration) → States 4, 6, 7.
 If they don't → Smaran is shelved without a line of code written, per the doc's stated philosophy that "only building before asking is a loss."
@@ -167,3 +168,56 @@ Composed template (§8.1): legal-but-unrecorded behaviour (H3), inside a non-neg
 Maintenance rule (§8.2): a heuristic enters §8 only with a named calibration event behind it.
 
 source: /Users/maulik/smaran/docs/ideating-toolset-v1.md (§8, lines 103-126)
+
+
+## Parameter Revision #1 — 2026-07-16 (shagun alignment)
+
+Required by the pre-registration protocol ("parameter revisions require written re-run of the
+back-solve"). **Trigger:** the live landing page (smaran.click) has been selling shagun-aligned
+prices while the binding record still carried the original ones. This records reality; it does not
+propose it.
+
+| Line | Pre-registered | Live / revised | Δ |
+|---|---|---|---|
+| Purohit anchor | ₹1,499/yr | ₹1,101/yr | −27% |
+| Early bird | ₹999/yr | ₹501 (first 100) | −50% |
+| Monthly fallback | ₹149/mo | ₹151/mo | +1% |
+| Family layer | ₹29/mo | ₹21/mo | −28% |
+
+**Rationale:** shagun — auspicious amounts end in 1 (21, 51, 101, 1101, 2100). To a purohit and
+their yajman, a price ending in 9 or 0 reads as inauspicious. The judgement is that price-shape
+credibility with this market outweighs nominal ARPU.
+
+### Re-run of the back-solve (unit = one activated purohit hub, ~30 families)
+
+    per activated purohit / month     ORIGINAL          REVISED (live)
+      purohit layer (30% conv)        ₹37.50            ₹27.53
+      family layer (30 × 5% attach)   ₹43.50 @ ₹29      ₹31.50 @ ₹21
+      TOTAL                           ₹80.97            ₹59.02   (−27.1%)
+
+    M12 @ the pre-registered volume (2,235 hubs)
+      modelled MRR                    ₹1.81L
+      revised MRR                     ₹1.32L    ← BELOW the ₹1.5-2L bar
+
+**Consequences, stated plainly:**
+
+1. **The ₹1.5-2L M12 bar is no longer reachable at the modelled volume.** Clearing ₹1.5L now needs
+   **2,541 hubs (+14%)**; the ₹1.81L pre-registered figure needs **3,066 hubs (+37%)**. Holding
+   ₹1.81L on attach alone would need **8.5% attach (+70% relative)**.
+2. **The family layer still exceeds the purohit layer per hub** (₹31.50 vs ₹27.53) — it remains
+   load-bearing, and is now the larger half of a smaller pie.
+3. **M4/M8 gate risk is unchanged.** Those gates test k, conversion %, attach % and retention —
+   all rate-based, none price-based. The damage lands at the M9-12 revenue gate.
+4. **The seed cohort halves its revenue** (₹501 vs ₹999) — largely moot, since M0-4 is "revenue ₹0
+   by design", but it lowers the M5-8 base.
+
+### Unresolved — needs a decision
+
+- This is **four parameter changes at once**, not one. The protocol says a *second* revision
+  escalates to full registry review; arguably that threshold is already met.
+- **₹51/mo for the family layer was not considered and should be.** It is equally shagun, and it
+  *repairs* the geometry instead of cutting it: at ₹51, the family layer holds ₹45.90/hub even at
+  the **M8 gate floor of 3% attach** — above the ₹43.50 the original model got from 5% @ ₹29.
+  ₹21 vs ₹51 is a ~₹1.2L/month swing at M12 volume. The ground-contact plan (item b) is the place
+  to test which price the families actually accept.
+- Either the M12 bar moves, or the volume assumption does. Both are currently unrevised.

@@ -79,7 +79,7 @@ source: /Users/maulik/smaran/docs/smaran-blueprint-v3.md (Part 5, State 5, lines
 
 **Acceptance criteria:**
 - Offer surfaced on cards families receive: "Get your family's ritual calendar."
-- ₹29/month via UPI autopay deep link.
+- ₹21/month via UPI autopay deep link (shagun-aligned; revised 2026-07-16, was ₹29).
 - Subscription states managed: active / lapsed / cancelled; renewal nudges sent as registered Utility messages.
 - The family flow must never enable discovery, comparison, or contact with any other purohit.
 

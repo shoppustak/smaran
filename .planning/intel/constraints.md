@@ -96,7 +96,7 @@ source: /Users/maulik/smaran/docs/smaran-blueprint-v3.md (Part 6, lines 97-152)
 **Note:** Source doc phrases these as permanent rules ("ever" / "never can be"). Classifier did not score this section as ADR (no Status/Context/Decision/Consequences structure, `locked: false` on the classification record) — see `decisions.md` for the LOCKED-eligibility caveat.
 
 1. No marketplace, ratings, search, matching, or discovery — ever. Trust is computed from corroborated interactions, never declared or rated. Families must never see, compare, or reach any other purohit.
-2. No consumer app or web UI. The family-side WhatsApp flow (cards, confirms, ₹29 calendar subscription) is in scope; an app, portal, or catalog is not.
+2. No consumer app or web UI. The family-side WhatsApp flow (cards, confirms, ₹21 calendar subscription) is in scope; an app, portal, or catalog is not.
 3. No payment gateways or PSP checkout. Raw dynamic UPI deep links to the purohit's merchant VPA only. Zero commission is the point.
 4. No webhook-driven payment states. No webhook will ever arrive. Corroboration buttons are the only path to `corroborated`; never trust a single side's client-side assertion.
 5. No samagri commerce. The samagri list is the value; kits, inventory, and fulfilment are out of scope.

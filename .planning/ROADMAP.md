@@ -114,7 +114,7 @@ Plans:
 **Depends on**: Phase 4
 **Requirements**: FAM-01, FAM-02, FAM-03
 **Success Criteria** (what must be TRUE):
-  1. Cards sent to families surface a "Get your family's ritual calendar" offer with a ₹29/month UPI autopay deep link.
+  1. Cards sent to families surface a "Get your family's ritual calendar" offer with a ₹21/month UPI autopay deep link (shagun-aligned: auspicious amounts end in 1).
   2. Subscription state (active / lapsed / cancelled) is tracked per family, and renewal nudges go out as registered Utility messages.
   3. At no point in this flow can a family discover, compare, or reach any purohit other than their own.
 **Plans**: 2 plans

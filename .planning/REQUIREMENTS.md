@@ -51,7 +51,7 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 
 <!-- Source: REQ-family-calendar-subscription -->
 
-- [ ] **FAM-01**: Cards sent to families surface an offer — "Get your family's ritual calendar" — with a ₹29/month UPI autopay deep link
+- [ ] **FAM-01**: Cards sent to families surface an offer — "Get your family's ritual calendar" — with a ₹21/month UPI autopay deep link (shagun-aligned: auspicious amounts end in 1)
 - [ ] **FAM-02**: Family subscription state (active / lapsed / cancelled) is tracked, with renewal nudges sent as registered Utility messages
 - [ ] **FAM-03**: The family-side flow never enables discovery, comparison, or contact with any purohit other than their own
 
