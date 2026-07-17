@@ -624,7 +624,7 @@ export function buildUpcomingPreRitualCard(
     `*अनुष्ठान:* ${ritualLine}\n` +
     `${RULE}\n\n` +
     `*आवश्यक सामग्री*\n${samagriList}\n\n` +
-    `${POINT} कृपया पूजा की पुष्टि करें।`;
+    `_स्मरण रहे_ — ${daysRemaining} दिन शेष।\n${POINT} कृपया पूजा की पुष्टि करें।`;
 
   const bodyText = isSolemn
     ? `${NAMASTE} आदरणीय ${purohitName}, प्रणाम।\n\nआगामी तिथि को निम्नलिखित श्राद्ध अनुष्ठान निर्धारित है:\n\n${detail}`
@@ -698,9 +698,24 @@ export function buildReferralCard(
     interactive: {
       type: "button",
       body: {
+        // There is NO referrer bounty in this product — GROW-01..03 are measurement
+        // only, and the growth mechanism is the sabha presentation, not this card
+        // (blueprint State 7). So the card must not imply a reward that does not exist.
+        //
+        // What it CAN do is stop making the purohit explain Smaran himself: everything
+        // below the second rule is written to be forwarded verbatim, states the
+        // INVITEE's benefit, and carries the one real, live incentive — the founding-100
+        // price already published on the landing page.
         text:
           `${ENVELOPE} *पुरोहित आमंत्रण कार्ड*\n${RULE}\n` +
-          `अपने साथी पुरोहित-जी को स्मरण से जोड़ें। वे इस लिंक पर क्लिक करके सीधे ऑनबोर्ड हो सकते हैं:\n\n${url}`,
+          `नीचे का संदेश अपने साथी पुरोहित-जी को भेज दीजिए।\n${RULE}\n` +
+          `${NAMASTE} *स्मरण* — पुरोहितों के लिए WhatsApp पर बही खाता।\n` +
+          `_${purohitName} जी की ओर से आमंत्रण_\n\n` +
+          `• यजमानों की तिथियाँ याद रहती हैं — कोई अनुष्ठान छूटता नहीं\n` +
+          `• दक्षिणा सीधे आपके UPI पर — बीच में न कोई प्लेटफ़ॉर्म, न कमीशन\n` +
+          `• बोलकर या बही खाता की फोटो भेजकर — कोई फॉर्म नहीं\n\n` +
+          `*पहले 100 पुरोहितों के लिए पहला वर्ष ₹501*\n\n` +
+          `${url}`,
       },
       action: {
         buttons: [

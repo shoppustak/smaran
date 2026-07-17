@@ -53,40 +53,49 @@ test.describe("Purohit Onboarding E2E Flow", () => {
     // 1. Initial greeting message
     await sendWebhookMessage(request, from, "namaste");
     let messages = await waitForOutboundMessages(request, from, 1);
-    expect(messages[0].text).toContain("naam batayein");
+    // The first message must introduce Smaran and state the deal before asking
+    // anything — an onboarding that opens with a bare question is the regression.
+    expect(messages[0].text).toContain("Pranaam");
+    expect(messages[0].text).toContain("_Smaran_");
+    expect(messages[0].text).toContain("Dakshina");
+    expect(messages[0].text).toContain("*1/5*");
 
     // 2. Name step -> transitions to city prompt
     await sendWebhookMessage(request, from, "Ramesh Sharma");
     messages = await waitForOutboundMessages(request, from, 2);
-    expect(messages[1].text).toContain("shahar (city)");
+    expect(messages[1].text).toContain("*2/5*");
 
     // 3. City step -> transitions to ward prompt
     await sendWebhookMessage(request, from, "Varanasi");
     messages = await waitForOutboundMessages(request, from, 3);
-    expect(messages[2].text).toContain("area ya mohalla");
+    expect(messages[2].text).toContain("*3/5*");
 
     // 4. Ward step -> triggers geocoding -> transitions to UPI prompt
     await sendWebhookMessage(request, from, "Assi Ghat");
     messages = await waitForOutboundMessages(request, from, 4);
-    expect(messages[3].text).toContain("UPI ID");
+    expect(messages[3].text).toContain("*4/5*");
 
     // 5. Invalid UPI step -> re-prompts for UPI (state does not advance)
     await sendWebhookMessage(request, from, "not-a-upi");
     messages = await waitForOutboundMessages(request, from, 5);
-    expect(messages[4].text).toContain("valid UPI ID");
+    expect(messages[4].text).toContain("UPI ID theek nahi lag rahi");
 
     // 6. Valid UPI step -> transitions to calendar system prompt
     await sendWebhookMessage(request, from, "ramesh@okhdfcbank");
     messages = await waitForOutboundMessages(request, from, 6);
-    expect(messages[5].text).toContain("calendar system");
+    expect(messages[5].text).toContain("*5/5*");
 
     // 7. Calendar system step -> completes onboarding, responds with confirmation & wow card
     await sendWebhookMessage(request, from, "purnimanta");
     messages = await waitForOutboundMessages(request, from, 8);
-    expect(messages[6].text).toContain("Aapka account ban gaya hai");
+    expect(messages[6].text).toContain("Aapka account taiyar hai");
     expect(messages[6].text).toContain("Varanasi");
     expect(messages[6].text).toContain("purnimanta");
     expect(messages[7].text).toContain("Sharma Family");
+    // The purohit must be told HOW to add a yajman — voice first.
+    expect(messages[7].text).toContain("Bol kar");
+    expect(messages[7].text).toContain("Likh kar");
+    expect(messages[7].text).toContain("Bahi khata ki photo");
 
     // 8. Verify persistence via GET /api/purohits/:phoneNumber with valid internal api key
     const getPurohitRes = await request.get(`/api/purohits/${from}`, {

@@ -2,13 +2,38 @@ import { eq } from "drizzle-orm";
 import { geocodeCity } from "./geocoding";
 import { isValidUpiId } from "./upi";
 import { logger } from "./logger";
-import { WAVE } from "./copy-tokens";
+import { NAMASTE, POINT, RULE } from "./copy-tokens";
 
 const ONBOARDING_STEPS = ["name", "city", "ward", "upi", "calendar_system"] as const;
 type OnboardingStep = (typeof ONBOARDING_STEPS)[number];
 
 const EXAMPLE_FAMILY_NAME = "Sharma Family (उदाहरण / example)";
 const EXAMPLE_EVENT_TYPE = "Satyanarayan Katha";
+
+/**
+ * The purohit's next move, named explicitly.
+ *
+ * Onboarding used to end on "aise hi aap record rakh sakte hain" — true, but it
+ * never said HOW. A purohit who has just answered five questions will assume a
+ * sixth is coming and wait. All three ways in are stated, voice first: the
+ * product's whole claim is that this is never a typed form.
+ */
+const NEXT_STEP_TEXT =
+  `Ab apna pehla yajman jodiye — jaise suvidha ho:\n` +
+  `• *Bol kar* — voice note bhej dijiye\n` +
+  `• *Likh kar* — type kar dijiye\n` +
+  `• *Bahi khata ki photo* bhej dijiye\n\n` +
+  `${POINT} Shuru kijiye — aapka har yajman, har tithi, smaran rahega.`;
+
+/** Vedika returns a full ISO timestamp; a purohit should never be shown one. */
+function formatWowDate(iso: string | undefined): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return String(iso);
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${p(d.getDate())}-${p(d.getMonth() + 1)}-${d.getFullYear()}`;
+}
+
 
 async function completeOnboarding(
   phoneNumber: string,
@@ -39,7 +64,7 @@ async function completeOnboarding(
 
   await db.delete(onboardingStateTable).where(eq(onboardingStateTable.phoneNumber, phoneNumber));
 
-  const confirmationText = `Namaste ${draft.name} Ji! Aapka account ban gaya hai (${draft.city}, ${draft.calendarSystem} calendar).`;
+  const confirmationText = `${NAMASTE} *Pranaam ${draft.name} ji!* Aapka account taiyar hai — *${draft.city}*, *${draft.calendarSystem}* panchang.`;
   let wowCardText = "";
 
   try {
@@ -48,14 +73,30 @@ async function completeOnboarding(
     
     if (upstream.ok) {
       const body = await upstream.json() as any;
-      wowCardText = `Yeh ek example hai:\n\nParivar: ${EXAMPLE_FAMILY_NAME}\nKarya: ${EXAMPLE_EVENT_TYPE}\nTithi: ${body.tithi?.name} ${body.tithi?.paksha}\nTarikh: ${body.date}\n\nAise hi aap apne yajmano ka record rakh sakte hain!`;
+      wowCardText =
+        `Dekhiye — aise dikhega aapka har yajman:\n${RULE}\n` +
+        `*Parivar:* ${EXAMPLE_FAMILY_NAME}\n` +
+        `*Karya:* ${EXAMPLE_EVENT_TYPE}\n` +
+        `*Tithi:* ${body.tithi?.name} ${body.tithi?.paksha}\n` +
+        `*Tarikh:* ${formatWowDate(body.date)}\n${RULE}\n\n` +
+        NEXT_STEP_TEXT;
     } else {
       logger.warn({ status: upstream.status }, "Internal panchang API failed during wow-card generation");
-      wowCardText = `Yeh ek example hai:\n\nParivar: ${EXAMPLE_FAMILY_NAME}\nKarya: ${EXAMPLE_EVENT_TYPE}\n(Date calculation abhi thodi der ke liye unavailable hai)\n\nAise hi aap apne yajmano ka record rakh sakte hain!`;
+      wowCardText =
+        `Dekhiye — aise dikhega aapka har yajman:\n${RULE}\n` +
+        `*Parivar:* ${EXAMPLE_FAMILY_NAME}\n` +
+        `*Karya:* ${EXAMPLE_EVENT_TYPE}\n` +
+        `_(Tarikh abhi nikal nahi paayi — thodi der mein theek ho jaayegi.)_\n${RULE}\n\n` +
+        NEXT_STEP_TEXT;
     }
   } catch (err) {
     logger.warn({ err }, "Internal panchang API failed during wow-card generation");
-    wowCardText = `Yeh ek example hai:\n\nParivar: ${EXAMPLE_FAMILY_NAME}\nKarya: ${EXAMPLE_EVENT_TYPE}\n(Date calculation abhi thodi der ke liye unavailable hai)\n\nAise hi aap apne yajmano ka record rakh sakte hain!`;
+    wowCardText =
+        `Dekhiye — aise dikhega aapka har yajman:\n${RULE}\n` +
+        `*Parivar:* ${EXAMPLE_FAMILY_NAME}\n` +
+        `*Karya:* ${EXAMPLE_EVENT_TYPE}\n` +
+        `_(Tarikh abhi nikal nahi paayi — thodi der mein theek ho jaayegi.)_\n${RULE}\n\n` +
+        NEXT_STEP_TEXT;
   }
 
   return [confirmationText, wowCardText];
@@ -75,7 +116,17 @@ export async function handleOnboardingMessage(phoneNumber: string, text: string)
     .limit(1);
 
   if (existing.length > 0) {
-    return [`Namaste ${existing[0].name} Ji! Aapka account already active hai.`];
+    // A returning purohit must never hit a dead end: tell them what they can do,
+    // in the same breath. This is the only reply an already-onboarded purohit gets
+    // for un-routed text, so it has to carry the menu.
+    return [
+      `${NAMASTE} *Pranaam ${existing[0].name} ji!* Aapka account chalu hai.\n\n` +
+      `Aap yeh kar sakte hain:\n` +
+      `• *Yajman jodna* — voice note, likhkar, ya bahi khata ki photo\n` +
+      `• *my week* likhiye — is hafte ke anushthan dekhiye\n` +
+      `• *referral* likhiye — kisi purohit-bhai ko jodiye\n\n` +
+      `${POINT} Boliye, main sun raha hoon.`,
+    ];
   }
 
   const draft = await db
@@ -87,6 +138,7 @@ export async function handleOnboardingMessage(phoneNumber: string, text: string)
   if (draft.length === 0) {
     const inviteMatch = text.trim().match(/^invite:([0-9a-fA-F-]{36})$/i);
     let referredByPurohitId: string | null = null;
+    let referrerName: string | null = null;
     if (inviteMatch) {
       const referrerId = inviteMatch[1];
       const referrerRows = await db
@@ -96,6 +148,7 @@ export async function handleOnboardingMessage(phoneNumber: string, text: string)
         .limit(1);
       if (referrerRows.length > 0) {
         referredByPurohitId = referrerId;
+        referrerName = referrerRows[0].name;
       }
     }
 
@@ -104,7 +157,24 @@ export async function handleOnboardingMessage(phoneNumber: string, text: string)
       currentStep: "name",
       referredByPurohitId,
     });
-    return [`${WAVE} Namaste! Smaran mein aapka swagat hai. Kripya apna poora naam batayein:`];
+    // A purohit who arrived on a brother-purohit's invite already has a reason to
+    // trust this; say whose. Growth here is purohit-to-purohit by design, so the
+    // referrer's name is the strongest thing in the first message.
+    // "smaran karna" = to remember / to call to mind. The brand IS the verb, so the
+    // referral line reads as "Sharma ji remembered you" AND "Sharma ji referred you
+    // to Smaran" at once. Bold carries the nouns a purohit scans for.
+    const opening = referrerName
+      ? `${NAMASTE} *Pranaam!* *${referrerName} ji* ne aapko _Smaran_ kiya hai.`
+      : `${NAMASTE} *Pranaam!* Main _Smaran_ hoon.`;
+
+    return [
+      `${opening}\n\n` +
+      `Aapke yajmano ki *tithiyan* main yaad rakhunga — koi anushthan chhoote na. ` +
+      `*Dakshina* seedhi aapke *UPI* par aayegi — beech mein na koi platform, na commission.\n\n` +
+      `Bas *5 baatein* poochh loon — ek hi baar. Uske baad aap sirf bolte jaaiyega, ` +
+      `baaki main sambhal lunga.\n\n` +
+      `*1/5* — Aapka *shubh naam*?`,
+    ];
   }
 
   const state = draft[0];
@@ -113,29 +183,36 @@ export async function handleOnboardingMessage(phoneNumber: string, text: string)
   switch (state.currentStep) {
     case "name": {
       if (trimmedText.length === 0 || trimmedText.length > 200) {
-        return ["Kripya apna sahi naam darj karein (1-200 characters):"];
+        return ["Naam thoda chhota ya lamba lag raha hai. Kripya dobara likhiye:"];
       }
       await db.update(onboardingStateTable)
         .set({ name: trimmedText, currentStep: "city", updatedAt: new Date() })
         .where(eq(onboardingStateTable.phoneNumber, phoneNumber));
-      return ["Dhanyawad! Ab kripya apne shahar (city) ka naam batayein:"];
+      return [
+        `Dhanyawad ${trimmedText} ji.\n\n` +
+        `*2/5* — Aapka *shahar* (city)?\n` +
+        `_Panchang aapke sthaan ke sooryoday se banta hai — isliye tithi bilkul sahi nikalti hai._`,
+      ];
     }
     case "city": {
       if (trimmedText.length === 0 || trimmedText.length > 200) {
-        return ["Kripya apne shahar ka sahi naam darj karein (1-200 characters):"];
+        return ["Shahar ka naam samajh nahi aaya. Kripya dobara likhiye:"];
       }
       await db.update(onboardingStateTable)
         .set({ city: trimmedText, currentStep: "ward", updatedAt: new Date() })
         .where(eq(onboardingStateTable.phoneNumber, phoneNumber));
-      return ["Dhanyawad! Ab kripya apna area ya mohalla batayein (jaise 'Andheri West' ya 'Sadar Bazaar'):"];
+      return [
+        `*3/5* — Aapka *mohalla* ya area? (jaise 'Sadar Bazaar')\n` +
+        `_Isse aapke aas-paas ke yajman aur sthaaniya panchang theek se judte hain._`,
+      ];
     }
     case "ward": {
       if (trimmedText.length === 0 || trimmedText.length > 200) {
-        return ["Kripya apne area ka sahi naam darj karein (1-200 characters):"];
+        return ["Area ka naam samajh nahi aaya. Kripya dobara likhiye:"];
       }
       const geo = await geocodeCity(state.city ?? "", trimmedText);
       if (geo === null) {
-        return ["Hum aapke area ko dhoondh nahi paaye. Kripya apne area/mohalla ka naam wapas type karein:"];
+        return ["Yeh area map par nahi mil paaya. Koi paas ka bada mohalla ya landmark likhiye:"];
       }
       await db.update(onboardingStateTable)
         .set({ 
@@ -146,21 +223,27 @@ export async function handleOnboardingMessage(phoneNumber: string, text: string)
           updatedAt: new Date() 
         })
         .where(eq(onboardingStateTable.phoneNumber, phoneNumber));
-      return ["Dhanyawad! Kripya apna UPI ID batayein, jismein aap dakshina prapt karna chahte hain (jaise name@bank):"];
+      return [
+        `*4/5* — Aapki *UPI ID*? (jaise name@bank)\n` +
+        `_Dakshina seedhi isi par aayegi. Smaran na beech mein aata hai, na koi commission leta hai._`,
+      ];
     }
     case "upi": {
       if (trimmedText.length === 0 || trimmedText.length > 256 || !isValidUpiId(trimmedText)) {
-        return ["Kripya ek valid UPI ID darj karein (jaise name@bank):"];
+        return ["Yeh UPI ID theek nahi lag rahi. Aise likhiye — name@bank:"];
       }
       await db.update(onboardingStateTable)
         .set({ upiId: trimmedText, currentStep: "calendar_system", updatedAt: new Date() })
         .where(eq(onboardingStateTable.phoneNumber, phoneNumber));
-      return ["Dhanyawad! Aap kaunsa calendar system follow karte hain? 'purnimanta' ya 'amanta' type karein:"];
+      return [
+        `*5/5* — Aap *purnimanta* panchang maante hain ya *amanta*?\n` +
+        `_Isse har tithi aapki parampara ke anusaar gini jaayegi._`,
+      ];
     }
     case "calendar_system": {
       const normalized = trimmedText.toLowerCase();
       if (normalized !== "purnimanta" && normalized !== "amanta") {
-        return ["Kripya sirf 'purnimanta' ya 'amanta' likhein:"];
+        return ["Sirf itna likhiye — purnimanta ya amanta:"];
       }
       
       return completeOnboarding(phoneNumber, {

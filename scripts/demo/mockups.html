@@ -99,53 +99,97 @@
   .field{flex:1;background:#fff;border:.5px solid #d1d1d6;border-radius:18px;padding:8px 12px;
          font-size:14px;color:#9aa0a6}
   .cico{color:var(--ios-blue);font-size:20px}
+  /* WhatsApp list message: tapping the list button opens a bottom sheet */
+  .sheet{
+    position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:14px 14px 0 0;
+    box-shadow:0 -8px 30px rgba(0,0,0,.22);padding-bottom:22px;z-index:2;
+  }
+  .sheet-hdr{display:flex;align-items:center;justify-content:space-between;
+             padding:14px 16px;border-bottom:.5px solid var(--wa-div);font-size:15px}
+  .sheet-hdr .x{color:var(--wa-meta);font-size:15px}
+  .sheet-sec{padding:10px 16px 6px;font-size:12.5px;font-weight:600;color:var(--wa-meta);
+             text-transform:uppercase;letter-spacing:.03em}
+  .sheet-row{padding:13px 16px;font-size:15px;border-top:.5px solid var(--wa-div)}
   @media print{body{background:#fff}}
 </style>
 </head>
 <body>
 
-<!-- ═══════════ 1. DAY-SHEET — verbatim production output, 2026-07-16T17:29:54Z ═══════════ -->
+<!-- ═══════════ 1. ONBOARDING — verbatim from onboarding.ts handleOnboardingMessage ═══════════ -->
 <div class="wrap">
-  <div class="cap">1 · Day-sheet</div>
-  <div class="phone">
-    <div class="status"><span>9:41</span><span class="r">••••&nbsp;&nbsp;⌁&nbsp;&nbsp;100%</span></div>
+  <div class="cap">1 · Onboarding (invite → UPI)</div>
+  <div class="phone auto">
+    <div class="status"><span>8:02</span><span class="r">••••&nbsp;&nbsp;⌁&nbsp;&nbsp;100%</span></div>
     <div class="hdr">
-      <div class="back">‹</div>
-      <div class="avatar"></div>
+      <div class="back">‹</div><div class="avatar"></div>
       <div class="who"><b>Smaran</b><span>online</span></div>
       <div class="icons"><span>📹</span><span>📞</span></div>
     </div>
     <div class="chat">
       <div class="day">TODAY</div>
-      <div class="row out"><div class="bub">my week<span class="meta">9:41 AM<span class="tick">✓✓</span></span></div></div>
-      <div class="row in"><div class="bub"><b>आपका साप्ताहिक कार्यक्रम</b>
-──────────────────
+      <div class="row out"><div class="bub">invite:d0000000-0000-4000-8000-000000000001<span class="meta">8:02 AM<span class="tick">✓✓</span></span></div></div>
+      <div class="row in"><div class="bub">🙏 <b>Pranaam!</b> <b>Gupta ji</b> ne aapko <i>Smaran</i> kiya hai.
 
-<b>17-07-2026 (शुक्रवार)</b>
-  <i>सुबह</i>
-  • 07:30 — पितृ श्राद्ध (मिश्रा)
+Aapke yajmano ki <b>tithiyan</b> main yaad rakhunga — koi anushthan chhoote na. <b>Dakshina</b> seedhi aapke <b>UPI</b> par aayegi — beech mein na koi platform, na commission.
 
-<b>18-07-2026 (शनिवार)</b>
-  <i>सुबह</i>
-  • 09:00 — सत्यनारायण कथा (शर्मा)
-  <i>शाम</i>
-  • 18:30 — जन्मदिन पूजा (वर्मा)
+Bas <b>5 baatein</b> poochh loon — ek hi baar. Uske baad aap sirf bolte jaaiyega, baaki main sambhal lunga.
 
-<b>20-07-2026 (सोमवार)</b>
-  <i>दोपहर</i>
-  • 13:00 — रुद्राभिषेक (तिवारी)
+<b>1/5</b> — Aapka <b>shubh naam</b>?<span class="meta">8:02 AM</span></div></div>
+      <div class="row out"><div class="bub">Ramesh Sharma<span class="meta">8:03 AM<span class="tick">✓✓</span></span></div></div>
+      <div class="row in"><div class="bub">Dhanyawad Ramesh Sharma ji.
 
-<b>22-07-2026 (बुधवार)</b>
-  <i>सुबह</i>
-  • 08:00 — अमावस्या श्राद्ध (गुप्ता)<span class="meta">9:41 AM</span></div></div>
+<b>2/5</b> — Aapka <b>shahar</b> (city)?
+<i>Panchang aapke sthaan ke sooryoday se banta hai — isliye tithi bilkul sahi nikalti hai.</i><span class="meta">8:03 AM</span></div></div>
+      <div class="row out"><div class="bub">Varanasi<span class="meta">8:03 AM<span class="tick">✓✓</span></span></div></div>
+      <div class="row in"><div class="bub"><b>3/5</b> — Aapka <b>mohalla</b> ya area? (jaise 'Sadar Bazaar')
+<i>Isse aapke aas-paas ke yajman aur sthaaniya panchang theek se judte hain.</i><span class="meta">8:04 AM</span></div></div>
+      <div class="row out"><div class="bub">Dashashwamedh<span class="meta">8:04 AM<span class="tick">✓✓</span></span></div></div>
+      <div class="row in"><div class="bub"><b>4/5</b> — Aapki <b>UPI ID</b>? (jaise name@bank)
+<i>Dakshina seedhi isi par aayegi. Smaran na beech mein aata hai, na koi commission leta hai.</i><span class="meta">8:04 AM</span></div></div>
+      <div class="row out"><div class="bub">ramesh.sharma@okhdfcbank<span class="meta">8:05 AM<span class="tick">✓✓</span></span></div></div>
     </div>
     <div class="composer"><span class="cico">＋</span><div class="field">Message</div><span class="cico">🎤</span></div>
   </div>
 </div>
 
-<!-- ═══════════ 2. VOICE NOTE → CONFIRM CARD ═══════════ -->
+<!-- ═══════════ 2. ONBOARDING COMPLETE — verbatim completeOnboarding() + live /api/panchang sandbox ═══════════ -->
 <div class="wrap">
-  <div class="cap">2 · Voice → confirm</div>
+  <div class="cap">2 · Account created</div>
+  <div class="phone">
+    <div class="status"><span>8:05</span><span class="r">••••&nbsp;&nbsp;⌁&nbsp;&nbsp;100%</span></div>
+    <div class="hdr">
+      <div class="back">‹</div><div class="avatar"></div>
+      <div class="who"><b>Smaran</b><span>online</span></div>
+      <div class="icons"><span>📹</span><span>📞</span></div>
+    </div>
+    <div class="chat">
+      <div class="day">TODAY</div>
+      <div class="row in"><div class="bub"><b>5/5</b> — Aap <b>purnimanta</b> panchang maante hain ya <b>amanta</b>?
+<i>Isse har tithi aapki parampara ke anusaar gini jaayegi.</i><span class="meta">8:05 AM</span></div></div>
+      <div class="row out"><div class="bub">purnimanta<span class="meta">8:05 AM<span class="tick">✓✓</span></span></div></div>
+      <div class="row in"><div class="bub">🙏 <b>Pranaam Ramesh Sharma ji!</b> Aapka account taiyar hai — <b>Varanasi</b>, <b>purnimanta</b> panchang.<span class="meta">8:05 AM</span></div></div>
+      <div class="row in"><div class="bub">Dekhiye — aise dikhega aapka har yajman:
+──────────────────
+<b>Parivar:</b> Sharma Family (उदाहरण / example)
+<b>Karya:</b> Satyanarayan Katha
+<b>Tithi:</b> Amavasya Krishna
+<b>Tarikh:</b> 01-01-1995
+──────────────────
+
+Ab apna pehla yajman jodiye — jaise suvidha ho:
+• <b>Bol kar</b> — voice note bhej dijiye
+• <b>Likh kar</b> — type kar dijiye
+• <b>Bahi khata ki photo</b> bhej dijiye
+
+👇 Shuru kijiye — aapka har yajman, har tithi, smaran rahega.<span class="meta">8:05 AM</span></div></div>
+    </div>
+    <div class="composer"><span class="cico">＋</span><div class="field">Message</div><span class="cico">🎤</span></div>
+  </div>
+</div>
+
+<!-- ═══════════ 3. VOICE NOTE → CONFIRM CARD ═══════════ -->
+<div class="wrap">
+  <div class="cap">3 · Voice → confirm</div>
   <div class="phone">
     <div class="status"><span>9:41</span><span class="r">••••&nbsp;&nbsp;⌁&nbsp;&nbsp;100%</span></div>
     <div class="hdr">
@@ -187,9 +231,44 @@
   </div>
 </div>
 
-<!-- ═══════════ 3. COLLISION WARNING — verbatim from muhurat.ts ═══════════ -->
+<!-- ═══════════ 4. CORRECTION — verbatim buildFieldSelectionList + buildFieldCandidateList ═══════════ -->
 <div class="wrap">
-  <div class="cap">3 · Double-booking</div>
+  <div class="cap">4 · Correction</div>
+  <div class="phone">
+    <div class="status"><span>9:42</span><span class="r">••••&nbsp;&nbsp;⌁&nbsp;&nbsp;100%</span></div>
+    <div class="hdr">
+      <div class="back">‹</div><div class="avatar"></div>
+      <div class="who"><b>Smaran</b><span>online</span></div>
+      <div class="icons"><span>📹</span><span>📞</span></div>
+    </div>
+    <div class="chat">
+      <div class="day">TODAY</div>
+      <div class="row out"><div class="bub">✏ सुधारें<span class="meta">9:42 AM<span class="tick">✓✓</span></span></div></div>
+      <div class="card">
+        <div class="bub">किस जानकारी में सुधार करना है? नीचे दी गई सूची से चुनें:<span class="meta">9:42 AM</span></div>
+        <div class="btns"><div class="btn">☰ जानकारी चुनें</div></div>
+      </div>
+      <div class="row out"><div class="bub">तिथि (सत्यनारायण कथा)<span class="meta">9:43 AM<span class="tick">✓✓</span></span></div></div>
+      <div class="card">
+        <div class="bub">सही तिथि चुनें या 'कुछ और' पर क्लिक करके टाइप करें:<span class="meta">9:43 AM</span></div>
+        <div class="btns"><div class="btn">☰ विकल्प चुनें</div></div>
+      </div>
+    </div>
+    <div class="sheet">
+      <div class="sheet-hdr"><b>विकल्प चुनें</b><span class="x">✕</span></div>
+      <div class="sheet-sec">संभावित विकल्प</div>
+      <div class="sheet-row">एकादशी</div>
+      <div class="sheet-row">द्वादशी</div>
+      <div class="sheet-row">त्रयोदशी</div>
+      <div class="sheet-row">कुछ और</div>
+    </div>
+    <div class="composer"><span class="cico">＋</span><div class="field">Message</div><span class="cico">🎤</span></div>
+  </div>
+</div>
+
+<!-- ═══════════ 5. COLLISION WARNING — verbatim from muhurat.ts ═══════════ -->
+<div class="wrap">
+  <div class="cap">5 · Double-booking</div>
   <div class="phone">
     <div class="status"><span>9:42</span><span class="r">••••&nbsp;&nbsp;⌁&nbsp;&nbsp;100%</span></div>
     <div class="hdr">
@@ -218,9 +297,68 @@
   </div>
 </div>
 
-<!-- ═══════════ 4. PRE-RITUAL ALERT — verbatim from buildUpcomingPreRitualCard (shraddh register) ═══════════ -->
+<!-- ═══════════ 6. MULTI-FAMILY — verbatim buildMultiFamilyFollowup + booking-confirm ack ═══════════ -->
 <div class="wrap">
-  <div class="cap">4 · 6 AM pre-ritual</div>
+  <div class="cap">6 · Multi-family</div>
+  <div class="phone">
+    <div class="status"><span>9:45</span><span class="r">••••&nbsp;&nbsp;⌁&nbsp;&nbsp;100%</span></div>
+    <div class="hdr">
+      <div class="back">‹</div><div class="avatar"></div>
+      <div class="who"><b>Smaran</b><span>online</span></div>
+      <div class="icons"><span>📹</span><span>📞</span></div>
+    </div>
+    <div class="chat">
+      <div class="day">TODAY</div>
+      <div class="row out"><div class="bub">फिर भी बुक करें<span class="meta">9:45 AM<span class="tick">✓✓</span></span></div></div>
+      <div class="row in"><div class="bub">👍 अनुष्ठान बुक कर लिया गया है। कार्यक्रम में जोड़ दिया गया है।<span class="meta">9:45 AM</span></div></div>
+      <div class="row in"><div class="bub">दूसरे परिवार के लिए एक और voice note भेज दें 🙏<span class="meta">9:45 AM</span></div></div>
+    </div>
+    <div class="composer"><span class="cico">＋</span><div class="field">Message</div><span class="cico">🎤</span></div>
+  </div>
+</div>
+
+<!-- ═══════════ 7. DAY-SHEET — verbatim production output, 2026-07-16T17:29:54Z ═══════════ -->
+<div class="wrap">
+  <div class="cap">7 · Day-sheet</div>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span class="r">••••&nbsp;&nbsp;⌁&nbsp;&nbsp;100%</span></div>
+    <div class="hdr">
+      <div class="back">‹</div>
+      <div class="avatar"></div>
+      <div class="who"><b>Smaran</b><span>online</span></div>
+      <div class="icons"><span>📹</span><span>📞</span></div>
+    </div>
+    <div class="chat">
+      <div class="day">TODAY</div>
+      <div class="row out"><div class="bub">my week<span class="meta">9:41 AM<span class="tick">✓✓</span></span></div></div>
+      <div class="row in"><div class="bub"><b>आपका साप्ताहिक कार्यक्रम</b>
+──────────────────
+
+<b>17-07-2026 (शुक्रवार)</b>
+  <i>सुबह</i>
+  • 07:30 — पितृ श्राद्ध (मिश्रा)
+
+<b>18-07-2026 (शनिवार)</b>
+  <i>सुबह</i>
+  • 09:00 — सत्यनारायण कथा (शर्मा)
+  <i>शाम</i>
+  • 18:30 — जन्मदिन पूजा (वर्मा)
+
+<b>20-07-2026 (सोमवार)</b>
+  <i>दोपहर</i>
+  • 13:00 — रुद्राभिषेक (तिवारी)
+
+<b>22-07-2026 (बुधवार)</b>
+  <i>सुबह</i>
+  • 08:00 — अमावस्या श्राद्ध (गुप्ता)<span class="meta">9:41 AM</span></div></div>
+    </div>
+    <div class="composer"><span class="cico">＋</span><div class="field">Message</div><span class="cico">🎤</span></div>
+  </div>
+</div>
+
+<!-- ═══════════ 8. PRE-RITUAL ALERT — verbatim from buildUpcomingPreRitualCard (shraddh register) ═══════════ -->
+<div class="wrap">
+  <div class="cap">8 · 6 AM pre-ritual</div>
   <div class="phone">
     <div class="status"><span>6:00</span><span class="r">••••&nbsp;&nbsp;⌁&nbsp;&nbsp;100%</span></div>
     <div class="hdr">
@@ -260,9 +398,9 @@
   </div>
 </div>
 
-<!-- ═══════════ 5. DAKSHINA — verbatim from buildRitualCompletedCard + buildPostRitualPurohitCard ═══════════ -->
+<!-- ═══════════ 9. DAKSHINA — verbatim from buildRitualCompletedCard + buildPostRitualPurohitCard ═══════════ -->
 <div class="wrap">
-  <div class="cap">5 · Dakshina (purohit)</div>
+  <div class="cap">9 · Dakshina (purohit)</div>
   <div class="phone">
     <div class="status"><span>7:15</span><span class="r">••••&nbsp;&nbsp;⌁&nbsp;&nbsp;100%</span></div>
     <div class="hdr">
@@ -299,9 +437,72 @@
   </div>
 </div>
 
-<!-- ═══════════ 6. FAMILY SIDE — verbatim buildPostRitualFamilyCard + buildFamilyCalendarOfferCard ═══════════ -->
+<!-- ═══════════ 10. LAPSE RECOVERY — verbatim brain.ts sendLapseRecoveryNudges + lapse-engage ack ═══════════ -->
 <div class="wrap">
-  <div class="cap">6 · Family + ₹21 offer</div>
+  <div class="cap">10 · Lapse nudge</div>
+  <div class="phone">
+    <div class="status"><span>6:00</span><span class="r">••••&nbsp;&nbsp;⌁&nbsp;&nbsp;100%</span></div>
+    <div class="hdr">
+      <div class="back">‹</div><div class="avatar"></div>
+      <div class="who"><b>Smaran</b><span>online</span></div>
+      <div class="icons"><span>📹</span><span>📞</span></div>
+    </div>
+    <div class="chat">
+      <div class="day">TODAY</div>
+      <div class="card">
+        <div class="bub">🔔 <b>स्मरण</b>
+──────────────────
+पं. रमेश शर्मा जी, यजमान <b>गुप्ता</b> के परिवार का अमावस्या श्राद्ध
+<i>(श्रावण कृष्ण अमावस्या)</i> इस वर्ष अभी बुक नहीं हुआ है।
+
+👇 क्या आप उन्हें संपर्क करना चाहते हैं?<span class="meta">6:00 AM</span></div>
+        <div class="btns"><div class="btn">नियत करें</div></div>
+      </div>
+      <div class="row out"><div class="bub">नियत करें<span class="meta">6:02 AM<span class="tick">✓✓</span></span></div></div>
+      <div class="row in"><div class="bub">सम्पर्क करने के लिए धन्यवाद। इस परिवार का अनुष्ठान शीघ्र ही नियत किया जाएगा।<span class="meta">6:02 AM</span></div></div>
+    </div>
+    <div class="composer"><span class="cico">＋</span><div class="field">Message</div><span class="cico">🎤</span></div>
+  </div>
+</div>
+
+<!-- ═══════════ 11. REFERRAL — verbatim buildReferralCard ═══════════ -->
+<div class="wrap">
+  <div class="cap">11 · Referral</div>
+  <div class="phone">
+    <div class="status"><span>9:50</span><span class="r">••••&nbsp;&nbsp;⌁&nbsp;&nbsp;100%</span></div>
+    <div class="hdr">
+      <div class="back">‹</div><div class="avatar"></div>
+      <div class="who"><b>Smaran</b><span>online</span></div>
+      <div class="icons"><span>📹</span><span>📞</span></div>
+    </div>
+    <div class="chat">
+      <div class="day">TODAY</div>
+      <div class="row out"><div class="bub">referral<span class="meta">9:50 AM<span class="tick">✓✓</span></span></div></div>
+      <div class="card">
+        <div class="bub">✉️ <b>पुरोहित आमंत्रण कार्ड</b>
+──────────────────
+नीचे का संदेश अपने साथी पुरोहित-जी को भेज दीजिए।
+──────────────────
+🙏 <b>स्मरण</b> — पुरोहितों के लिए WhatsApp पर बही खाता।
+<i>रमेश शर्मा जी की ओर से आमंत्रण</i>
+
+• यजमानों की तिथियाँ याद रहती हैं — कोई अनुष्ठान छूटता नहीं
+• दक्षिणा सीधे आपके UPI पर — बीच में न कोई प्लेटफ़ॉर्म, न कमीशन
+• बोलकर या बही खाता की फोटो भेजकर — कोई फॉर्म नहीं
+
+<b>पहले 100 पुरोहितों के लिए पहला वर्ष ₹501</b>
+
+<span class="lnk">https://api.smaran.click/i/Xk7pQ2mN</span><span class="meta">9:50 AM</span></div>
+        <div class="btns"><div class="btn">आमंत्रण भेजा गया</div></div>
+      </div>
+    </div>
+    <div class="composer"><span class="cico">＋</span><div class="field">Message</div><span class="cico">🎤</span></div>
+  </div>
+</div>
+
+<!-- ═══════════ 12. FAMILY SIDE — verbatim buildPostRitualFamilyCard ═══════════ -->
+<div class="wrap">
+  <div class="cap">12 · Family confirms</div>
   <div class="phone">
     <div class="status"><span>7:16</span><span class="r">••••&nbsp;&nbsp;⌁&nbsp;&nbsp;100%</span></div>
     <div class="hdr">
@@ -324,6 +525,23 @@
       </div>
       <div class="row out"><div class="bub">Confirm ✓<span class="meta">7:16 AM<span class="tick">✓✓</span></span></div></div>
       <div class="row in"><div class="bub">🤝 पुष्टि के लिए धन्यवाद।<span class="meta">7:16 AM</span></div></div>
+    </div>
+    <div class="composer"><span class="cico">＋</span><div class="field">Message</div><span class="cico">🎤</span></div>
+  </div>
+</div>
+
+<!-- ═══════════ 13. FAMILY CALENDAR OFFER — verbatim buildFamilyCalendarOfferCard ═══════════ -->
+<div class="wrap">
+  <div class="cap">13 · Family + ₹21 offer</div>
+  <div class="phone">
+    <div class="status"><span>7:16</span><span class="r">••••&nbsp;&nbsp;⌁&nbsp;&nbsp;100%</span></div>
+    <div class="hdr">
+      <div class="back">‹</div><div class="avatar"></div>
+      <div class="who"><b>Smaran</b><span>online</span></div>
+      <div class="icons"><span>📹</span><span>📞</span></div>
+    </div>
+    <div class="chat">
+      <div class="day">TODAY</div>
       <div class="card">
         <div class="bub">🪔 <b>परिवार का पंचांग</b>
 ──────────────────
@@ -341,11 +559,11 @@
   </div>
 </div>
 
-<!-- ═══════════ 7. REFERRAL — verbatim buildReferralCard ═══════════ -->
+<!-- ═══════════ 14. SUBSCRIPTION ACTIVATED — verbatim subscribe-confirm handler (whatsapp.ts) ═══════════ -->
 <div class="wrap">
-  <div class="cap">7 · Referral</div>
+  <div class="cap">14 · Family subscribed</div>
   <div class="phone">
-    <div class="status"><span>9:50</span><span class="r">••••&nbsp;&nbsp;⌁&nbsp;&nbsp;100%</span></div>
+    <div class="status"><span>7:18</span><span class="r">••••&nbsp;&nbsp;⌁&nbsp;&nbsp;100%</span></div>
     <div class="hdr">
       <div class="back">‹</div><div class="avatar"></div>
       <div class="who"><b>Smaran</b><span>online</span></div>
@@ -353,15 +571,8 @@
     </div>
     <div class="chat">
       <div class="day">TODAY</div>
-      <div class="row out"><div class="bub">referral<span class="meta">9:50 AM<span class="tick">✓✓</span></span></div></div>
-      <div class="card">
-        <div class="bub">✉️ <b>पुरोहित आमंत्रण कार्ड</b>
-──────────────────
-अपने साथी पुरोहित-जी को स्मरण से जोड़ें। वे इस लिंक पर क्लिक करके सीधे ऑनबोर्ड हो सकते हैं:
-
-<span class="lnk">https://wa.me/15551363612?text=invite:d0000000-0000-4000-8000-000000000001</span><span class="meta">9:50 AM</span></div>
-        <div class="btns"><div class="btn">आमंत्रण भेजा गया</div></div>
-      </div>
+      <div class="row out"><div class="bub">मैंने सदस्यता ले ली<span class="meta">7:18 AM<span class="tick">✓✓</span></span></div></div>
+      <div class="row in"><div class="bub">👍 आपकी सदस्यता सक्रिय कर दी गई है। धन्यवाद!<span class="meta">7:18 AM</span></div></div>
     </div>
     <div class="composer"><span class="cico">＋</span><div class="field">Message</div><span class="cico">🎤</span></div>
   </div>

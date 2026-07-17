@@ -33,6 +33,21 @@
  *   - ⚠️ is the one exception to the anchor rule: a collision warning earns it.
  *   - Hand gestures (🙏 / 👇) are deliberate: bots read as familiar when they
  *     gesture, and 🙏 is the native greeting of this product's users.
+ *   - Greeting is *Pranaam*, not Namaste — the register a purohit is owed.
+ *
+ * ── THE BRAND IS ALSO A VERB ────────────────────────────────────────────────
+ * "smaran" = remembrance; "smaran karna/rahe" = to remember / let it be remembered.
+ * The product name does work inside a sentence, so it is allowed to:
+ *     "X ji ne aapko _Smaran_ kiya hai"      — remembered you AND referred you
+ *     "har yajman, har tithi, smaran rahega" — the promise, as a verb
+ *     "_स्मरण रहे_ — 2 दिन शेष"                — the reminder naming itself
+ *
+ * Two rules, both load-bearing:
+ *   1. GENTLY. Three uses in the whole product, on three different surfaces. A pun
+ *      in every message stops being a pun and becomes a tic.
+ *   2. The BRAND is _italic_ in running text, so it is visually distinct from the
+ *      ordinary verb (plain lowercase). Bold stays reserved for labels and the
+ *      nouns a purohit scans for — never for the wordplay, which should whisper.
  *
  * ── ROUND vs SQUARE ─────────────────────────────────────────────────────────
  * Emoji fall into two visual families, and mixing them inline is what makes
