@@ -110,13 +110,13 @@ test.describe("Schedule Protection E2E Flows", () => {
     let messages = await waitForOutboundMessages(request, purohitPhone, 1);
     let daySheet = messages[messages.length - 1].text;
 
-    expect(daySheet).toContain("📅 आपका साप्ताहिक कार्यक्रम:");
+    expect(daySheet).toContain("*आपका साप्ताहिक कार्यक्रम*");
     expect(daySheet).toContain("Satyanarayan Puja");
     expect(daySheet).toContain("Son Birthday");
     expect(daySheet).toContain("Tiwari");
-    expect(daySheet).toContain("🌅 सुबह:");
+    expect(daySheet).toContain("_सुबह_");
     expect(daySheet).toContain("• 09:30");
-    expect(daySheet).toContain("☀️ दोपहर:");
+    expect(daySheet).toContain("_दोपहर_");
     expect(daySheet).toContain("• 14:15");
 
     // Clean up
@@ -185,7 +185,7 @@ test.describe("Schedule Protection E2E Flows", () => {
     let messages = await waitForOutboundMessages(request, purohitPhone, 1);
     let warningMsg = messages[messages.length - 1].text;
 
-    expect(warningMsg).toContain("⚠️ चेतावनी: इस समय पर पहले से एक अनुष्ठान बुक है");
+    expect(warningMsg).toContain("⚠️ *चेतावनी*");
     expect(warningMsg).toContain("booking-force:" + jobBId);
     expect(warningMsg).toContain("booking-cancel:" + jobBId);
 
@@ -227,7 +227,7 @@ test.describe("Schedule Protection E2E Flows", () => {
 
     messages = await waitForOutboundMessages(request, purohitPhone, 3);
     warningMsg = messages[messages.length - 1].text;
-    expect(warningMsg).toContain("⚠️ चेतावनी: इस समय पर पहले से एक अनुष्ठान बुक है");
+    expect(warningMsg).toContain("⚠️ *चेतावनी*");
 
     // Send cancel action
     await sendWebhookInteractive(request, purohitPhone, `booking-cancel:${jobCId}`);
@@ -339,7 +339,7 @@ test.describe("Schedule Protection E2E Flows", () => {
     const messages = await waitForOutboundMessages(request, purohitPhone, 1);
     const daySheet = messages[messages.length - 1].text;
     expect(daySheet).toContain("Warm Cache Puja");
-    expect(daySheet).toContain("🌅 सुबह:");
+    expect(daySheet).toContain("_सुबह_");
     expect(daySheet).toContain("• 08:00");
 
     // Clean up

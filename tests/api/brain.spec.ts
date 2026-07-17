@@ -141,11 +141,11 @@ test.describe("Daily Brain Cron and Lapse Recovery E2E Flow", () => {
     );
     expect(alertsForA.length).toBe(2);
 
-    const alert2 = alertsForA.find((m: any) => m.text.includes("(शेष दिन: 2)"));
+    const alert2 = alertsForA.find((m: any) => m.text.includes("*शेष दिन:* 2"));
     expect(alert2).toBeDefined();
     expect(alert2!.text).toContain("पंजीरी");
 
-    const alert7 = alertsForA.find((m: any) => m.text.includes("(शेष दिन: 7)"));
+    const alert7 = alertsForA.find((m: any) => m.text.includes("*शेष दिन:* 7"));
     expect(alert7).toBeDefined();
     expect(alert7!.text).toContain("पंजीरी");
 

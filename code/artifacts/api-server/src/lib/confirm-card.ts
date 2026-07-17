@@ -15,6 +15,7 @@ import {
 } from "./fuzzy-match";
 import { sendWhatsappMessage } from "./whatsapp-client";
 import { buildAutopayDeepLink } from "./subscription";
+import { BEADS, NAMASTE, FLOWER, DIYA, ENVELOPE, POINT, RULE } from "./copy-tokens";
 
 // Static mapping of English canonicals to Hindi Devanagari
 const HINDI_MAPS: Record<string, Record<string, string>> = {
@@ -466,7 +467,11 @@ export function buildPostRitualPurohitCard(
   eventLabel: string,
   upiLink: string
 ): { type: "interactive"; interactive: Record<string, unknown> } {
-  const bodyText = `📿 यजमान: ${familyName}\nअनुष्ठान: ${eventLabel}\n\nदक्षिणा भुगतान लिंक: ${upiLink}\n\nदक्षिणा प्राप्त होने पर पुष्टि करें:`;
+  const bodyText =
+    `${BEADS} *दक्षिणा*\n${RULE}\n` +
+    `*यजमान:* ${familyName}\n*अनुष्ठान:* ${eventLabel}\n\n` +
+    `*भुगतान लिंक:* ${upiLink}\n\n` +
+    `${POINT} दक्षिणा प्राप्त होने पर पुष्टि करें:`;
   return {
     type: "interactive",
     interactive: {
@@ -494,7 +499,10 @@ export function buildRitualCompletedCard(
   familyName: string,
   eventLabel: string
 ): { type: "interactive"; interactive: Record<string, unknown> } {
-  const bodyText = `📿 यजमान: ${familyName}\nअनुष्ठान: ${eventLabel}\n\nक्या अनुष्ठान पूर्ण हो गया है? नीचे टैप करें:`;
+  const bodyText =
+    `${BEADS} *अनुष्ठान की स्थिति*\n${RULE}\n` +
+    `*यजमान:* ${familyName}\n*अनुष्ठान:* ${eventLabel}\n\n` +
+    `${POINT} क्या अनुष्ठान पूर्ण हो गया है? नीचे टैप करें:`;
   return {
     type: "interactive",
     interactive: {
@@ -523,7 +531,11 @@ export function buildPostRitualFamilyCard(
   eventLabel: string,
   upiLink: string
 ): { type: "interactive"; interactive: Record<string, unknown> } {
-  const bodyText = `📿 पुरोहित: ${purohitName}\nअनुष्ठान: ${eventLabel}\n\nदक्षिणा अर्पण लिंक: ${upiLink}\n\nदक्षिणा अर्पण की पुष्टि करें (अनुष्ठान संपन्न हुआ):`;
+  const bodyText =
+    `${BEADS} *दक्षिणा अर्पण*\n${RULE}\n` +
+    `*पुरोहित:* ${purohitName}\n*अनुष्ठान:* ${eventLabel}\n\n` +
+    `*अर्पण लिंक:* ${upiLink}\n\n` +
+    `${POINT} दक्षिणा अर्पण की पुष्टि करें (अनुष्ठान संपन्न हुआ):`;
   return {
     type: "interactive",
     interactive: {
@@ -597,12 +609,26 @@ export function buildUpcomingPreRitualCard(
   const eventName = eventTypeMap[resolved.event.eventType] || resolved.event.eventType;
   const purohitName = resolved.purohit.name.endsWith("जी") ? resolved.purohit.name : `${resolved.purohit.name} जी`;
 
-  let bodyText = "";
-  if (isSolemn) {
-    bodyText = `आदरणीय ${purohitName}, प्रणाम।\n\nआगामी तिथि को निम्नलिखित श्राद्ध अनुष्ठान निर्धारित है:\n\n📅 तिथि: ${resolved.gregorianDate} (${maas} ${paksha} पक्ष, ${tithi}) (शेष दिन: ${daysRemaining})\n👤 यजमान: ${familyName} परिवार\n📿 अनुष्ठान: श्राद्ध/पुण्यतिथि ${resolved.event.label ? `(${resolved.event.label})` : ""}\n\nआवश्यक सामग्री सूची:\n${samagriList}\n\nकृपया पूजा की पुष्टि करें।`;
-  } else {
-    bodyText = `जय श्री राम ${purohitName}!\n\nआगामी तिथि को निम्नलिखित मांगलिक कार्य निर्धारित है:\n\n📅 तिथि: ${resolved.gregorianDate} (${maas} ${paksha} पक्ष, ${tithi}) (शेष दिन: ${daysRemaining})\n👤 यजमान: ${familyName} परिवार\n🎉 अनुष्ठान: ${eventName} ${resolved.event.label ? `(${resolved.event.label})` : ""}\n\nआवश्यक सामग्री सूची:\n${samagriList}\n\nकृपया पूजा की पुष्टि करें।`;
-  }
+  // One anchor emoji per register (NAMASTE = solemn, FLOWER = celebratory);
+  // everything else is carried by bold labels and a divider. See copy-tokens.ts.
+  const ritualLine = isSolemn
+    ? `श्राद्ध/पुण्यतिथि ${resolved.event.label ? `(${resolved.event.label})` : ""}`.trim()
+    : `${eventName} ${resolved.event.label ? `(${resolved.event.label})` : ""}`.trim();
+
+  const detail =
+    `${RULE}\n` +
+    `*तिथि:* ${resolved.gregorianDate}\n` +
+    `*पंचांग:* ${maas} ${paksha} पक्ष, ${tithi}\n` +
+    `*शेष दिन:* ${daysRemaining}\n\n` +
+    `*यजमान:* ${familyName} परिवार\n` +
+    `*अनुष्ठान:* ${ritualLine}\n` +
+    `${RULE}\n\n` +
+    `*आवश्यक सामग्री*\n${samagriList}\n\n` +
+    `${POINT} कृपया पूजा की पुष्टि करें।`;
+
+  const bodyText = isSolemn
+    ? `${NAMASTE} आदरणीय ${purohitName}, प्रणाम।\n\nआगामी तिथि को निम्नलिखित श्राद्ध अनुष्ठान निर्धारित है:\n\n${detail}`
+    : `${FLOWER} जय श्री राम ${purohitName}!\n\nआगामी तिथि को निम्नलिखित मांगलिक कार्य निर्धारित है:\n\n${detail}`;
 
   return {
     type: "interactive",
@@ -638,7 +664,12 @@ export function buildFamilyCalendarOfferCard(
     interactive: {
       type: "button",
       body: {
-        text: `📅 अपने परिवार का पंचांग और अनुष्ठान कैलेंडर सीधे अपने WhatsApp पर प्राप्त करें।\n(वार्षिक अनुष्ठानों के स्मरण पत्र सीधे प्राप्त होंगे)\n\nशुल्क: ₹29/माह (UPI Autopay)\nपुरोहित जी: ${purohitName}\n\nसदस्यता लिंक: ${mandateUrl}`,
+        text:
+          `${DIYA} *परिवार का पंचांग*\n${RULE}\n` +
+          `अपने परिवार का पंचांग और अनुष्ठान कैलेंडर सीधे अपने WhatsApp पर प्राप्त करें।\n` +
+          `_वार्षिक अनुष्ठानों के स्मरण पत्र सीधे प्राप्त होंगे_\n\n` +
+          `*शुल्क:* ₹21/माह (UPI Autopay)\n*पुरोहित जी:* ${purohitName}\n\n` +
+          `*सदस्यता लिंक:* ${mandateUrl}`,
       },
       action: {
         buttons: [
@@ -656,18 +687,20 @@ export function buildFamilyCalendarOfferCard(
 }
 
 export function buildReferralCard(
-  purohitId: string,
+  inviteUrl: string,
   purohitName: string
 ): { type: "interactive"; interactive: Record<string, unknown> } {
-  const botNumber = process.env.WHATSAPP_BOT_NUMBER || "12345";
-  const url = `https://wa.me/${botNumber}?text=invite:${purohitId}`;
+  // Takes a prebuilt short URL: minting one is a DB write, and this builder stays pure.
+  const url = inviteUrl;
   
   return {
     type: "interactive",
     interactive: {
       type: "button",
       body: {
-        text: `🚩 पुरोहित आमंत्रण कार्ड\n\nअपने साथी पुरोहित-जी को स्मरण से जोड़ें। वे इस लिंक पर क्लिक करके सीधे ऑनबोर्ड हो सकते हैं:\n\n${url}`,
+        text:
+          `${ENVELOPE} *पुरोहित आमंत्रण कार्ड*\n${RULE}\n` +
+          `अपने साथी पुरोहित-जी को स्मरण से जोड़ें। वे इस लिंक पर क्लिक करके सीधे ऑनबोर्ड हो सकते हैं:\n\n${url}`,
       },
       action: {
         buttons: [

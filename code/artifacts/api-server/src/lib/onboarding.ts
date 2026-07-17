@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { geocodeCity } from "./geocoding";
 import { isValidUpiId } from "./upi";
 import { logger } from "./logger";
+import { WAVE } from "./copy-tokens";
 
 const ONBOARDING_STEPS = ["name", "city", "ward", "upi", "calendar_system"] as const;
 type OnboardingStep = (typeof ONBOARDING_STEPS)[number];
@@ -103,7 +104,7 @@ export async function handleOnboardingMessage(phoneNumber: string, text: string)
       currentStep: "name",
       referredByPurohitId,
     });
-    return ["Namaste! Smaran mein aapka swagat hai. Kripya apna poora naam batayein:"];
+    return [`${WAVE} Namaste! Smaran mein aapka swagat hai. Kripya apna poora naam batayein:`];
   }
 
   const state = draft[0];

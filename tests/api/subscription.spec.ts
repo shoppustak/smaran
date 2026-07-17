@@ -30,10 +30,10 @@ test.describe("Family Subscription E2E Flows & Isolation Gating", () => {
     expect(card.interactive.type).toBe("button");
     const bodyText = (card.interactive.body as any).text;
     expect(bodyText).toContain("अपने परिवार का पंचांग");
-    expect(bodyText).toContain("₹29/माह");
+    expect(bodyText).toContain("₹21/माह");
     expect(bodyText).toContain("Sharma Ji");
     expect(bodyText).toContain("upi://mandate");
-    expect(bodyText).toContain("am=29.00");
+    expect(bodyText).toContain("am=21.00");
     expect(bodyText).toContain("recur=MONTHLY");
     expect(bodyText).toContain("sharma%40upi");
 

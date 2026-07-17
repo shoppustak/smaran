@@ -67,7 +67,31 @@ test.describe("Referral Loop & Cohort Metrics E2E", () => {
       (m: any) => m.to === purohitPhone && m.text.includes("पुरोहित आमंत्रण कार्ड")
     );
     expect(referralMsg).toBeDefined();
-    expect(referralMsg.text).toContain(`invite:${purohitId}`);
+
+    // The card must carry a SHORT link, not a 74-char wa.me+UUID string.
+    const shortUrl = (referralMsg.text.match(/https?:\/\/\S+\/i\/[A-Za-z0-9_-]+/) || [])[0];
+    expect(shortUrl, "referral card should contain a short /i/<code> link").toBeDefined();
+    expect(referralMsg.text).not.toContain(purohitId); // the raw UUID must not be shown
+
+    const code = shortUrl.split("/i/")[1];
+    expect(code.length).toBeLessThanOrEqual(12);
+
+    // It must resolve back to the real invite payload via a 302.
+    const redirect = await request.get(`/i/${code}`, { maxRedirects: 0 });
+    expect(redirect.status()).toBe(302);
+    const location = redirect.headers()["location"];
+    expect(location).toContain("wa.me");
+    expect(decodeURIComponent(location)).toContain(`invite:${purohitId}`);
+
+    // Asking twice must reuse the same code — a forwarded link has to keep working.
+    await sendWebhookText(request, purohitPhone, "referral");
+    const outbound2 = await (await request.get("/api/whatsapp/outbound")).json();
+    const again = outbound2.filter((m: any) => m.to === purohitPhone && m.text.includes("/i/"));
+    for (const m of again) expect(m.text).toContain(code);
+
+    // Unknown code 404s rather than redirecting somewhere surprising.
+    const missing = await request.get("/i/zzzzzzzz", { maxRedirects: 0 });
+    expect(missing.status()).toBe(404);
 
     // 3. Onboard referred purohit A using invite link
     const referredPhoneA = "1555" + Math.floor(1000000 + Math.random() * 9000000).toString().slice(-7);
@@ -140,6 +164,7 @@ test.describe("Referral Loop & Cohort Metrics E2E", () => {
     await client.query(
       "DELETE FROM purohits WHERE referred_by_purohit_id IN (SELECT id FROM purohits WHERE name = 'Referrer Purohit')",
     );
+    await client.query("DELETE FROM short_links WHERE purohit_id IN (SELECT id FROM purohits WHERE name = 'Referrer Purohit')");
     await client.query("DELETE FROM purohits WHERE name IN ('Referrer Purohit', 'Referred Name A', 'Referred Name B')");
   });
 });

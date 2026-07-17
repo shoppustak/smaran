@@ -8,6 +8,7 @@ import { logger } from "./logger";
 import { retryFetch } from "./retry";
 import { buildUpcomingPreRitualCard, toHindi, getTithiHindiName, eventTypeMap } from "./confirm-card";
 import { windowFromTime } from "./muhurat";
+import { BELL, POINT, RULE } from "./copy-tokens";
 
 export interface ResolvedBrainEvent {
   event: Event;
@@ -406,7 +407,11 @@ export async function runLapseDetectionScan(): Promise<void> {
           const familyName = yajman.familyName;
           const purohitGreeting = purohit.name.endsWith("जी") ? purohit.name : `${purohit.name} जी`;
 
-          const bodyText = `${purohitGreeting}, यजमान ${familyName} के परिवार का ${eventLabel} (${hindiMaas} ${hindiPaksha} ${hindiTithi}) इस वर्ष अभी बुक नहीं हुआ है। क्या आप उन्हें संपर्क करना चाहते हैं?`;
+          const bodyText =
+            `${BELL} *स्मरण*\n${RULE}\n` +
+            `${purohitGreeting}, यजमान *${familyName}* के परिवार का ${eventLabel}\n` +
+            `_(${hindiMaas} ${hindiPaksha} ${hindiTithi})_ इस वर्ष अभी बुक नहीं हुआ है।\n\n` +
+            `${POINT} क्या आप उन्हें संपर्क करना चाहते हैं?`;
 
           const payload = {
             type: "interactive" as const,

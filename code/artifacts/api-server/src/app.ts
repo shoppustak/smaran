@@ -4,6 +4,7 @@ import pinoHttp from "pino-http";
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
 import router from "./routes";
+import shortLinkRouter from "./routes/short-link";
 import { logger } from "./lib/logger";
 import { captureException } from "./lib/sentry";
 
@@ -77,6 +78,9 @@ const webhookLimiter = rateLimit({
   legacyHeaders: false,
   skip: () => !isProduction,
 });
+
+// Mounted at the root on purpose: short links must stay short (see routes/short-link.ts)
+app.use(apiLimiter, shortLinkRouter);
 
 app.use("/api/whatsapp/webhook", webhookLimiter);
 app.use("/api", apiLimiter, router);

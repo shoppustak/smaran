@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import crypto from "crypto";
 import { SendWhatsappMessageResponse, ListWhatsappMessagesResponseItem, ListWhatsappOutboundMessagesResponseItem } from "@workspace/api-zod";
 import { handleOnboardingMessage } from "../lib/onboarding";
+import { WARN, DONE, AGREED, RULE } from "../lib/copy-tokens";
 import { sendWhatsappMessage, getOutboundMessages, WhatsappSendError } from "../lib/whatsapp-client";
 import { eq, and } from "drizzle-orm";
 import { captureException } from "../lib/sentry";
@@ -348,11 +349,13 @@ router.post("/whatsapp/webhook", async (req, res) => {
                   return `${dd}-${mm}-${yyyy} (${dayName})`;
                 };
 
+                // Window names carry no emoji: WhatsApp italics mark them as
+                // sub-headers, which reads as a ledger rather than a sticker wall.
                 const getWindowDisplayName = (window: string) => {
-                  if (window === "morning") return "🌅 सुबह";
-                  if (window === "afternoon") return "☀️ दोपहर";
-                  if (window === "evening") return "🌇 शाम";
-                  return "🌙 रात";
+                  if (window === "morning") return "सुबह";
+                  if (window === "afternoon") return "दोपहर";
+                  if (window === "evening") return "शाम";
+                  return "रात";
                 };
 
                 // Groups will map: dateKey -> window -> Array of events
@@ -379,7 +382,7 @@ router.post("/whatsapp/webhook", async (req, res) => {
                   });
                 }
 
-                responseText = "📅 आपका साप्ताहिक कार्यक्रम:\n";
+                responseText = `*आपका साप्ताहिक कार्यक्रम*\n${RULE}\n`;
                 if (Object.keys(groups).length === 0) {
                   responseText += "\nइस हफ्ते कोई अनुष्ठान निर्धारित नहीं है।";
                 } else {
@@ -389,9 +392,9 @@ router.post("/whatsapp/webhook", async (req, res) => {
                     for (const w of windowOrder) {
                       const events = windows[w];
                       if (events && events.length > 0) {
-                        responseText += `  ${getWindowDisplayName(w)}:\n`;
+                        responseText += `  _${getWindowDisplayName(w)}_\n`;
                         for (const e of events) {
-                          responseText += `    • ${e.time} - ${e.label} (यजमान: ${e.familyName})\n`;
+                          responseText += `  • ${e.time} — ${e.label} (${e.familyName})\n`;
                         }
                       }
                     }
@@ -416,8 +419,11 @@ router.post("/whatsapp/webhook", async (req, res) => {
 
             if (normalizedText === "referral" || normalizedText === "आमंत्रण") {
               const { buildReferralCard } = await import("../lib/confirm-card");
+              const { getOrCreateInviteLink } = await import("../lib/short-link");
               try {
-                await sendWhatsappMessage(msg.from, buildReferralCard(purohit.id, purohit.name));
+                const botNumber = process.env.WHATSAPP_BOT_NUMBER || "12345";
+                const inviteUrl = await getOrCreateInviteLink(purohit.id, botNumber);
+                await sendWhatsappMessage(msg.from, buildReferralCard(inviteUrl, purohit.name));
               } catch (sendErr) {
                 req.log.error({ sendErr, purohitId: purohit.id }, "Failed to send referral card");
               }
@@ -679,7 +685,7 @@ router.post("/whatsapp/webhook", async (req, res) => {
               await sendWhatsappMessage(msg.from, {
                 type: "text",
                 text: {
-                  body: "आपकी सदस्यता सक्रिय कर दी गई है। धन्यवाद!",
+                  body: `${DONE} आपकी सदस्यता सक्रिय कर दी गई है। धन्यवाद!`,
                 },
               });
             } catch (err) {
@@ -733,7 +739,7 @@ router.post("/whatsapp/webhook", async (req, res) => {
                 await claimLedgerEntry(ledgerId, purohit.id);
                 await sendWhatsappMessage(msg.from, {
                   type: "text",
-                  text: { body: "दक्षिणा प्राप्त हुई, बही खाता अपडेट कर दिया गया है।" },
+                  text: { body: `${DONE} दक्षिणा प्राप्त हुई, बही खाता अपडेट कर दिया गया है।` },
                 });
               } else {
                 const [yajman] = await db
@@ -760,7 +766,7 @@ router.post("/whatsapp/webhook", async (req, res) => {
                 await confirmLedgerEntry(ledgerId, yajman.id);
                 await sendWhatsappMessage(msg.from, {
                   type: "text",
-                  text: { body: "पुष्टि के लिए धन्यवाद।" },
+                  text: { body: `${AGREED} पुष्टि के लिए धन्यवाद।` },
                 });
 
                 if (yajman.familySubStatus === "none" || !yajman.familySubStatus) {
@@ -824,7 +830,9 @@ router.post("/whatsapp/webhook", async (req, res) => {
                   interactive: {
                     type: "button" as const,
                     body: {
-                      text: "⚠️ चेतावनी: इस समय पर पहले से एक अनुष्ठान बुक है। क्या आप फिर भी इसे सहेजना चाहते हैं?",
+                      // ⚠️ is the one intentional per-line emoji: it carries signal,
+                      // not decoration. See lib/copy-tokens.ts.
+                      text: `${WARN} *चेतावनी*\n${RULE}\nइस समय पर पहले से एक अनुष्ठान बुक है। क्या आप फिर भी इसे सहेजना चाहते हैं?`,
                     },
                     action: {
                       buttons: [
@@ -887,7 +895,7 @@ router.post("/whatsapp/webhook", async (req, res) => {
               if (res.status === "written") {
                 await sendWhatsappMessage(msg.from, {
                   type: "text",
-                  text: { body: "अनुष्ठान बुक कर लिया गया है (ओवरराइड)।" },
+                  text: { body: `${DONE} अनुष्ठान बुक कर लिया गया है (ओवरराइड)।` },
                 });
               }
             } catch (err) {
@@ -988,7 +996,7 @@ router.post("/whatsapp/webhook", async (req, res) => {
                 await sendWhatsappMessage(msg.from, {
                   type: "text",
                   text: {
-                    body: "अनुष्ठान बुक कर लिया गया है। कार्यक्रम में जोड़ दिया गया है।",
+                    body: `${DONE} अनुष्ठान बुक कर लिया गया है। कार्यक्रम में जोड़ दिया गया है।`,
                   },
                 });
                 } catch (err) {

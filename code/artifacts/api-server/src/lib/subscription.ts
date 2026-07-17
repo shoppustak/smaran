@@ -1,4 +1,5 @@
 import { eq, and, lte } from "drizzle-orm";
+import { refCode } from "./short-code";
 
 /**
  * Builds a dynamic UPI Autopay deep link with the required subscription parameters.
@@ -13,7 +14,13 @@ export function buildAutopayDeepLink(
   merchantVpa: string,
   payeeName: string
 ): string {
-  return `upi://mandate?pa=${encodeURIComponent(merchantVpa)}&pn=${encodeURIComponent(payeeName)}&am=29.00&cu=INR&mc=8999&tr=${yajmanId}&recur=MONTHLY`;
+  // Kept short on purpose: the purohit and family read this in a chat bubble, and
+  // a link that wraps over three lines reads as spam. Dropped `mc` (optional NPCI
+  // merchant-category code) and shortened `tr` from a 36-char UUID to an 8-char
+  // reference. `tr` is display/reference only — activation is an ownership-checked
+  // button tap (subscribe-confirm:{yajmanId}), never a parse of this link.
+  // `cu=INR` stays: some PSPs reject a mandate without an explicit currency.
+  return `upi://mandate?pa=${encodeURIComponent(merchantVpa)}&pn=${encodeURIComponent(payeeName)}&am=21.00&cu=INR&recur=MONTHLY&tr=${refCode(yajmanId)}`;
 }
 
 export async function activateSubscriptionForYajman(
@@ -85,7 +92,7 @@ export async function runSubscriptionStateCheck(): Promise<void> {
         .where(eq(yajmansTable.id, row.yajman.id));
 
       if (row.yajman.whatsappNumber) {
-        const inviteLink = `upi://mandate?pa=${encodeURIComponent(row.purohit.upiId)}&pn=${encodeURIComponent(row.purohit.name)}&am=29.00&cu=INR&mc=8999&tr=${row.yajman.id}&recur=MONTHLY`;
+        const inviteLink = buildAutopayDeepLink(row.yajman.id, row.purohit.upiId, row.purohit.name);
 
         const templateName = "smaran_renewal_nudge";
         const components = [
