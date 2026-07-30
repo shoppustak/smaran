@@ -21,3 +21,7 @@ export const ledgerTable = pgTable("ledger", {
 export const insertLedgerSchema = createInsertSchema(ledgerTable).omit({ id: true });
 export type InsertLedger = z.infer<typeof insertLedgerSchema>;
 export type Ledger = typeof ledgerTable.$inferSelect;
+
+
+
+ledgerTable.enableRLS();

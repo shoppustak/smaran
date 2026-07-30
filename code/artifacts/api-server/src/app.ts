@@ -46,7 +46,10 @@ app.use(
       if (allowed) {
         callback(null, true);
       } else {
-        callback(new Error("Not allowed by CORS"));
+        // Passing false instead of an Error prevents Express from crashing this request
+        // into the 500 error handler (which floods Sentry). The cors middleware will 
+        // simply omit the CORS headers, correctly failing the browser's CORS check.
+        callback(null, false as any);
       }
     },
     credentials: true,

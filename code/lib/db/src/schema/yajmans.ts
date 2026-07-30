@@ -20,3 +20,7 @@ export const yajmansTable = pgTable("yajmans", {
 export const insertYajmanSchema = createInsertSchema(yajmansTable).omit({ id: true });
 export type InsertYajman = z.infer<typeof insertYajmanSchema>;
 export type Yajman = typeof yajmansTable.$inferSelect;
+
+
+
+yajmansTable.enableRLS();

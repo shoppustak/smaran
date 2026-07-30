@@ -21,3 +21,7 @@ export const ingestJobsTable = pgTable("ingest_jobs", {
 export const insertIngestJobSchema = createInsertSchema(ingestJobsTable).omit({ id: true });
 export type InsertIngestJob = z.infer<typeof insertIngestJobSchema>;
 export type IngestJob = typeof ingestJobsTable.$inferSelect;
+
+
+
+ingestJobsTable.enableRLS();

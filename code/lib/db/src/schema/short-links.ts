@@ -28,3 +28,7 @@ export const shortLinksTable = pgTable("short_links", {
 });
 
 export type ShortLink = typeof shortLinksTable.$inferSelect;
+
+
+
+shortLinksTable.enableRLS();

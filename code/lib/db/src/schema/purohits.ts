@@ -7,12 +7,13 @@ export const purohitsTable = pgTable("purohits", {
   id: uuid("id").primaryKey().defaultRandom(),
   phoneNumber: text("phone_number").notNull().unique(),
   name: text("name").notNull(),
-  city: text("city").notNull(),
-  latitude: doublePrecision("latitude").notNull(),
-  longitude: doublePrecision("longitude").notNull(),
-  localityKey: text("locality_key").notNull(),
-  upiId: text("upi_id").notNull(),
+  city: text("city"),
+  latitude: doublePrecision("latitude"),
+  longitude: doublePrecision("longitude"),
+  localityKey: text("locality_key"),
+  upiId: text("upi_id"),
   calendarSystem: text("calendar_system").notNull().default("purnimanta"),
+  hintsShown: text("hints_shown").array(),
   plan: text("plan").notNull().default("trial"),
   renewsAt: timestamp("renews_at", { withTimezone: true }),
   trialEndsAt: timestamp("trial_ends_at", { withTimezone: true }),
@@ -23,3 +24,6 @@ export const purohitsTable = pgTable("purohits", {
 export const insertPurohitSchema = createInsertSchema(purohitsTable).omit({ id: true });
 export type InsertPurohit = z.infer<typeof insertPurohitSchema>;
 export type Purohit = typeof purohitsTable.$inferSelect;
+
+
+purohitsTable.enableRLS();

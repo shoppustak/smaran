@@ -20,3 +20,7 @@ export const lapseRecoveriesTable = pgTable("lapse_recoveries", {
 export const insertLapseRecoverySchema = createInsertSchema(lapseRecoveriesTable).omit({ id: true });
 export type InsertLapseRecovery = z.infer<typeof insertLapseRecoverySchema>;
 export type LapseRecovery = typeof lapseRecoveriesTable.$inferSelect;
+
+
+
+lapseRecoveriesTable.enableRLS();

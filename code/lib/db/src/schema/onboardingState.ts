@@ -20,3 +20,7 @@ export const onboardingStateTable = pgTable("onboarding_state", {
 export const insertOnboardingStateSchema = createInsertSchema(onboardingStateTable);
 export type InsertOnboardingState = z.infer<typeof insertOnboardingStateSchema>;
 export type OnboardingState = typeof onboardingStateTable.$inferSelect;
+
+
+
+onboardingStateTable.enableRLS();
