@@ -3,7 +3,7 @@ import { matchField, MAAS_MAX_EDITS, PAKSHA_MAX_EDITS, TITHI_MAX_EDITS } from ".
 import { maasVocab } from "./vocab/maas";
 import { pakshaVocab } from "./vocab/paksha";
 import { tithiVocab } from "./vocab/tithi";
-import { sendWhatsappMessage, sendWhatsappTemplate } from "./whatsapp-client";
+import { enqueueOutboundMessage } from "./outbound-queue";
 import { logger } from "./logger";
 import { retryFetch } from "./retry";
 import { buildUpcomingPreRitualCard, toHindi, getTithiHindiName, eventTypeMap } from "./confirm-card";
@@ -55,13 +55,16 @@ async function fetchPanchangForDate(dateStr: string) {
   const VEDIKA_BASE_URL = VEDIKA_API_KEY
     ? (process.env.VEDIKA_API_BASE_URL ?? "https://api.vedika.io")
     : "https://api.vedika.io/sandbox";
+    
+  // Support v2 endpoint if key is present (assuming v2 structure)
+  const endpoint = VEDIKA_API_KEY ? `${VEDIKA_BASE_URL}/v2/astrology/panchang` : `${VEDIKA_BASE_URL}/astrology/panchang`;
 
   const DEFAULT_LATITUDE = 25.3176;
   const DEFAULT_LONGITUDE = 82.9739;
   const DEFAULT_TIMEZONE = "+05:30";
 
   const datetime = `${dateStr}T06:00:00${DEFAULT_TIMEZONE}`;
-  const response = await retryFetch(`${VEDIKA_BASE_URL}/astrology/panchang`, {
+  const response = await retryFetch(endpoint, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -278,6 +281,9 @@ export async function dispatchPreRitualAlerts(alerts: ResolvedBrainEvent[]): Pro
           
           if (PRE_RITUAL_ALERT_DAYS.includes(daysRemaining)) {
             await sendPreRitualAlerts(alert, daysRemaining);
+            if (alert.yajman.familySubStatus === 'active') {
+              await sendFamilyPreRitualAlert(alert, daysRemaining);
+            }
           }
         } catch (err) {
           logger.error(err, `Failed to send alert for event ${alert.event.id}`);
@@ -336,11 +342,46 @@ export async function sendPreRitualAlerts(event: ResolvedBrainEvent, daysRemaini
   ];
 
   try {
-    await sendWhatsappTemplate(event.purohit.phoneNumber, templateName, components);
+    await enqueueOutboundMessage(event.purohit.phoneNumber, "template", {
+      templateName,
+      components
+    }, `pre-ritual-${event.event.id}-${daysRemaining}`);
   } catch (err) {
-    logger.warn({ err, eventId: event.event.id }, "Template send failed, falling back to free-form interactive");
-    const card = buildUpcomingPreRitualCard(event, daysRemaining);
-    await sendWhatsappMessage(event.purohit.phoneNumber, card);
+    logger.error({ err, eventId: event.event.id }, "Template enqueue failed");
+  }
+}
+
+export async function sendFamilyPreRitualAlert(event: ResolvedBrainEvent, daysRemaining: number): Promise<void> {
+  const isSolemn = event.event.eventType === "shraddh";
+  const anchor = isSolemn ? "🙏" : "🌸";
+  const greeting = isSolemn ? "प्रणाम" : "जय श्री राम";
+  
+  const purohitName = event.purohit.name.endsWith("जी") ? event.purohit.name : `${event.purohit.name} जी`;
+  const maas = toHindi("maas", event.hinduDate.maas);
+  const paksha = toHindi("paksha", event.hinduDate.paksha);
+  const tithi = getTithiHindiName(event.hinduDate.tithi, event.hinduDate.paksha);
+  const eventName = eventTypeMap[event.event.eventType] || event.event.eventType;
+
+  // Format date like '8 October 2027'
+  const dateObj = new Date(`${event.gregorianDate}T00:00:00`);
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const formattedDate = `${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+
+  const labelLine = isSolemn 
+    ? `श्राद्ध/पुण्यतिथि ${event.event.label ? `(${event.event.label})` : ""}`
+    : `${eventName} ${event.event.label ? `(${event.event.label})` : ""}`;
+
+  const body = `${anchor} ${greeting}।\n${RULE}\n*तिथि:* ${formattedDate}\n*पंचांग:* ${maas} ${paksha} पक्ष, ${tithi}\n\n*अनुष्ठान:* ${labelLine}\n*पुरोहित:* ${purohitName}\n${RULE}\n\n_स्मरण रहे_ — ${daysRemaining} दिन शेष।`;
+
+  if (event.yajman.whatsappNumber) {
+    try {
+      await enqueueOutboundMessage(event.yajman.whatsappNumber, "text", {
+        type: "text",
+        text: { body }
+      }, `family-pre-ritual-${event.event.id}-${daysRemaining}`);
+    } catch (err) {
+      logger.error({ err, eventId: event.event.id }, "Failed to enqueue family pre-ritual alert");
+    }
   }
 }
 
@@ -349,14 +390,16 @@ export async function runLapseDetectionScan(): Promise<void> {
     logger.error("runLapseDetectionScan failed: DATABASE_URL is not set");
     return;
   }
-  const { db, eventsTable, yajmansTable, purohitsTable, ledgerTable, lapseRecoveriesTable } = await import("@workspace/db");
-  const { eq, and, lt, gte, lte } = await import("drizzle-orm");
+  const { db, eventsTable, yajmansTable, purohitsTable, ledgerTable, lapseRecoveriesTable, occurrencesTable } = await import("@workspace/db");
+  const { eq, and, lt, gte, lte, isNull } = await import("drizzle-orm");
 
   const currentYear = new Date().getFullYear();
+  const now = new Date();
   const startOfYear = new Date(currentYear, 0, 1);
   const endOfYear = new Date(currentYear, 11, 31, 23, 59, 59, 999);
 
-  // 1. Query all active events records where last_performed_year is less than current year
+  // 1. Query all active events where resolvedDate has passed this year,
+  //    and no occurrence exists for the current cycleYear.
   const events = await db
     .select({
       event: eventsTable,
@@ -366,7 +409,20 @@ export async function runLapseDetectionScan(): Promise<void> {
     .from(eventsTable)
     .innerJoin(yajmansTable, eq(eventsTable.yajmanId, yajmansTable.id))
     .innerJoin(purohitsTable, eq(eventsTable.purohitId, purohitsTable.id))
-    .where(lt(eventsTable.lastPerformedYear, currentYear));
+    .leftJoin(
+      occurrencesTable,
+      and(
+        eq(occurrencesTable.eventId, eventsTable.id),
+        eq(occurrencesTable.cycleYear, currentYear)
+      )
+    )
+    .where(
+      and(
+        lt(eventsTable.resolvedDate, now),
+        eq(eventsTable.resolvedCycleYear, currentYear),
+        isNull(occurrencesTable.id)
+      )
+    );
 
   const itemsToNudge: Array<{
     event: typeof eventsTable.$inferSelect;
@@ -457,10 +513,12 @@ export async function runLapseDetectionScan(): Promise<void> {
           ];
 
           try {
-            await sendWhatsappTemplate(purohit.phoneNumber, templateName, components);
+            await enqueueOutboundMessage(purohit.phoneNumber, "template", {
+              templateName,
+              components
+            }, `lapse-nudge-${event.id}-${currentYear}`);
           } catch (err) {
-            logger.warn({ err, eventId: event.id }, "Template send failed for lapse nudge, falling back to free-form interactive");
-            await sendWhatsappMessage(purohit.phoneNumber, payload);
+            logger.error({ err, eventId: event.id }, "Template enqueue failed for lapse nudge");
           }
 
           // Durably record the nudge in lapse_recoveries table

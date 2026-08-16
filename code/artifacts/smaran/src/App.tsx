@@ -13,24 +13,14 @@ import Settings from '@/pages/settings';
 import YajmanDetail from '@/pages/yajman-detail';
 import Onboarding from '@/pages/onboarding';
 import { Route, Switch, Router as WouterRouter } from 'wouter';
-
+import UnderConstruction from '@/pages/under-construction';
 
 const queryClient = new QueryClient();
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Dashboard} />
-      <Route path="/roster" component={Roster} />
-      <Route path="/roster/:id" component={YajmanDetail} />
-      <Route path="/recover" component={Recover} />
-      <Route path="/protect" component={Protect} />
-      <Route path="/collect" component={Collect} />
-      <Route path="/add" component={AddEntry} />
-      <Route path="/referral" component={Referral} />
-      <Route path="/settings" component={Settings} />
-      <Route path="/onboarding" component={Onboarding} />
-      <Route component={NotFound} />
+      <Route component={UnderConstruction} />
     </Switch>
   );
 }

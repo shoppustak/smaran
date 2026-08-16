@@ -37,7 +37,7 @@ VALUES ('d0000000-0000-4000-8000-000000000001', :'phone', 'पं. रमेश 
 
 -- ---------------------------------------------------------------- yajmans
 -- Sharma carries the family-side number: it receives the post-ritual confirm card
--- and (because family_sub_status='none') the ₹29 subscription offer afterwards.
+-- and (because family_sub_status='none') the ₹21 subscription offer afterwards.
 INSERT INTO yajmans (id, purohit_id, family_name, gotra, whatsapp_number, locality_key, consent_status, family_sub_status)
 VALUES
   ('d0000000-0000-4000-8000-000000000011', 'd0000000-0000-4000-8000-000000000001', 'शर्मा',  'कश्यप',    NULLIF(:'yajman_phone', ''), 'smaran-demo', 'confirmed', 'none'),

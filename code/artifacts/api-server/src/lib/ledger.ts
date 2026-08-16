@@ -111,7 +111,7 @@ export async function confirmLedgerEntry(
     throw new LedgerDbUnavailableError();
   }
 
-  const { db, ledgerTable } = await import("@workspace/db");
+  const { db, ledgerTable, occurrencesTable, eventsTable } = await import("@workspace/db");
 
   const [ledger] = await db
     .select()
@@ -143,6 +143,41 @@ export async function confirmLedgerEntry(
       familyConfirmedAt: new Date(),
     })
     .where(eq(ledgerTable.id, ledgerId));
+
+  if (ledger.eventId) {
+    const cycleYear = new Date().getFullYear(); // Occurrences created live via ledger correspond to current cycle year
+    
+    // Upsert occurrence for both parties
+    await db
+      .insert(occurrencesTable)
+      .values({
+        eventId: ledger.eventId,
+        yajmanId: ledger.yajmanId,
+        purohitId: ledger.purohitId,
+        cycleYear,
+        source: "ledger",
+        ledgerId: ledger.id,
+        attestedBy: "both",
+      })
+      .onConflictDoUpdate({
+        target: [occurrencesTable.eventId, occurrencesTable.cycleYear],
+        set: { attestedBy: "both", ledgerId: ledger.id },
+      });
+
+    // Update denormalized cache on events
+    const [event] = await db
+      .select({ lastPerformedYear: eventsTable.lastPerformedYear })
+      .from(eventsTable)
+      .where(eq(eventsTable.id, ledger.eventId))
+      .limit(1);
+
+    if (event && (event.lastPerformedYear === null || cycleYear > event.lastPerformedYear)) {
+      await db
+        .update(eventsTable)
+        .set({ lastPerformedYear: cycleYear })
+        .where(eq(eventsTable.id, ledger.eventId));
+    }
+  }
 }
 
 export async function findAwaitingAmountEntry(purohitId: string): Promise<Ledger | null> {
@@ -215,4 +250,58 @@ export async function recordDakshinaAmount(
   }
 
   return updated;
+}
+
+export async function expireStaleEntries(ttlDays: number = 14): Promise<number> {
+  if (!process.env.DATABASE_URL) {
+    throw new LedgerDbUnavailableError();
+  }
+
+  const { db, ledgerTable, yajmansTable, purohitsTable } = await import("@workspace/db");
+  const { eq, and, lt, isNull, inArray } = await import("drizzle-orm");
+  const { logger } = await import("./logger");
+  const { sendWhatsappMessage } = await import("./whatsapp-client");
+
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - ttlDays);
+
+  const staleEntries = await db
+    .select({
+      ledger: ledgerTable,
+      yajman: yajmansTable,
+      purohit: purohitsTable,
+    })
+    .from(ledgerTable)
+    .innerJoin(yajmansTable, eq(ledgerTable.yajmanId, yajmansTable.id))
+    .innerJoin(purohitsTable, eq(ledgerTable.purohitId, purohitsTable.id))
+    .where(
+      and(
+        inArray(ledgerTable.paymentStatus, ["pending", "awaiting_corroboration"]),
+        isNull(ledgerTable.amountCollected),
+        lt(ledgerTable.createdAt, cutoff)
+      )
+    );
+
+  if (staleEntries.length === 0) return 0;
+
+  for (const row of staleEntries) {
+    try {
+      await db
+        .update(ledgerTable)
+        .set({ paymentStatus: "expired_uncorroborated" as any }) // Use type assertion if enum hasn't been updated
+        .where(eq(ledgerTable.id, row.ledger.id));
+
+      if (row.purohit.phoneNumber) {
+        const msg = `⚠️ आपका यजमान *${row.yajman.familyName}* के लिए दक्षिणा दावा (${row.ledger.createdAt.toLocaleDateString()}) अपुष्ट रहा और समाप्त हो गया है। आवश्यकता होने पर कृपया पुनः आरंभ करें।`;
+        await sendWhatsappMessage(row.purohit.phoneNumber, {
+          type: "text",
+          text: { body: msg }
+        });
+      }
+    } catch (err) {
+      logger.error({ err, ledgerId: row.ledger.id }, "Failed to expire stale ledger entry");
+    }
+  }
+
+  return staleEntries.length;
 }

@@ -1,5 +1,7 @@
 import { Router, type IRouter } from "express";
 import { resolveUpcomingEventsForWeek, persistResolvedSchedule, dispatchPreRitualAlerts, runLapseDetectionScan } from "../lib/brain";
+import { runFamilyContentDispatch } from "../cron/family-content-dispatch";
+import { flushOutboundQueue } from "../lib/outbound-queue";
 import { logger } from "../lib/logger";
 import { captureException } from "../lib/sentry";
 
@@ -81,10 +83,63 @@ router.post("/cron/subscription-sweep", async (req, res) => {
       .returning();
     logger.info({ deletedCount: deleted.length }, "Cleaned up old processed webhook ids in subscription-sweep");
 
-    res.json({ status: "success", cleanedWebhooks: deleted.length });
+    // Clean up stale uncorroborated ledger entries
+    const { expireStaleEntries } = await import("../lib/ledger");
+    const ttlDays = parseInt(process.env.LEDGER_TTL_DAYS || "14", 10);
+    const expiredLedgers = await expireStaleEntries(ttlDays);
+    logger.info({ expiredCount: expiredLedgers }, "Expired stale uncorroborated ledger entries");
+
+    res.json({ status: "success", cleanedWebhooks: deleted.length, expiredLedgers });
   } catch (err) {
     logger.error({ err }, "Subscription sweep cron execution failed");
     captureException(err, { cron: "subscription-sweep" });
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post("/cron/family-content-dispatch", async (req, res) => {
+  if (!process.env.DATABASE_URL) {
+    res.status(503).json({ error: "Database not configured" });
+    return;
+  }
+
+  const cronSecret = req.headers["x-cron-secret"];
+  if (!process.env.CRON_SECRET || cronSecret !== process.env.CRON_SECRET) {
+    logger.warn({ headerPresent: !!cronSecret }, "Unauthorized access attempt to family-content-dispatch cron");
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  try {
+    logger.info("Starting family content dispatch cron");
+    await runFamilyContentDispatch();
+    res.json({ status: "success" });
+  } catch (err) {
+    logger.error({ err }, "Family content dispatch cron execution failed");
+    captureException(err, { cron: "family-content-dispatch" });
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post("/cron/outbound-queue-flush", async (req, res) => {
+  if (!process.env.DATABASE_URL) {
+    res.status(503).json({ error: "Database not configured" });
+    return;
+  }
+
+  const cronSecret = req.headers["x-cron-secret"];
+  if (!process.env.CRON_SECRET || cronSecret !== process.env.CRON_SECRET) {
+    logger.warn({ headerPresent: !!cronSecret }, "Unauthorized access attempt to outbound-queue-flush cron");
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  try {
+    await flushOutboundQueue();
+    res.json({ status: "success" });
+  } catch (err) {
+    logger.error({ err }, "Outbound queue flush cron execution failed");
+    captureException(err, { cron: "outbound-queue-flush" });
     res.status(500).json({ error: "Internal server error" });
   }
 });

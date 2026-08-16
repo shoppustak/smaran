@@ -51,6 +51,7 @@ export async function activateSubscriptionForYajman(
     .set({
       familySubStatus: "active",
       familySubRenewsAt: renewsAt,
+      consentStatus: "granted",
     })
     .where(eq(yajmansTable.id, yajmanId))
     .returning();
@@ -64,7 +65,7 @@ export async function activateSubscriptionForYajman(
 export async function runSubscriptionStateCheck(): Promise<void> {
   const { db, yajmansTable, purohitsTable } = await import("@workspace/db");
   const { eq, and, lte } = await import("drizzle-orm");
-  const { sendWhatsappTemplate } = await import("./whatsapp-client");
+  const { enqueueOutboundMessage } = await import("./outbound-queue");
 
   const now = new Date();
 
@@ -92,7 +93,7 @@ export async function runSubscriptionStateCheck(): Promise<void> {
         .where(eq(yajmansTable.id, row.yajman.id));
 
       if (row.yajman.whatsappNumber) {
-        const inviteLink = buildAutopayDeepLink(row.yajman.id, row.purohit.upiId, row.purohit.name);
+        const inviteLink = buildAutopayDeepLink(row.yajman.id, row.purohit.upiId || "", row.purohit.name);
 
         const templateName = "smaran_renewal_nudge";
         const components = [
@@ -105,7 +106,10 @@ export async function runSubscriptionStateCheck(): Promise<void> {
           },
         ];
 
-        await sendWhatsappTemplate(row.yajman.whatsappNumber, templateName, components);
+        await enqueueOutboundMessage(row.yajman.whatsappNumber, "template", {
+          templateName,
+          components
+        }, `renewal-nudge-${row.yajman.id}-${now.getFullYear()}-${now.getMonth()}`);
       }
     } catch (err) {
       console.warn(`Failed to process subscription lapse for yajman ${row.yajman.id}:`, err);

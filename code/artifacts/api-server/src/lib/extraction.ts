@@ -24,6 +24,7 @@ export const ExtractionResultSchema = z.object({
       paksha: z.enum(["Shukla", "Krishna"]).nullable(),
       tithi_name: z.string().nullable(),
       gregorian_hint: z.string().nullable(),
+      years_performed: z.array(z.number()).nullable(),
     })
   ),
   confidence_notes: z.string().nullable(),
@@ -49,7 +50,8 @@ You must output a single JSON object matching this schema:
     "maas": "string | null",
     "paksha": "Shukla | Krishna | null",
     "tithi_name": "string | null",
-    "gregorian_hint": "string | null"
+    "gregorian_hint": "string | null",
+    "years_performed": "array of numbers | null"
   }],
   "confidence_notes": "string | null"
 }
@@ -57,13 +59,15 @@ You must output a single JSON object matching this schema:
 Extraction Rules:
 1. NEVER guess a field that was not spoken or present. If you cannot find a value, return null for that field.
 2. Multiple events per note are normal. Extract all of them.
-3. Exactly ONE family per note/transcript. If two or more families are detected, extract the first family only and set "confidence_notes" to "multi-family".
-4. Here are the canonical lists of terms. If you extract these fields, match them to these canonical values if possible, or extract them as heard:
+3. Explicitly capture the beneficiary or subject of the event into the "label" field (e.g. "माता जी", "पिता जी", "रोहन").
+4. If a bahi khata image shows year marks or tally marks, extract them into "years_performed".
+5. Exactly ONE family per note/transcript. If two or more families are detected, extract the first family only and set "confidence_notes" to "multi-family".
+6. Here are the canonical lists of terms. If you extract these fields, match them to these canonical values if possible, or extract them as heard:
    - Canonical Maas (months): [ ${maasCanonical} ]
    - Canonical Tithis: [ ${tithiCanonical} ] (Note: Purnima implies paksha Shukla, Amavasya implies paksha Krishna. If either is spoken, set paksha to Shukla or Krishna respectively.)
    - Canonical Paksha: [ ${pakshaCanonical} ]
    - Canonical Gotras (partial seed list): [ ${gotraCanonical} ]
-5. Return ONLY a valid JSON object. Do not include any explanation or markdown formatting (except a standard json code block if required by the caller, but preferably just raw JSON).`;
+7. Return ONLY a valid JSON object. Do not include any explanation or markdown formatting (except a standard json code block if required by the caller, but preferably just raw JSON).`;
 }
 
 export async function extractFields(

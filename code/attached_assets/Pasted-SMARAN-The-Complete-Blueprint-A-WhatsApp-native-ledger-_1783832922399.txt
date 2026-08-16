@@ -42,9 +42,9 @@ Part 4 — Business Model & Revenue Geometry
 
 Purohit pricing — annual-first. ₹1,499/year (anchor), positioned immediately after a festival season the tool has just visibly carried him through. ₹999/year early-bird for the seed-ward cohort only. Monthly (₹149) exists as a fallback plan, never the default — a monthly fee invites churn in every lean month, and the purohit's income rhythm is seasonal.
 
-Family layer — load-bearing, not optional. Families receiving cards may subscribe to their own family ritual calendar — reminders of their tithis and festivals, always attributed to and routed through their purohit — at ₹29/month via UPI autopay. The geometry below does not close without this layer.
+Family layer — load-bearing, not optional. Families receiving cards may subscribe to their own family ritual calendar — reminders of their tithis and festivals, always attributed to and routed through their purohit — at ₹21/month via UPI autopay. The geometry below does not close without this layer.
 
-The back-solve (machine-verified). Unit: the purohit hub (~30 actively reached families each). Feasible solo seed: 70 activated purohits by end of month 4 in 2–3 temple-dense wards of one city. Compounding months m = 8 (M4→M12); one-time purohit-to-purohit invite multiplier k; revenue per activated hub r = (conversion × ARPU) + (30 × family attach × ₹29).
+The back-solve (machine-verified). Unit: the purohit hub (~30 actively reached families each). Feasible solo seed: 70 activated purohits by end of month 4 in 2–3 temple-dense wards of one city. Compounding months m = 8 (M4→M12); one-time purohit-to-purohit invite multiplier k; revenue per activated hub r = (conversion × ARPU) + (30 × family attach × ₹21).
 
 ScenariokConv.Family attachM12 MRRConservative1.025%3%~₹52KMiddle1.1530%5%~₹1.15LPre-registered1.330% @ ₹125/mo-eq5%~₹1.81L
 
@@ -53,7 +53,7 @@ Read this honestly: Smaran clears the ₹1.5–2L MRR month-12 bar only at the o
 Pre-registration record (binding):
 
 
-Seed: 70 activated purohits by end M4 · k = 1.3 · purohit conversion 30% at ₹1,499/yr · family attach 5% at ₹29/mo
+Seed: 70 activated purohits by end M4 · k = 1.3 · purohit conversion 30% at ₹1,499/yr · family attach 5% at ₹21/mo
 Voiding thresholds: observed k < 1.15 at the M4 gate voids the revenue case and reopens the kill question at month 4. Conversion < 22% or attach < 3% at the M8 gate does the same. Parameter revisions in writing only, with the back-solve re-run; a second revision escalates to a full registry review.
 Gates: M0–4 seed (density + observed k; revenue ₹0 by design) → M5–8 geometry (conversion + attach + week-8 retention >60%) → M9–12 replicate.
 
@@ -104,7 +104,7 @@ Each corroborated pair is a deposit into the relationship record — the asset.
 
 State 6 — Family calendar subscription
 
-On cards a family receives, a subtle offer: "Get your family's ritual calendar" — their own tithis and festival dates, reminded directly, always in their purohit's name. ₹29/month UPI autopay deep link. Managed states: active / lapsed / cancelled, renewal nudges as Utility messages. The family flow must never enable discovery, comparison, or contact with any other purohit.
+On cards a family receives, a subtle offer: "Get your family's ritual calendar" — their own tithis and festival dates, reminded directly, always in their purohit's name. ₹21/month UPI autopay deep link. Managed states: active / lapsed / cancelled, renewal nudges as Utility messages. The family flow must never enable discovery, comparison, or contact with any other purohit.
 
 State 7 — Referral (k-instrumentation)
 
@@ -172,7 +172,7 @@ Part 7 — Negative Constraints (Agent Doc C — strict)
 
 
 NO marketplace, ratings, search, matching, or discovery — ever. Trust is computed from corroborated interactions, never declared or rated. Families must never see, compare, or reach any other purohit. Every future "growth idea" will disguise itself as this; the answer is permanently no.
-NO consumer app or web UI. The family-side WhatsApp flow is in scope (cards, confirms, ₹29 calendar subscription); an app, portal, or catalog is not.
+NO consumer app or web UI. The family-side WhatsApp flow is in scope (cards, confirms, ₹21 calendar subscription); an app, portal, or catalog is not.
 NO payment gateways or PSP checkout. Raw dynamic UPI deep links to the purohit's merchant VPA only. Zero commission is the point.
 NO webhook-driven payment states. No webhook will ever arrive (see State 5). Corroboration buttons are the only path to corroborated. Never trust a single side's client-side assertion.
 NO samagri commerce. The samagri list is the value; kits, inventory, and fulfilment break leanness and are someone else's business.

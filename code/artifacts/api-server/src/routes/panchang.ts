@@ -23,8 +23,10 @@ router.get("/panchang", async (req, res) => {
   const longitude = req.query.longitude ? Number(req.query.longitude) : DEFAULT_LONGITUDE;
   const datetime = date ? `${date}T06:00:00${DEFAULT_TIMEZONE}` : `${new Date().toISOString().slice(0, 10)}T06:00:00${DEFAULT_TIMEZONE}`;
 
+  const endpoint = VEDIKA_API_KEY ? `${VEDIKA_BASE_URL}/v2/astrology/panchang` : `${VEDIKA_BASE_URL}/astrology/panchang`;
+
   try {
-    const upstream = await fetch(`${VEDIKA_BASE_URL}/astrology/panchang`, {
+    const upstream = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

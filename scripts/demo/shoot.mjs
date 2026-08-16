@@ -17,6 +17,8 @@ const P = "purohit";
 const Y = "yajman";
 
 const SCREENS = [
+  { slug: "00-purohit-menu",      lane: P, title: "Purohit Menu",        note: "Triggered by 'pranaam'. Replaces archaic numbered lists with native WhatsApp interactive lists." },
+  { slug: "00-yajman-menu",       lane: Y, title: "Yajman Menu",         note: "Triggered by 'pranaam' or unrecognized text. Yajmans don't need to memorize commands anymore." },
   { slug: "01-onboarding",        lane: P, title: "Onboarding",          note: "A brother-purohit's invite link prefills `invite:{id}` as the very first message.\n\nFive questions, no forms: name → city → area → UPI → calendar system. `referred_by_purohit_id` is captured here — before the account row exists." },
   { slug: "02-account-created",   lane: P, title: "Account created",     note: "Account written, draft state dropped, then a \"wow card\" pulled **live** from `/api/panchang`.\n\n⚠️ Verbatim sandbox output. Without `VEDIKA_API_KEY` the free tier serves fixed 1995 mock data, and `Tarikh:` prints Vedika's raw ISO timestamp — this is the purohit's first impression of the product." },
   { slug: "03-voice-confirm",     lane: P, title: "Voice → confirm",     note: "Voice note → ASR → LLM extraction → **confirm card**.\n\nNo typed forms, ever. Nothing reaches the DB until the purohit taps ✓ (ING-03)." },
@@ -31,7 +33,7 @@ const SCREENS = [
 
   { slug: "12-family-dakshina",   lane: Y, title: "Family confirms",     note: "The family's **first contact** — they never onboard; they exist because a purohit logged them.\n\nThey confirm independently → the ledger row reaches **corroborated** (🤝, a token spent on this moment alone). Neither side can assert payment by itself." },
   { slug: "13-family-offer",      lane: Y, title: "Family + ₹21",        note: "Only once the ledger corroborates does the ₹21/mo calendar offer follow — attributed to their own purohit, never the platform.\n\nA UPI autopay mandate on the purohit's own VPA. Gated on `familySubStatus === \"none\"`, so it is never re-offered." },
-  { slug: "14-family-subscribed", lane: Y, title: "Subscription active", note: "`familySubStatus: active`. The mandate is the family's own UPI autopay.\n\n**The lane ends here — that's a finding, not a layout gap.** Nothing reads `active` to *deliver* a family calendar; it is read once, to suppress a repeat offer. The ₹21 is collected; the thing it buys isn't built yet." },
+  { slug: "14-family-subscribed", lane: Y, title: "Subscription active", note: "`familySubStatus: active`. The mandate is the family's own UPI autopay.\n\n**The lane now delivers content.** A daily `family-content-dispatch` cron reads `active` and dispatches Vedika affirmation content to the family, idempotently tracked." },
 ];
 
 const browser = await chromium.launch();

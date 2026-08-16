@@ -15,7 +15,7 @@ export function buildAutopayDeepLink(
   const params = new URLSearchParams({
     pa: merchantVpa,
     pn: payeeName,
-    am: "29.00",
+    am: "21.00",
     cu: "INR",
     mc: "8999", // Merchant category code for subscriptions
     tr: yajmanId, // Transaction reference tracking yajman ID

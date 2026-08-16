@@ -8,7 +8,7 @@
 
 The Family Calendar Subscription introduces a recurring revenue stream directly linked to the purohit's yajman roster.
 
-- **Family Calendar Subscription Offer (FAM-01):** Interactive cards dispatched to yajman family contacts surface a subscription offer: `"अपने परिवार का पंचांग और अनुष्ठान कैलेंडर..."`. The card embeds a dynamic UPI Autopay deep link priced at ₹29/month.
+- **Family Calendar Subscription Offer (FAM-01):** Interactive cards dispatched to yajman family contacts surface a subscription offer: `"अपने परिवार का पंचांग और अनुष्ठान कैलेंडर..."`. The card embeds a dynamic UPI Autopay deep link priced at ₹21/month.
 - **Subscription Tracking (FAM-02):** The `yajmans` table columns `family_sub_status` (none, active, lapsed, cancelled) and `family_sub_renews_at` store subscription states. A background checker identifies expired active records and updates them to `lapsed`.
 - **Strict Purohit Lock-In Isolation (FAM-03):** The family-side workflow must NEVER enable discovery, comparison, or contact with any other purohit. A family contact can only query, confirm, or subscribe under their direct associated purohit's configuration.
 
@@ -18,7 +18,7 @@ The Family Calendar Subscription introduces a recurring revenue stream directly 
 ## Implementation Decisions
 
 ### Mandate URL Scheme
-- **D-01:** Autopay mandate URLs utilize the standard merchant recurring parameters (`recur=MONTHLY`, `am=29.00`) mapped to the associated purohit's merchant VPA, ensuring funds route directly without passing through the platform.
+- **D-01:** Autopay mandate URLs utilize the standard merchant recurring parameters (`recur=MONTHLY`, `am=21.00`) mapped to the associated purohit's merchant VPA, ensuring funds route directly without passing through the platform.
 
 ### Webhook Sub Callback
 - **D-02:** Subscription activations will be simulated or processed via webhook notifications that update `family_sub_status = "active"` and extend `family_sub_renews_at` by 30 days.

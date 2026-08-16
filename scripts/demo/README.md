@@ -65,7 +65,7 @@ will they actually arrive.
    purohit's own VPA** (money never touches the platform — worth saying out loud).
 6. **Purohit taps "Dakshina received"** → `claimed`. **Family taps "Confirm"** → `corroborated`.
    Neither side alone can mark it paid.
-7. **The family then gets the ₹29/month calendar offer** (fires automatically on ledger-confirm
+7. **The family then gets the ₹21/month calendar offer** (fires automatically on ledger-confirm
    because `family_sub_status='none'`). Tap **"मैंने सदस्यता ले ली"** → active.
 8. **`referral`** (or `आमंत्रण`) → referral card with the invite link.
 9. Optional, for a technical audience:

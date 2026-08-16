@@ -49,6 +49,20 @@
  *      ordinary verb (plain lowercase). Bold stays reserved for labels and the
  *      nouns a purohit scans for — never for the wordplay, which should whisper.
  *
+ * ── VOCABULARY ──────────────────────────────────────────────────────────────
+ * In real practice, purohits do not use the word "tarikh" (तारीख़) to mean
+ * date or time. They use terms rooted in the panchang context:
+ *   - "tithi" (तिथि)
+ *   - "shubh muhurt" (शुभ मुहूर्त)
+ *   - "shubh samay" (शुभ समय)
+ *   - "uchit tithi" (उचित तिथि)
+ * Never use "tarikh" in outbound copy.
+ *
+ * Similarly, do not use the casual word "kaam" (काम) to refer to a ritual or event.
+ * Use the more formal and respectful term "karya" (कार्य).
+ *   - "agle karya" instead of "agle kaam"
+ *   - "karya" instead of "kaam"
+ *
  * ── ROUND vs SQUARE ─────────────────────────────────────────────────────────
  * Emoji fall into two visual families, and mixing them inline is what makes
  * copy feel noisy:

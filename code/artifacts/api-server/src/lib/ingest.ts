@@ -250,8 +250,9 @@ async function finalizeFamilyExtraction(
 export async function runIngestPipeline(
   job: IngestJob,
   purohit: { id: string; calendarSystem: string; localityKey: string; phoneNumber: string },
-  mediaId: string,
-  audioDurationSeconds?: number
+  mediaId?: string,
+  audioDurationSeconds?: number,
+  textContent?: string
 ): Promise<void> {
   // a) Guard rail: audio duration check
   if (job.kind === "voice" && audioDurationSeconds !== undefined && audioDurationSeconds > 300) {
@@ -269,30 +270,37 @@ export async function runIngestPipeline(
     text: { body: "सुन लिया, एक क्षण…" },
   });
 
-  // c) Download media
-  let mediaBytes: Buffer;
-  try {
-    const download = await downloadWhatsappMedia(mediaId);
-    mediaBytes = download.bytes;
-  } catch (err: any) {
-    logger.error({ err, jobId: job.id }, "Media download failed in pipeline");
-    captureException(err, { jobId: job.id, step: "download" });
-    await transitionJob(job.id, "failed", { error: String(err) });
-    const apology = job.kind === "voice" ? VOICE_APOLOGY_MESSAGE : PHOTO_APOLOGY_MESSAGE;
-    await sendWhatsappMessage(purohit.phoneNumber, {
-      type: "text",
-      text: { body: apology },
-    });
-    return;
+
+
+  let mediaBytes: Buffer | undefined;
+  if (!textContent && mediaId) {
+    try {
+      const download = await downloadWhatsappMedia(mediaId);
+      mediaBytes = download.bytes;
+    } catch (err: any) {
+      logger.error({ err, jobId: job.id }, "Media download failed in pipeline");
+      captureException(err, { jobId: job.id, step: "download" });
+      await transitionJob(job.id, "failed", { error: String(err) });
+      const apology = job.kind === "voice" ? VOICE_APOLOGY_MESSAGE : PHOTO_APOLOGY_MESSAGE;
+      await sendWhatsappMessage(purohit.phoneNumber, {
+        type: "text",
+        text: { body: apology },
+      });
+      return;
+    }
   }
 
   if (job.kind === "voice") {
-    // VOICE path
+    // VOICE path or TEXT path
     let transcript = "";
     try {
-      const asr = asrModule.getAsrProvider();
-      const asrResult = await asr.transcribe(mediaBytes, { languageHint: "hi-IN" });
-      transcript = asrResult.transcript;
+      if (textContent) {
+        transcript = textContent;
+      } else if (mediaBytes) {
+        const asr = asrModule.getAsrProvider();
+        const asrResult = await asr.transcribe(mediaBytes, { languageHint: "hi-IN" });
+        transcript = asrResult.transcript;
+      }
       await transitionJob(job.id, "transcribed", { transcript });
     } catch (err: any) {
       logger.error({ err, jobId: job.id }, "ASR transcription failed");
@@ -338,6 +346,7 @@ export async function runIngestPipeline(
     // PHOTO path
     let extractionResult: { families: ExtractionResult[]; truncated: boolean };
     try {
+      if (!mediaBytes) throw new Error("No media bytes available for photo ingestion");
       extractionResult = await extractFieldsFromImage(mediaBytes, getExtractionModelCaller());
     } catch (err: any) {
       logger.error({ err, jobId: job.id }, "Vision extraction failed");
@@ -478,6 +487,7 @@ export async function confirmJob(
     label: string | null;
     date: Date | null;
     time: string | null;
+    years_performed: number[] | null;
   }> = [];
 
   const rawEvents = extraction.events || [];
@@ -527,6 +537,7 @@ export async function confirmJob(
       label: event.label,
       date,
       time,
+      years_performed: (event as any).years_performed ?? null,
     });
   }
 
@@ -665,6 +676,7 @@ export async function confirmJob(
   // Insert events
   const cycleYear = new Date().getFullYear();
   const { resolveEventGregorianForCycle } = await import("./brain");
+  const { occurrencesTable } = await import("@workspace/db");
   for (const resolvedEvent of resolvedEvents) {
     const resolved = await resolveEventGregorianForCycle(
       { maas: resolvedEvent.maas, paksha: resolvedEvent.paksha, tithi: resolvedEvent.tithi, time: resolvedEvent.time },
@@ -674,7 +686,12 @@ export async function confirmJob(
 
     const window = windowFromTime(resolvedEvent.time);
 
-    await db.insert(eventsTable).values({
+    let maxCycleYear: number | null = null;
+    if (resolvedEvent.years_performed && resolvedEvent.years_performed.length > 0) {
+      maxCycleYear = Math.max(...resolvedEvent.years_performed);
+    }
+
+    const [newEvent] = await db.insert(eventsTable).values({
       yajmanId,
       purohitId: job.purohitId,
       date: resolvedEvent.date || null,
@@ -683,13 +700,26 @@ export async function confirmJob(
       maas: resolvedEvent.maas,
       paksha: resolvedEvent.paksha,
       tithi: resolvedEvent.tithi,
+      lastPerformedYear: maxCycleYear,
       label: resolvedEvent.label,
       source: job.kind,
       ingestJobId: job.id,
       resolvedDate: resolved?.gregorianDate ?? null,
       resolvedWindow: resolved?.window ?? window,
       resolvedCycleYear: resolved ? cycleYear : null,
-    });
+    }).returning();
+
+    if (newEvent && resolvedEvent.years_performed && resolvedEvent.years_performed.length > 0) {
+      const occurrenceRows = resolvedEvent.years_performed.map(year => ({
+        eventId: newEvent.id,
+        yajmanId: newEvent.yajmanId,
+        purohitId: newEvent.purohitId!,
+        cycleYear: year,
+        source: job.kind, // 'bahi_khata' (or 'voice'/'photo')
+        attestedBy: "purohit", // Bahi khata is purohit-asserted
+      }));
+      await db.insert(occurrencesTable).values(occurrenceRows).onConflictDoNothing();
+    }
   }
 
   // Transition job status to confirmed
@@ -773,7 +803,7 @@ export function setFieldValue(extraction: ExtractionResult, fieldPath: string, v
       newExtraction.events = [];
     }
     if (!newExtraction.events[idx]) {
-      newExtraction.events[idx] = { event_type: "other", label: null, maas: null, paksha: null, tithi_name: null, gregorian_hint: null };
+      newExtraction.events[idx] = { event_type: "other", label: null, maas: null, paksha: null, tithi_name: null, gregorian_hint: null, years_performed: null };
     }
     newExtraction.events[idx][key] = value as any;
   }

@@ -732,5 +732,304 @@ export function buildReferralCard(
   };
 }
 
+export function buildCalendarSystemCard(): any {
+  return {
+    type: "interactive",
+    interactive: {
+      type: "button",
+      body: {
+        text: "शुभ मुहूर्त ठीक-ठीक निकालने के लिए दो छोटे सवाल। पहला — आप किस पंचांग से चलते हैं?",
+      },
+      action: {
+        buttons: [
+          {
+            type: "reply",
+            reply: {
+              id: "calendar:purnimanta",
+              title: "पूर्णिमांत",
+            },
+          },
+          {
+            type: "reply",
+            reply: {
+              id: "calendar:amanta",
+              title: "अमांत",
+            },
+          },
+        ],
+      },
+    },
+  };
+}
 
+export async function buildFamilyLaneCard(yajmanId: string, timeframe: "year" | "month"): Promise<any | null> {
+  const { db, eventsTable, yajmansTable, purohitsTable } = await import("@workspace/db");
+  const { eq, and, gte, lte, asc } = await import("drizzle-orm");
 
+  const [yajman] = await db
+    .select()
+    .from(yajmansTable)
+    .where(eq(yajmansTable.id, yajmanId))
+    .limit(1);
+
+  if (!yajman) return null;
+
+  const [purohit] = await db
+    .select()
+    .from(purohitsTable)
+    .where(eq(purohitsTable.id, yajman.purohitId))
+    .limit(1);
+
+  if (!purohit) return null;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const currentYear = today.getFullYear();
+  
+  let startDate: Date;
+  let endDate: Date;
+  
+  if (timeframe === "year") {
+    startDate = new Date(currentYear, 0, 1);
+    endDate = new Date(currentYear, 11, 31, 23, 59, 59, 999);
+  } else {
+    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999);
+  }
+
+  const events = await db
+    .select()
+    .from(eventsTable)
+    .where(
+      and(
+        eq(eventsTable.yajmanId, yajmanId),
+        eq(eventsTable.resolvedCycleYear, currentYear),
+        gte(eventsTable.resolvedDate, startDate),
+        lte(eventsTable.resolvedDate, endDate)
+      )
+    )
+    .orderBy(asc(eventsTable.resolvedDate));
+
+  if (events.length === 0) return null;
+
+  const formatShortDate = (d: Date) => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return `${d.getDate()} ${months[d.getMonth()]}`;
+  };
+
+  const titleStr = timeframe === "year" ? `*वार्षिक तिथि सूची (${currentYear})*` : `*मासिक तिथि सूची*`;
+
+  let bodyText = `${NAMASTE} प्रणाम।\n${RULE}\n${titleStr}\n`;
+
+  for (const event of events) {
+    if (!event.resolvedDate) continue;
+    const dateStr = formatShortDate(new Date(event.resolvedDate));
+    const label = event.label || event.eventType || "अनुष्ठान";
+    const pakshaHindi = HINDI_MAPS.paksha[event.paksha] || event.paksha;
+    const maasHindi = HINDI_MAPS.maas[event.maas] || event.maas;
+    
+    const tithiEntry = fieldVocabMap.tithi_name.find((t: any) => t.tithiNumber === event.tithi);
+    const tithiCanonical = tithiEntry ? tithiEntry.canonical : String(event.tithi);
+    const tithiH = HINDI_MAPS.tithi_name[tithiCanonical] || tithiCanonical;
+
+    bodyText += `\n*${label}*\n${maasHindi} ${pakshaHindi}, ${tithiH} — ${dateStr}\n`;
+  }
+
+  bodyText += `\n${RULE}\n*पुरोहित:* ${purohit.name} जी`;
+
+  return {
+    type: "text",
+    text: { body: bodyText },
+  };
+}
+
+export async function buildMeraSmaranCard(yajmanId: string): Promise<any | null> {
+  const { db, eventsTable, occurrencesTable, yajmansTable, purohitsTable } = await import("@workspace/db");
+  const { eq, and, asc } = await import("drizzle-orm");
+
+  const [yajman] = await db.select().from(yajmansTable).where(eq(yajmansTable.id, yajmanId)).limit(1);
+  if (!yajman) return null;
+  const [purohit] = await db.select().from(purohitsTable).where(eq(purohitsTable.id, yajman.purohitId)).limit(1);
+  if (!purohit) return null;
+
+  const events = await db.select().from(eventsTable).where(eq(eventsTable.yajmanId, yajmanId));
+  if (events.length === 0) return null;
+
+  let bodyText = `${BEADS} *स्मरण*\n${RULE}\n`;
+
+  for (const event of events) {
+    const label = event.label || event.eventType || "अनुष्ठान";
+    const pakshaHindi = HINDI_MAPS.paksha[event.paksha] || event.paksha;
+    const maasHindi = HINDI_MAPS.maas[event.maas] || event.maas;
+    const tithiEntry = fieldVocabMap.tithi_name.find((t: any) => t.tithiNumber === event.tithi);
+    const tithiH = HINDI_MAPS.tithi_name[tithiEntry?.canonical || String(event.tithi)] || tithiEntry?.canonical || String(event.tithi);
+
+    bodyText += `*${label}*\n${maasHindi} ${pakshaHindi}, ${tithiH}\n`;
+
+    const occs = await db.select().from(occurrencesTable).where(eq(occurrencesTable.eventId, event.id)).orderBy(asc(occurrencesTable.cycleYear));
+    if (occs.length > 0) {
+      const years = occs.map(o => o.cycleYear).sort();
+      bodyText += `${years.join(' · ')}\n`;
+      let streak = 1;
+      let currentYear = years[years.length - 1];
+      for (let i = years.length - 2; i >= 0; i--) {
+        if (years[i] === currentYear - 1) {
+          streak++;
+          currentYear--;
+        } else {
+          break;
+        }
+      }
+      bodyText += `_${streak} वर्ष नियमित रूप से_\n`;
+    } else {
+      bodyText += `_कोई पुराना रिकॉर्ड नहीं_\n`;
+    }
+    bodyText += `\n`;
+  }
+
+  bodyText += `${RULE}\n*संकल्प:* ${purohit.name} जी`;
+
+  return {
+    type: "text",
+    text: { body: bodyText },
+  };
+}
+
+export async function buildBeneficiarySmaranCard(yajmanId: string, beneficiaryLabel: string): Promise<any | null> {
+  const { db, eventsTable, occurrencesTable, yajmansTable, purohitsTable } = await import("@workspace/db");
+  const { eq, and, asc, ilike } = await import("drizzle-orm");
+
+  const [yajman] = await db.select().from(yajmansTable).where(eq(yajmansTable.id, yajmanId)).limit(1);
+  if (!yajman) return null;
+  const [purohit] = await db.select().from(purohitsTable).where(eq(purohitsTable.id, yajman.purohitId)).limit(1);
+  if (!purohit) return null;
+
+  const events = await db.select().from(eventsTable).where(and(eq(eventsTable.yajmanId, yajmanId), ilike(eventsTable.label, `%${beneficiaryLabel}%`)));
+  if (events.length === 0) return null;
+
+  let bodyText = `${BEADS} *${beneficiaryLabel} — स्मरण*\n${RULE}\n`;
+
+  for (const event of events) {
+    const label = event.eventType === "shraddh" ? "पुण्यतिथि" : (event.eventType === "birthday" ? "जन्मदिन" : "अनुष्ठान");
+    const pakshaHindi = HINDI_MAPS.paksha[event.paksha] || event.paksha;
+    const maasHindi = HINDI_MAPS.maas[event.maas] || event.maas;
+    const tithiEntry = fieldVocabMap.tithi_name.find((t: any) => t.tithiNumber === event.tithi);
+    const tithiH = HINDI_MAPS.tithi_name[tithiEntry?.canonical || String(event.tithi)] || tithiEntry?.canonical || String(event.tithi);
+
+    bodyText += `*${label}*\n${maasHindi} ${pakshaHindi}, ${tithiH}\n`;
+
+    const occs = await db.select().from(occurrencesTable).where(eq(occurrencesTable.eventId, event.id)).orderBy(asc(occurrencesTable.cycleYear));
+    if (occs.length > 0) {
+      const years = occs.map(o => o.cycleYear).sort();
+      bodyText += `${years.join(' · ')}\n`;
+      let streak = 1;
+      let currentYear = years[years.length - 1];
+      for (let i = years.length - 2; i >= 0; i--) {
+        if (years[i] === currentYear - 1) {
+          streak++;
+          currentYear--;
+        } else {
+          break;
+        }
+      }
+      bodyText += `_${streak} वर्ष नियमित रूप से_\n`;
+    } else {
+      bodyText += `_कोई पुराना रिकॉर्ड नहीं_\n`;
+    }
+    bodyText += `\n`;
+  }
+
+  bodyText += `${RULE}\n*संकल्प:* ${purohit.name} जी`;
+
+  return {
+    type: "interactive",
+    interactive: {
+      type: "button",
+      body: { text: bodyText },
+      action: {
+        buttons: [
+          {
+            type: "reply",
+            reply: {
+              id: `notify-purohit:${yajmanId}`,
+              title: "हाँ, सूचित करें",
+            },
+          },
+        ],
+      },
+    },
+  };
+}
+
+export async function buildAgleKaamCard(yajmanId: string): Promise<any | null> {
+  const { db, eventsTable, yajmansTable, purohitsTable } = await import("@workspace/db");
+  const { eq, and, gte, asc } = await import("drizzle-orm");
+
+  const [yajman] = await db.select().from(yajmansTable).where(eq(yajmansTable.id, yajmanId)).limit(1);
+  if (!yajman) return null;
+  const [purohit] = await db.select().from(purohitsTable).where(eq(purohitsTable.id, yajman.purohitId)).limit(1);
+  if (!purohit) return null;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const currentYear = today.getFullYear();
+
+  const events = await db
+    .select()
+    .from(eventsTable)
+    .where(
+      and(
+        eq(eventsTable.yajmanId, yajmanId),
+        gte(eventsTable.resolvedDate, today),
+        eq(eventsTable.resolvedCycleYear, currentYear)
+      )
+    )
+    .orderBy(asc(eventsTable.resolvedDate))
+    .limit(5);
+
+  if (events.length === 0) return null;
+
+  const formatShortDate = (d: Date) => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return `${d.getDate()} ${months[d.getMonth()]}`;
+  };
+
+  let bodyText = `${NAMASTE} प्रणाम।\n${RULE}\n*आने वाले अनुष्ठान*\n`;
+
+  for (const event of events) {
+    if (!event.resolvedDate) continue;
+    const dateObj = new Date(event.resolvedDate);
+    const dateStr = formatShortDate(dateObj);
+    const diffTime = dateObj.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    const label = event.label || event.eventType || "अनुष्ठान";
+    const pakshaHindi = HINDI_MAPS.paksha[event.paksha] || event.paksha;
+    const maasHindi = HINDI_MAPS.maas[event.maas] || event.maas;
+    const tithiEntry = fieldVocabMap.tithi_name.find((t: any) => t.tithiNumber === event.tithi);
+    const tithiH = HINDI_MAPS.tithi_name[tithiEntry?.canonical || String(event.tithi)] || tithiEntry?.canonical || String(event.tithi);
+
+    bodyText += `\n*${label}* — ${dateStr}\n${maasHindi} ${pakshaHindi}, ${tithiH} — _${diffDays} दिन शेष_\n`;
+  }
+
+  bodyText += `\n${RULE}\n*पुरोहित:* ${purohit.name} जी`;
+
+  return {
+    type: "interactive",
+    interactive: {
+      type: "button",
+      body: { text: bodyText },
+      action: {
+        buttons: [
+          {
+            type: "reply",
+            reply: {
+              id: `notify-purohit:${yajmanId}`,
+              title: "हाँ, सूचित करें",
+            },
+          },
+        ],
+      },
+    },
+  };
+}

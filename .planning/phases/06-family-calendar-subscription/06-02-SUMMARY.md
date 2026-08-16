@@ -3,7 +3,7 @@
 
 ### Execution Summary
 - Added `buildFamilyCalendarOfferCard(yajmanId, purohitName, VPA)` in `confirm-card.ts` — Devanagari
-  offer body ("अपने परिवार का पंचांग…", "₹29/माह (UPI Autopay)") carrying the `upi://mandate` deep
+  offer body ("अपने परिवार का पंचांग…", "₹21/माह (UPI Autopay)") carrying the `upi://mandate` deep
   link, with a `सदस्यता लें` / `मैंने सदस्यता ले ली` button whose id is `subscribe-confirm:{yajmanId}`.
 - Wired family-side webhook routing in `whatsapp.ts`:
   - FAM-03 isolation block: a family (yajman) sender's interactive/text resource id is checked

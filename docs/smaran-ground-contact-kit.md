@@ -31,7 +31,7 @@ Introduce yourself as someone studying how purohits manage their practice — no
 ## §3 — The pain excavation (15 min): stories, not opinions
 
 ### A. Memory & the bahi khata (ingestion evidence)
-4. How do you keep track of every family's dates — the shraddh tithis, annual kathas? **Ask to see it.** The diary/notebook/register is the single most informative artifact of the whole interview: photograph it (with permission), note the fields he keeps (names? gotra? tithi format? amounts?).
+4. How do you keep track of every family's dates — the shraddh tithis, annual kathas? **Ask to see it.** The diary/notebook/register is the single most informative artifact of the whole interview: photograph it (with permission), note the fields he keeps (names? gotra? tithi format? amounts? **do pages carry per-year marks?**).
 5. Walk me through how you'd check, right now, whose rituals fall in the next two weeks. *(watch the actual process — minutes of page-flipping is the pain, live)*
 6. **Micro-test:** "Would you mind if I take a photo of one page? I want to see if something I'm working on can read it." His reaction to photographing the khata previews the entire ingestion assumption.
 

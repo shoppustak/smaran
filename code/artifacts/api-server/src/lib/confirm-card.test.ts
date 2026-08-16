@@ -30,7 +30,8 @@ test("buildConfirmCard with all fields >= threshold", () => {
         maas: "Bhadrapada",
         paksha: "Krishna",
         tithi_name: "Dwadashi",
-        gregorian_hint: null
+        gregorian_hint: null,
+      years_performed: null
       },
       {
         event_type: "birthday",
@@ -38,7 +39,8 @@ test("buildConfirmCard with all fields >= threshold", () => {
         maas: "Kartika",
         paksha: "Shukla",
         tithi_name: "Panchami",
-        gregorian_hint: null
+        gregorian_hint: null,
+      years_performed: null
       }
     ],
     confidence_notes: null
@@ -96,7 +98,8 @@ test("buildConfirmCard with a field < threshold", () => {
         maas: "भदो", // low confidence maas
         paksha: "Krishna",
         tithi_name: "Dwadashi",
-        gregorian_hint: null
+        gregorian_hint: null,
+      years_performed: null
       }
     ],
     confidence_notes: null
